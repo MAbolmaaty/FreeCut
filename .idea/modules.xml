@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/FreeCut.iml" filepath="$PROJECT_DIR$/FreeCut.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/FFmpegAndroid/FreeCut.FFmpegAndroid.iml" filepath="$PROJECT_DIR$/.idea/modules/FFmpegAndroid/FreeCut.FFmpegAndroid.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ParseLoginUI/FreeCut.ParseLoginUI.iml" filepath="$PROJECT_DIR$/.idea/modules/ParseLoginUI/FreeCut.ParseLoginUI.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/FreeCut.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/FreeCut.app.iml" />
+    </modules>
+  </component>
+</project>

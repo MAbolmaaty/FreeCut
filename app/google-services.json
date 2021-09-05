@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "1084760531447",
+    "firebase_url": "https://freecut-aebd6.firebaseio.com",
+    "project_id": "freecut-aebd6",
+    "storage_bucket": "freecut-aebd6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1084760531447:android:b8a26ee6485258f8",
+        "android_client_info": {
+          "package_name": "force.freecut.freecut"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1084760531447-b4abtuqhl6b4ih6qheclck6m1j8jbpc7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDC3ZRhlFJxNBNlll3imLCle7zReZBsgX0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

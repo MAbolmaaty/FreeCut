@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_my_list"
+        android:icon="@drawable/my_list_white"
+        android:title="@string/my_list" />
+
+    <item
+        android:id="@+id/navigation_about"
+        android:icon="@drawable/who_are_we_white"
+        android:title="@string/about_app" />
+
+    <item
+        android:id="@+id/navigation_merge"
+        android:icon="@drawable/merge_white"
+        android:title="@string/merge" />
+
+    <item
+        android:id="@+id/navigation_trim"
+        android:icon="@drawable/cut_white"
+        android:title="@string/trim" />
+</menu>

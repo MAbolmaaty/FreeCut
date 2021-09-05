@@ -1,0 +1,68 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 29
+    buildToolsVersion '29.0.2'
+    defaultConfig {
+        applicationId "force.freecut.freecut"
+        minSdkVersion 24
+        targetSdkVersion 29
+        versionCode 14
+        versionName "12.1"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    packagingOptions {
+        pickFirst 'lib/x86/libc++_shared.so'
+        pickFirst 'lib/x86_64/libc++_shared.so'
+        pickFirst 'lib/armeabi-v7a/libc++_shared.so'
+        pickFirst 'lib/arm64-v8a/libc++_shared.so'
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestImplementation('androidx.test.espresso:espresso-core:3.1.0', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+
+    //ConstraintLayout
+    implementation "androidx.constraintlayout:constraintlayout:2.0.1"
+
+    implementation 'com.google.android.material:material:1.2.1'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+
+    //implementation project(':FFmpegAndroid')
+    implementation 'com.google.code.gson:gson:2.8.5'
+
+    implementation 'com.erikagtierrez.multiple_media_picker:multiple-media-picker:1.0.3'
+
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
+    implementation 'com.google.android.gms:play-services-ads:11.0.0'
+
+    implementation 'bg.devlabs.fullscreenvideoview:library:0.0.9'
+
+    implementation 'com.github.bumptech.glide:glide:3.7.0'
+    implementation 'com.intuit.sdp:sdp-android:1.0.5'
+
+    implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.10'
+    testImplementation 'junit:junit:4.12'
+
+    //Lifecycle components
+    def archLifecycleVersion = '1.1.1'
+    implementation "android.arch.lifecycle:extensions:$archLifecycleVersion"
+    annotationProcessor "android.arch.lifecycle:compiler:$archLifecycleVersion"
+
+    //ViewPager2
+    implementation "androidx.viewpager2:viewpager2:1.0.0"
+
+    implementation 'com.arthenica:mobile-ffmpeg-full-gpl:4.4'
+
+}

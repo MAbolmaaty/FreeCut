@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/app_background">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/_42sdp"
+        android:text="@string/change_language"
+        android:textColor="@color/white"
+        android:textSize="@dimen/_12sdp"
+        android:background="@color/orange"
+        android:gravity="center"
+        android:fontFamily="@font/cairo_semi_bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <RadioGroup
+        android:id="@+id/RadioGroup"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/title">
+
+        <RadioButton
+            android:id="@+id/button_arabic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/_12sdp"
+            android:textColor="@color/white"
+            android:text="@string/arabic"
+            android:button="@null"
+            android:fontFamily="@font/cairo_semi_bold"
+            android:layout_gravity="end"
+            android:drawablePadding="@dimen/_8sdp"
+            android:drawableEnd="@android:drawable/btn_radio"
+            android:gravity="center_vertical" />
+
+        <RadioButton
+            android:id="@+id/button_english"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/_12sdp"
+            android:textColor="@color/white"
+            android:text="@string/english"
+            android:button="@null"
+            android:fontFamily="@font/cairo_semi_bold"
+            android:drawablePadding="@dimen/_8sdp"
+            android:layout_gravity="end"
+            android:drawableEnd="@android:drawable/btn_radio"
+            android:gravity="center_vertical"/>
+
+    </RadioGroup>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

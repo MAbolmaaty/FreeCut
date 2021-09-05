@@ -1,0 +1,74 @@
+<resources>
+    <string name="app_name">Free Cut</string>
+    <string-array name="video">
+        <item>webm</item>
+        <item>mkv</item>
+        <item>flv</item>
+        <item>avi</item>
+        <item>mov</item>
+        <item>wmv</item>
+        <item>ts</item>
+        <item>3g2</item>
+        <item>ts</item>
+        <item>mp4</item>
+        <item>3gp</item>
+        <item>flv</item>
+        <item>ts</item>
+    </string-array>
+    <string name="speed_trim"> تقطيع سريع</string>
+    <string name="splash">جعل الفيديو الخاص بك طول مثالي</string>
+    <string name="permission">السماح للتطبيق باستخدام التخزين</string>
+    <string name="trim">تقطيع</string>
+    <string name="merge">دمج</string>
+    <string name="about_app">من نحن</string>
+    <string name="no_videos">لا يوجد فيديوهات</string>
+    <string name="enter_seconds">أدخل عدد الثوانى</string>
+    <string name="delete_all">مسح الكل</string>
+    <string name="import_videos">الاستيراد</string>
+    <string name="about">هو تطبيق يقوم بعمل التالى
+تقطيع الفيديوهات بطريقتين
+- الطريقه السريعه ونسبه الدقه تكون 70 فى المئه بالنسيه للفيديوهات المخرجه
+- الطريقه البطيئه تأخذ وقت احيانا ما يكون مكافىء لمده الفيديو او اقل ولكن نسبه الدقه فى المخرجات تكون مئه بالمائه
+- يمكنك تجربه التقطيع السريع اولا واذا لم تكون النتائج دقيقه فيمكنك اختيار الطريقه الثانيه
+دمج الفيدوهات بطريقه ال Filter:
+يقوم بدمج اى نوع من الفيديوهات مهما كانت الصيغ مختلفه ويأخذ مده مطابقه لاجمالى وقت الفيديوهات المدمجه</string>
+    <string name="app_description">وصف التطبيق</string>
+    <string name="web_site">موقع الشركة</string>
+    <string name="hint_copyrights">تمت البرمجة والتصميم لدى شركة قوة اللمسات وجميع الحقوق والملكيات محفوظة</string>
+    <string name="google_play">جوجل بلاى</string>
+    <string name="apple_store">ابل ستور</string>
+    <string name="share">مشاركة</string>
+    <string name="home">الصفحه الرئيسيه</string>
+    <string name="show_content">لمشاهدة الفيديوهات اضغط هنا</string>
+    <string name="saved1">محفوظة فى مجلد فرى كت فى الذاكرة</string>
+    <string name="saved2">محفوظة فى مجلد فرى كت فى الذاكرة</string>
+    <string name="files_ready">الملفات جاهزه الان</string>
+    <string name="language">اللغة</string>        
+    <string name="change_language">تغير اللغة</string>
+    <string name="soon">قريبا&#8230;</string>
+    <string name="my_list">قائمتي</string>
+    <string name="default_number_of_seconds">10</string>
+    <string name="speed_trim_hint">الدقة : 70 %</string>
+    <string name="trim_hint">الدقة : 100 %</string>
+    <string name="waiting">جاري التحميل&#8230;</string>
+    <string name="no_video">لا يوجد فيديو</string>
+    <string name="preparing">تحضير الملفات</string>
+    <string name="remainder_time_is">الوقت المتبقي </string>
+    <string name="process_please_wait">جاري العمل يرجي الأنتظار</string>
+    <string name="cutting_begin">بدأ التقطيع&#8230;</string>
+    <string name="videos">الفيديوهات</string>
+    <string name="video">فيديو</string>
+    <string name="preview"></string>
+    <string name="scanning_begin">جاري الفحص&#8230;</string>
+    <string name="check_errors">فحص الأخطاء&#8230;</string>
+    <string name="prepare_file_number">تجهيز الملف رقم :</string>
+    <string name="progress">المعالجة :</string>
+    <string name="estimated_time">الوقت المتبقي :</string>
+    <string name="please_wait">يرجى الأنتظار</string>
+    <string name="select_videos_for_merge">من فضلك قم باختار اكثر من فيديو لعملية الدمج</string>
+    <string name="your_process_is_executing_now">جاي تنفيذ العملية&#8230;</string>
+    <string name="you_need_to_wait">وقت الانتظار</string>
+    <string name="progress_loading">المعالجة : جاري التحميل</string>
+    <string name="processing">المعالجة&#8230;</string>
+    <string name="specify_number_of_seconds">اختر عدد الثواني</string>
+</resources>

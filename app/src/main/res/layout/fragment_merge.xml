@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:scrollbars="none"
+    android:background="@color/darkBlue"
+    tools:context=".ui.fragments.MergeFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/banner"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/_46sdp"
+            android:scaleType="centerCrop"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:src="@drawable/gid" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_margin="@dimen/_8sdp"
+            app:layout_constraintBottom_toTopOf="@+id/view_import"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/banner"/>
+
+        <TextView
+            android:id="@+id/noVideos"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_margin="@dimen/_16sdp"
+            android:background="@drawable/background_rectangle_corners_stroke_18"
+            android:text="@string/no_videos"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/_12sdp"
+            android:gravity="center"
+            android:fontFamily="@font/cairo_semi_bold"
+            app:layout_constraintBottom_toTopOf="@+id/view_import"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/banner" />
+
+        <View
+            android:id="@+id/view_import"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/_36sdp"
+            android:layout_marginStart="@dimen/_8sdp"
+            android:layout_marginEnd="@dimen/_8sdp"
+            android:layout_marginBottom="@dimen/_8sdp"
+            android:background="@drawable/background_rectangle_corners_18"
+            android:backgroundTint="@color/orange"
+            android:elevation="@dimen/_12sdp"
+            app:layout_constraintHorizontal_weight="1"
+            app:layout_constraintEnd_toStartOf="@+id/view_merge"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/adView22" />
+
+        <TextView
+            android:id="@+id/textView_import"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/_4sdp"
+            android:text="@string/import_videos"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_12sdp"
+            android:elevation="@dimen/_12sdp"
+            android:fontFamily="@font/cairo_semi_bold"
+            app:layout_constraintBottom_toBottomOf="@+id/view_import"
+            app:layout_constraintEnd_toStartOf="@+id/icon_import"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="@id/view_import"
+            app:layout_constraintTop_toTopOf="@id/view_import" />
+
+        <ImageView
+            android:id="@+id/icon_import"
+            android:layout_width="@dimen/_18sdp"
+            android:layout_height="@dimen/_18sdp"
+            android:layout_marginStart="@dimen/_4sdp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/merge_white"
+            android:elevation="@dimen/_12sdp"
+            app:layout_constraintBottom_toBottomOf="@+id/view_import"
+            app:layout_constraintEnd_toEndOf="@+id/view_import"
+            app:layout_constraintStart_toEndOf="@+id/textView_import"
+            app:layout_constraintTop_toTopOf="@+id/view_import" />
+
+        <View
+            android:id="@+id/view_merge"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/_36sdp"
+            android:layout_marginStart="@dimen/_8sdp"
+            android:layout_marginEnd="@dimen/_8sdp"
+            android:layout_marginBottom="@dimen/_16sdp"
+            android:background="@drawable/background_rectangle_corners_18"
+            android:backgroundTint="@color/grey"
+            android:elevation="@dimen/_12sdp"
+            app:layout_constraintHorizontal_weight="1"
+            app:layout_constraintTop_toTopOf="@+id/view_import"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/view_import" />
+
+        <TextView
+            android:id="@+id/textView_merge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/_4sdp"
+            android:text="@string/merge"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_12sdp"
+            android:elevation="@dimen/_12sdp"
+            android:fontFamily="@font/cairo_semi_bold"
+            app:layout_constraintBottom_toBottomOf="@+id/view_merge"
+            app:layout_constraintEnd_toStartOf="@+id/icon_merge"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="@id/view_merge"
+            app:layout_constraintTop_toTopOf="@id/view_merge" />
+
+        <ImageView
+            android:id="@+id/icon_merge"
+            android:layout_width="@dimen/_18sdp"
+            android:layout_height="@dimen/_18sdp"
+            android:layout_marginStart="@dimen/_4sdp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/merge_white"
+            android:elevation="@dimen/_12sdp"
+            app:layout_constraintBottom_toBottomOf="@+id/view_merge"
+            app:layout_constraintEnd_toEndOf="@+id/view_merge"
+            app:layout_constraintStart_toEndOf="@+id/textView_merge"
+            app:layout_constraintTop_toTopOf="@+id/view_merge" />
+
+        <com.google.android.gms.ads.AdView
+            android:id="@+id/adView22"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/_8sdp"
+            app:adSize="BANNER"
+            app:adUnitId="ca-app-pub-6503532425142366/6199804785"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

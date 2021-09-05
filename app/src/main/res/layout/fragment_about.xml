@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:scrollbars="none"
+    tools:context=".ui.fragments.AboutFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/app_background">
+
+        <ImageView
+            android:id="@+id/image_rest"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/_128sdp"
+            android:src="@drawable/about_us"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/iconLanguage"
+            android:layout_width="@dimen/_18sdp"
+            android:layout_height="@dimen/_18sdp"
+            android:layout_marginStart="@dimen/_8sdp"
+            android:src="@drawable/language"
+            app:layout_constraintBottom_toBottomOf="@+id/text_language"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/languageLabel" />
+
+        <View
+            android:id="@+id/languageDot"
+            android:layout_width="@dimen/_8sdp"
+            android:layout_height="@dimen/_8sdp"
+            android:layout_marginStart="@dimen/_8sdp"
+            android:background="@drawable/background_oval"
+            android:backgroundTint="@color/button"
+            app:layout_constraintBottom_toBottomOf="@+id/languageLabel"
+            app:layout_constraintStart_toEndOf="@id/iconLanguage"
+            app:layout_constraintTop_toTopOf="@+id/languageLabel" />
+
+        <TextView
+            android:id="@+id/languageLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_4sdp"
+            android:layout_marginTop="@dimen/_8sdp"
+            android:text="@string/language"
+            android:textColor="@color/button"
+            android:textSize="@dimen/_10sdp"
+            android:fontFamily="@font/cairo_semi_bold"
+            app:layout_constraintStart_toEndOf="@+id/languageDot"
+            app:layout_constraintTop_toBottomOf="@+id/image_rest" />
+
+        <TextView
+            android:id="@+id/text_language"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/language"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_12sdp"
+            android:fontFamily="@font/cairo_semi_bold"
+            app:layout_constraintStart_toStartOf="@+id/languageDot"
+            app:layout_constraintTop_toBottomOf="@+id/languageLabel" />
+
+        <View
+            android:id="@+id/view_changeLanguage"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@+id/divider"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/image_rest" />
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/_1sdp"
+            android:layout_margin="@dimen/_8sdp"
+            android:background="@color/view_color"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_language" />
+
+        <TextView
+            android:id="@+id/aboutLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/_8sdp"
+            android:text="@string/app_description"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_12sdp"
+            android:fontFamily="@font/cairo_semi_bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divider" />
+
+        <TextView
+            android:id="@+id/about"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/_8sdp"
+            android:gravity="start"
+            android:text="@string/about"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_10sdp"
+            android:fontFamily="@font/cairo_semi_bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/aboutLabel" />
+
+        <TextView
+            android:id="@+id/web_link"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_8sdp"
+            android:layout_marginTop="@dimen/_36sdp"
+            android:layout_marginEnd="@dimen/_8sdp"
+            android:background="@drawable/background_button"
+            android:gravity="center"
+            android:padding="@dimen/_6sdp"
+            android:text="@string/web_site"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_12sdp"
+            android:fontFamily="@font/cairo_semi_bold"
+            app:layout_constraintEnd_toStartOf="@+id/apple_store"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/about" />
+
+        <TextView
+            android:id="@+id/apple_store"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_8sdp"
+            android:layout_marginEnd="@dimen/_8sdp"
+            android:background="@drawable/background_button"
+            android:gravity="center"
+            android:padding="@dimen/_6sdp"
+            android:text="@string/apple_store"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_12sdp"
+            android:fontFamily="@font/cairo_semi_bold"
+            app:layout_constraintEnd_toStartOf="@id/google_store"
+            app:layout_constraintStart_toEndOf="@+id/web_link"
+            app:layout_constraintTop_toTopOf="@+id/web_link" />
+
+
+        <TextView
+            android:id="@+id/google_store"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_8sdp"
+            android:layout_marginEnd="@dimen/_8sdp"
+            android:background="@drawable/background_button"
+            android:gravity="center"
+            android:padding="@dimen/_6sdp"
+            android:text="@string/google_play"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_12sdp"
+            android:fontFamily="@font/cairo_semi_bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/apple_store"
+            app:layout_constraintTop_toTopOf="@id/web_link" />
+
+        <TextView
+            android:id="@+id/hint_copyrights"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_8sdp"
+            android:layout_marginTop="@dimen/_16sdp"
+            android:layout_marginEnd="@dimen/_8sdp"
+            android:text="@string/hint_copyrights"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_10sdp"
+            android:gravity="center"
+            android:fontFamily="@font/cairo_semi_bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/web_link" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/_12sdp"
+            android:fontFamily="@font/cairo_semi_bold"
+            android:text="@string/force_touches_website"
+            android:textColor="@android:color/white"
+            android:layout_marginTop="@dimen/_8sdp"
+            app:layout_constraintStart_toStartOf="@+id/hint_copyrights"
+            app:layout_constraintEnd_toEndOf="@id/hint_copyrights"
+            app:layout_constraintTop_toBottomOf="@id/hint_copyrights"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

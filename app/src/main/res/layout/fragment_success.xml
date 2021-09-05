@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/app_background"
+    android:fillViewport="true"
+    android:scrollbars="none"
+    tools:context=".ui.fragments.SuccessFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <View
+            android:id="@+id/view_progress"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:background="@color/darkBlue"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <ProgressBar
+            android:id="@+id/progress1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:visibility="gone"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:indeterminateTintMode="src_atop"
+            android:indeterminateTint="#4E4AF2"
+            app:layout_constraintEnd_toEndOf="@id/view_progress"
+            app:layout_constraintStart_toStartOf="@id/view_progress"
+            app:layout_constraintTop_toTopOf="@id/view_progress"
+            app:layout_constraintBottom_toBottomOf="@+id/view_progress"/>
+
+        <ProgressBar
+            android:id="@+id/progress2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:visibility="gone"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:indeterminateTintMode="src_atop"
+            android:rotation="180"
+            android:indeterminateTint="#35C1E8"
+            app:layout_constraintEnd_toEndOf="@id/view_progress"
+            app:layout_constraintStart_toStartOf="@id/view_progress"
+            app:layout_constraintTop_toTopOf="@id/view_progress"
+            app:layout_constraintBottom_toBottomOf="@+id/view_progress"/>
+
+        <ImageView
+            android:id="@+id/banner"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/_46sdp"
+            android:scaleType="centerCrop"
+            android:layout_marginTop="@dimen/_4sdp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/view_progress"
+            android:src="@drawable/gid" />
+
+        <TextView
+            android:id="@+id/text_message"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/_16sdp"
+            android:background="@color/black"
+            android:gravity="center"
+            android:padding="@dimen/_12sdp"
+            android:text="@string/saved1"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_12sdp"
+            android:fontFamily="@font/cairo_semi_bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/banner" />
+
+        <TextView
+            android:id="@+id/filesStatus"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="@string/files_ready"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_12sdp"
+            android:layout_marginTop="@dimen/_16sdp"
+            android:fontFamily="@font/cairo_semi_bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_message"/>
+
+        <Button
+            android:id="@+id/showVideos"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/_24sdp"
+            android:text="@string/show_content"
+            android:textAllCaps="false"
+            android:textSize="@dimen/_12sdp"
+            android:elevation="@dimen/_12sdp"
+            android:stateListAnimator="@null"
+            android:background="@drawable/background_rectangle_corners_18"
+            android:backgroundTint="@color/orange"
+            android:fontFamily="@font/cairo_semi_bold"
+            android:textColor="@android:color/white"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/filesStatus"/>
+
+        <Button
+            android:id="@+id/home"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/home"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/_12sdp"
+            android:elevation="@dimen/_12sdp"
+            android:stateListAnimator="@null"
+            android:layout_margin="@dimen/_24sdp"
+            android:fontFamily="@font/cairo_semi_bold"
+            android:background="@drawable/background_rectangle_corners_18"
+            android:backgroundTint="@color/grey"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/adView2"/>
+
+        <com.google.android.gms.ads.AdView
+            android:id="@+id/adView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:adSize="BANNER"
+            app:adUnitId="ca-app-pub-6503532425142366/6199804785"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>

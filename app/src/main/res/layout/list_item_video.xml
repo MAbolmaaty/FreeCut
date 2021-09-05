@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_marginStart="@dimen/_4sdp"
+    android:layout_marginEnd="@dimen/_4sdp"
+    android:padding="@dimen/_4sdp"
+    android:background="@android:color/transparent"
+    android:layout_marginBottom="@dimen/_4sdp">
+
+    <View
+        android:id="@+id/view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="@dimen/_24sdp"
+        android:layout_marginEnd="@dimen/_4sdp"
+        android:layout_marginBottom="@dimen/_4sdp"
+        android:elevation="@dimen/_8sdp"
+        android:background="@drawable/background_rectangle_corners_stroke_18"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/videoThumbnail"
+        android:layout_width="@dimen/_68sdp"
+        android:layout_height="@dimen/_68sdp"
+        android:layout_marginTop="@dimen/_8sdp"
+        android:layout_marginBottom="@dimen/_8sdp"
+        android:scaleType="centerCrop"
+        tools:src="@drawable/video"
+        android:elevation="@dimen/_8sdp"
+        app:layout_constraintBottom_toBottomOf="@id/view"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/view" />
+
+    <TextView
+        android:id="@+id/videoName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_8sdp"
+        android:fontFamily="@font/cairo_semi_bold"
+        android:lines="1"
+        tools:text="video_1"
+        android:textColor="@color/white"
+        android:textSize="@dimen/_12sdp"
+        android:elevation="@dimen/_8sdp"
+        app:layout_constraintStart_toEndOf="@+id/videoThumbnail"
+        app:layout_constraintTop_toTopOf="@+id/videoThumbnail" />
+
+    <TextView
+        android:id="@+id/videoDuration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_8sdp"
+        android:lines="1"
+        android:visibility="gone"
+        android:textColor="@color/white"
+        android:textSize="@dimen/_10sdp"
+        android:elevation="@dimen/_8sdp"
+        tools:text="00:16:89"
+        tools:visibility="visible"
+        app:layout_constraintStart_toEndOf="@+id/videoThumbnail"
+        app:layout_constraintTop_toBottomOf="@+id/videoName" />
+
+    <ImageView
+        android:id="@+id/iconPlay"
+        android:layout_width="@dimen/_18sdp"
+        android:layout_height="@dimen/_18sdp"
+        android:src="@drawable/ic_play"
+        android:tint="@color/orange"
+        android:padding="@dimen/_2sdp"
+        android:elevation="@dimen/_8sdp"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:background="@drawable/background_oval"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <ImageView
+        android:id="@+id/delete"
+        android:layout_width="@dimen/_36sdp"
+        android:layout_height="@dimen/_36sdp"
+        android:src="@drawable/delete"
+        android:elevation="@dimen/_8sdp"
+        android:padding="@dimen/_6sdp"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:layout_margin="@dimen/_8sdp"
+        app:layout_constraintEnd_toEndOf="@id/view"
+        app:layout_constraintBottom_toBottomOf="@id/view"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+

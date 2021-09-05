@@ -1,0 +1,76 @@
+<resources>
+    <string name="app_name">Free Cut</string>
+    <string-array name="video">
+        <item>webm</item>
+        <item>mkv</item>
+        <item>flv</item>
+        <item>avi</item>
+        <item>mov</item>
+        <item>wmv</item>
+        <item>ts</item>
+        <item>3g2</item>
+        <item>ts</item>
+        <item>mp4</item>
+        <item>3gp</item>
+        <item>flv</item>
+        <item>ts</item>
+    </string-array>
+    <string name="force_touches_website" translatable="false">http://www.forcetouches.com/</string>
+    <string name="arabic" translatable="false">عربي</string>
+    <string name="english" translatable="false">English</string>
+    <string name="force_touches" translatable="false">Force Touches</string>
+    <string name="speed_trim">Speed Trim</string>
+    <string name="splash">Make Your Video The Perfect Length</string>
+    <string name="permission">Let this App Access Your Storage</string>
+    <string name="trim">Trim</string>
+    <string name="merge">Merge</string>
+    <string name="about_app">About app</string>
+    <string name="no_videos">No videos</string>
+    <string name="enter_seconds">Enter number of seconds</string>
+    <string name="delete_all">Delete all</string>
+    <string name="import_videos">Import</string>
+    <string name="about">Is an application that does the following:
+cut video in two ways:
+- Fast speed and accuracy ratio will be 70 per cent of the forgotten video output
+- The slow way takes time sometimes is equivalent to the length of the video or less, but the proportion of accuracy in the outputs be one hundred percent
+- You can try the quick shredding first and if the results are not accurate you can choose the second way Embed videos in filter mode: It merges any type of video regardless of the different formats and takes a total length of time to match the total time of the video clips</string>
+    <string name="app_description">About app</string>
+    <string name="web_site">Web Site</string>
+    <string name="hint_copyrights">All rights are reserved for Force Touches</string>
+    <string name="google_play"> Google Play</string>
+    <string name="apple_store">Apple Store</string>
+    <string name="share">Share</string>
+    <string name="home">Home</string>
+    <string name="show_content">To watch videos click here</string>
+    <string name="saved1">Saved in FreeCut Folder In Your Memory</string>
+    <string name="saved2">Saved in FreeCut Folder</string>
+    <string name="files_ready">Files are ready</string>
+    <string name="language">Language</string>        
+    <string name="change_language">Change Language</string>
+    <string name="soon">Soon&#8230;</string>
+    <string name="my_list">My List</string>
+    <string name="default_number_of_seconds">10</string>
+    <string name="speed_trim_hint">precession : 70 %</string>
+    <string name="trim_hint">precession : 100 %</string>
+    <string name="waiting">Waiting&#8230;</string>
+    <string name="no_video">No Video</string>
+    <string name="preparing">Preparing Files</string>
+    <string name="remainder_time_is">progress : Remainder time is  </string>
+    <string name="process_please_wait">progress :  processing please wait</string>
+    <string name="cutting_begin">Cutting Begin&#8230;</string>
+    <string name="videos">Videos</string>
+    <string name="video">Video</string>
+    <string name="preview">" Preview"</string>
+    <string name="scanning_begin">Scanning Begin&#8230;</string>
+    <string name="check_errors">Check errors&#8230;</string>
+    <string name="prepare_file_number">Prepare File Number:</string>
+    <string name="progress">progress :</string>
+    <string name="estimated_time">Estimated Time:  </string>
+    <string name="please_wait">please wait</string>
+    <string name="select_videos_for_merge">Please select more than one video for merge</string>
+    <string name="your_process_is_executing_now">Your Process is executing Now&#8230;</string>
+    <string name="you_need_to_wait">You need to wait</string>
+    <string name="progress_loading">progress :  Loading</string>
+    <string name="processing">Processing&#8230;</string>
+    <string name="specify_number_of_seconds">Specify Number Of Seconds</string>
+</resources>
