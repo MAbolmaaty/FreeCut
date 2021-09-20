@@ -37,7 +37,7 @@ public class TinyDB {
      * @param path image path
      * @return the Bitmap from 'path'
      */
-    public Bitmap getImage(String path) {
+    public Bitmap getImavge(String path) {
         Bitmap bitmapFromPath = null;
         try {
             bitmapFromPath = BitmapFactory.decodeFile(path);
@@ -389,7 +389,8 @@ public class TinyDB {
      * @param value String value to be added
      */
     public void putString(String key, String value) {
-        checkForNullKey(key); checkForNullValue(value);
+        checkForNullKey(key);
+        checkForNullValue(value);
         preferences.edit().putString(key, value).apply();
     }
 

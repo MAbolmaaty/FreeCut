@@ -44,6 +44,7 @@ import static force.freecut.freecut.ui.activities.MainActivity.loadFragment;
 
 
 public class CutFragmentTwo extends Fragment {
+    private static final String TAG = CutFragmentTwo.class.getSimpleName();
     ArrayList<String> listvideos;
     ArrayList<String> Dur_videos;
     boolean err = false;
@@ -95,6 +96,7 @@ public class CutFragmentTwo extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.cut_two, container, false);
         Log.d("Em-FFMPEG", "CutFragmentTwo");
+        Log.d(TAG, "CutFragmentTwo onCreateView");
         mPercentage = view.findViewById(R.id.percentage);
         mProgressBar = view.findViewById(R.id.progressBar);
         mFileNumber = view.findViewById(R.id.file);

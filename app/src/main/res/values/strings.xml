@@ -73,4 +73,6 @@ cut video in two ways:
     <string name="progress_loading">progress :  Loading</string>
     <string name="processing">Processing&#8230;</string>
     <string name="specify_number_of_seconds">Specify Number Of Seconds</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

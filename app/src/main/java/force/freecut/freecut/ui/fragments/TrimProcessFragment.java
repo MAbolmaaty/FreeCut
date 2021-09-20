@@ -85,18 +85,11 @@ public class TrimProcessFragment extends Fragment {
         trimViewModel.getTrimBundle().observe(this, new Observer<Bundle>() {
             @Override
             public void onChanged(Bundle bundle) {
-                Log.d(TAG, "File PATH : " + bundle.getString(FILE_PATH));
-                final String[] CutCommand = {"-i", bundle.getString(TRIM_VIDEO_PATH),
-                        "-y", "-acodec", "copy", "-f", "segment", "-segment_time",
-                        bundle.getString(TRIM_NUMBER_OF_SECONDS), "-vcodec", "copy",
-                        "-reset_timestamps", "1", "-map", "0", bundle.getString(FILE_PATH)};
-                final String[] command = {"-ss", "00:00:00", "-i",
-                        bundle.getString(TRIM_VIDEO_PATH), "-c", "copy", "-t", "00:00:10",
-                        bundle.getString(FILE_PATH)};
-                final String[] command2 = {"-y", "-i", bundle.getString(TRIM_VIDEO_PATH),
-                "-ss", "00:00:05", "-t", "00:00:05", "-async", "1", "-strict", "-2",
-                        bundle.getString(FILE_PATH)};
-                long executionId = FFmpeg.executeAsync(CutCommand, new ExecuteCallback() {
+                final String[] commandTrim = {"-i", bundle.getString(TRIM_VIDEO_PATH),
+                        "-codec:a", "copy", "-f", "segment", "-segment_time",
+                        bundle.getString(TRIM_NUMBER_OF_SECONDS), "-codec:v", "copy",
+                        "-map", "0", bundle.getString(FILE_PATH)};
+                long executionId = FFmpeg.executeAsync(commandTrim, new ExecuteCallback() {
                     @Override
                     public void apply(long executionId, int returnCode) {
                         Log.d(TAG, "start");
@@ -106,7 +99,7 @@ public class TrimProcessFragment extends Fragment {
                                 mProgressBar.setProgress(100);
                                 mPercentage.setText("100 %");
                                 loadFragment(getActivity().getSupportFragmentManager(),
-                                        SuccessFragment.newInstance(null, null), false);
+                                        SuccessFragment2.newInstance(null, null), false);
                             }
                         } else {
                             Log.d(TAG, "fail");

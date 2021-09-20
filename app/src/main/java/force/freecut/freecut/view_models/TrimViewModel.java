@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel;
 
 public class TrimViewModel extends ViewModel {
 
-    private MutableLiveData<Bundle> mTrimBundle = new MutableLiveData<>();
+    private final MutableLiveData<Bundle> mTrimBundle = new MutableLiveData<>();
 
     public void setTrimBundle(Bundle bundle){
         mTrimBundle.setValue(bundle);

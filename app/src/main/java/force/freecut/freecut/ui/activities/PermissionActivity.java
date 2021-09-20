@@ -146,8 +146,6 @@ public class PermissionActivity extends AppCompatActivity {
                         .setPositiveButton("Settings", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                TinyDB tinydb = new TinyDB(PermissionActivity.this);
-                                tinydb.putBoolean("setting", true);
 
                                 Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
                                         Uri.fromParts("package", getPackageName(), null));

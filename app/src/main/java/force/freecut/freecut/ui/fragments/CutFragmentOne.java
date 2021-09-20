@@ -103,7 +103,7 @@ public class CutFragmentOne extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.cut_one, container, false);
-        Log.d("Em-FFMPEG", "CutFragmentOne");
+        Log.d(TAG, "CutFragmentOne onCreateView");
         mPercentage = view.findViewById(R.id.percentage);
         mProgressBar = view.findViewById(R.id.progressBar);
         mFileNumber = view.findViewById(R.id.file);
@@ -123,6 +123,7 @@ public class CutFragmentOne extends Fragment {
                 tinyDB = new TinyDB(getActivity());
 
                 cutfile = new File(tinyDB.getString("cut"));
+                // User specified seconds
                 seconds = tinyDB.getString("seconds");
                 extension = tinyDB.getString("extension");
                 start = Integer.parseInt(tinyDB.getString("start"));
@@ -177,12 +178,15 @@ public class CutFragmentOne extends Fragment {
                 if (Main.equals("0")) {
                     for (int i = 0; i < files.length; i++) {
                         retriever.setDataSource(files[i].getAbsolutePath());
-                        String time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-                        long timeInmillisec = Long.parseLong(time) / 1000;
-                        File newFile = new File(files[i].getParent() + "/" + files[i].getName() + "_" + (i + begin) + extension);
+                        String time =
+                                retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+                        long timeInSec = Long.parseLong(time) / 1000;
+                        File newFile = new File(files[i].getParent()
+                                + "/" + files[i].getName() + "_" + (i + begin) + extension);
                         files[i].renameTo(newFile);
                         listvideos.add(newFile.getAbsolutePath());
-                        Dur_videos.add(timeInmillisec + "");
+                        Log.d(TAG, "Video " + i+1 + " duration is : " + timeInSec);
+                        Dur_videos.add(timeInSec + "");
                     }
                 } else {
                     listvideos = tinyDB.getListString("videos");
@@ -190,7 +194,8 @@ public class CutFragmentOne extends Fragment {
                 }
 
                 type = MimeTypeMap.getFileExtensionFromUrl(cutfile.getAbsolutePath());
-                File mediaStorageDir = new File(Environment.getExternalStorageDirectory(), "FreeCut Test");
+                File mediaStorageDir =
+                        new File(Environment.getExternalStorageDirectory(), "FreeCut Test");
 
                 Log.d("App", "Mypath: " + mediaStorageDir.getAbsolutePath());
                 if (!mediaStorageDir.exists()) {
@@ -361,6 +366,7 @@ public class CutFragmentOne extends Fragment {
     }
 
     private void command1(){
+        Log.d(TAG, "Command 1 seconds : " + second_loop1);
         final String[] command = {"-ss", hours_loop1 + ":" + minutes_loop1 + ":" + second_loop1,
                 "-i", index_path, "-t", plus + "", "-c:v", "libx264", "-c:a", "aac", cut_part_path0};
 

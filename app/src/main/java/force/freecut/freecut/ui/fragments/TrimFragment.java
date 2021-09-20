@@ -1,7 +1,13 @@
 package force.freecut.freecut.ui.fragments;
 
-import android.Manifest;
-import android.app.ProgressDialog;
+import static android.app.Activity.RESULT_OK;
+import static com.arthenica.mobileffmpeg.Config.RETURN_CODE_SUCCESS;
+import static force.freecut.freecut.ui.activities.MainActivity.loadFragment;
+import static force.freecut.freecut.utils.Constants.FILE_PATH;
+import static force.freecut.freecut.utils.Constants.STORAGE_DIRECTORY;
+import static force.freecut.freecut.utils.Constants.TRIM_NUMBER_OF_SECONDS;
+import static force.freecut.freecut.utils.Constants.TRIM_VIDEO_PATH;
+
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -22,8 +28,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.app.ActivityCompat;
-import androidx.core.graphics.PathUtils;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
@@ -45,21 +49,12 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import force.freecut.freecut.Data.TinyDB;
 import force.freecut.freecut.Data.Utils;
 import force.freecut.freecut.R;
 import force.freecut.freecut.helper.PreferenceHelper;
 import force.freecut.freecut.view_models.TrimViewModel;
-
-import static android.app.Activity.RESULT_OK;
-import static com.arthenica.mobileffmpeg.Config.RETURN_CODE_SUCCESS;
-import static force.freecut.freecut.ui.activities.MainActivity.loadFragment;
-import static force.freecut.freecut.utils.Constants.FILE_PATH;
-import static force.freecut.freecut.utils.Constants.TRIM_NUMBER_OF_SECONDS;
-import static force.freecut.freecut.utils.Constants.TRIM_VIDEO_PATH;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -68,22 +63,24 @@ import static force.freecut.freecut.utils.Constants.TRIM_VIDEO_PATH;
  */
 public class TrimFragment extends Fragment {
     private static final String TAG = TrimFragment.class.getSimpleName();
+
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
+    private String mVideoPath;
+    private String mVideoName;
+
     private String mParam1;
     private String mParam2;
-    File mergefile;
+
     boolean fault = false;
     int fileno = 1;
     String filePath, fileExtn_mp4;
-    private ProgressDialog progressDialog;
     Button textCut;
-    String yourselectionpath = "";
-    Uri selectedVideoUri;
+    Uri mSelectedVideoUri;
     EditText seconds;
     String mypath;
-    //boolean isError = false;
+    // TinyDB : Implementation for Shared Preferences
     TinyDB tinydb;
     File dest;
     String filePrefix;
@@ -100,8 +97,6 @@ public class TrimFragment extends Fragment {
     private ImageView mIconNoVideo;
     private TextView mTextNoVideo;
     private Toast mToast;
-
-    String path;
 
     public TrimFragment() {
     }
@@ -162,24 +157,15 @@ public class TrimFragment extends Fragment {
 
         mRootView = view.findViewById(R.id.rootView);
 
+        // Initialize SharedPreference
         tinydb = new TinyDB(getActivity());
-        tinydb.putBoolean("Main", true);
-        tinydb.putBoolean("setting", false);
 
         placeholder = view.findViewById(R.id.view_videoView);
 
         textCut = view.findViewById(R.id.trim);
 
-        progressDialog = new ProgressDialog(getActivity());
-        progressDialog.setTitle("Checking For Errors");
-
-        progressDialog.setCancelable(false);
-
         seconds = view.findViewById(R.id.numberOfSeconds);
 
-        ActivityCompat.requestPermissions(getActivity(),
-                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-        path = createFolder();
         new GetDataSync().execute();
 
         textCut.setOnClickListener(new View.OnClickListener() {
@@ -195,7 +181,7 @@ public class TrimFragment extends Fragment {
                 if (mToast != null)
                     mToast.cancel();
 
-                if (selectedVideoUri == null) {
+                if (mSelectedVideoUri == null) {
                     placeholder.startAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.shake50));
                     mIconNoVideo.startAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.shake50));
                     mTextNoVideo.startAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.shake50));
@@ -215,9 +201,7 @@ public class TrimFragment extends Fragment {
                 final AlertDialog dialog = builder.create();
                 dialog.show();
 
-                //yourselectionpath = Utils.getRealPathFromURI_API19(getActivity(), selectedVideoUri);
-
-                File file = new File(selectedVideoUri.toString());
+                File file = new File(mSelectedVideoUri.toString());
 
                 long file_size = Integer.parseInt(String.valueOf(file.length()));
                 if (Utils.getInternalAvailableSpace() > file_size) {
@@ -227,10 +211,11 @@ public class TrimFragment extends Fragment {
 
                     imm.hideSoftInputFromWindow(seconds.getWindowToken(), 0);
                 } else {
-
                     Toast.makeText(getActivity(),
                             "You Don't have free space in your internal memory",
                             Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                    return;
                 }
 
                 Button speedTrim = dialog.findViewById(R.id.speedTrim);
@@ -240,17 +225,30 @@ public class TrimFragment extends Fragment {
                     @Override
                     public void onClick(View view) {
                         dialog.dismiss();
-                        fileExtn_mp4 = yourselectionpath.substring(yourselectionpath.lastIndexOf("."));
-                        mypath = createfolder2(new File(yourselectionpath).getName(), seconds.getText().toString());
-                        filePrefix = "cut" + seconds.getText().toString() + fileno + "%02d";
-                        dest = new File(mypath, filePrefix + fileExtn_mp4);
-                        filePath = dest.getAbsolutePath();
+                            // mVideoPath : /storage/emulated/0/video.mp4
+                            // fileExtn_mp4 : .mp4
+                        //fileExtn_mp4 = mVideoPath.substring(mVideoPath.lastIndexOf("."));
+                            // mVideoName : video.mp4
+                        //mypath = createDirectory(mVideoName, seconds.getText().toString());
+                            // mypath : /storage/emulated/0/FreeCut/FreeCut-video.mp4-seconds-1
+                        //filePrefix = "cut" + seconds.getText().toString() + fileno + "%02d";
+                            // filePrefix : cut[seconds]1%02d
+                        //dest = new File(mypath, filePrefix + fileExtn_mp4);
+                        //filePath = dest.getAbsolutePath();
+                            // filePath directory : /storage/emulated/0/FreeCut/
+                            // FreeCut-videoplayback.mp4-100-2/cut1001%02d.mp4
+                        // new storage directory
+                        String directory = createStorageDirectory(mVideoName);
+                        String file =
+                                new File(directory,"speed-trim" + "-" + seconds.getText().toString()
+                                        + "-" + "%02d" + ".mp4").getAbsolutePath();
                         Bundle bundle = new Bundle();
-                        bundle.putString(TRIM_VIDEO_PATH, yourselectionpath);
+                        bundle.putString(TRIM_VIDEO_PATH, mVideoPath);
                         bundle.putString(TRIM_NUMBER_OF_SECONDS, seconds.getText().toString());
-                        bundle.putString(FILE_PATH, filePath);
+                        bundle.putString(STORAGE_DIRECTORY, directory);
+                        bundle.putString(FILE_PATH, file);
                         mTrimViewModel.setTrimBundle(bundle);
-                        tinydb.putString("cut", mypath);
+                        //tinydb.putString("cut", mypath);
                         loadFragment(getActivity().getSupportFragmentManager(),
                                 TrimProcessFragment.newInstance(null, null), false);
                     }
@@ -259,12 +257,13 @@ public class TrimFragment extends Fragment {
                 trim.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        Log.d(TAG, "Trim Button Clicked");
                         dialog.dismiss();
-                        //yourselectionpath : /storage/emulated/0/videoplayback.mp4
-                        fileExtn_mp4 = yourselectionpath.substring(yourselectionpath.lastIndexOf("."));
+                        // mVideoPath : /storage/emulated/0/videoplayback.mp4
+                        fileExtn_mp4 = mVideoPath.substring(mVideoPath.lastIndexOf("."));
 
                         //String : /storage/emulated/0/FreeCut/FreeCut-videoplayback.mp4-66-1
-                        mypath = createfolder2(new File(yourselectionpath).getName(),
+                        mypath = createDirectory(new File(mVideoPath).getName(),
                                 seconds.getText().toString());
 
                         //String : cut1001%02d
@@ -282,28 +281,27 @@ public class TrimFragment extends Fragment {
             }
         });
 
+        /**
+         * Pick up video file
+         * */
         placeholder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                if (!mergefile.exists()) {
-                    Toast.makeText(getActivity(), "You don't have enough memory please close the app and delete some file from internal storage",
-                            Toast.LENGTH_SHORT).show();
-                } else {
-                    try {
-                        Intent intent = new Intent();
-                        String[] mimeTypes = {"video/mp4", "video/x-ms-wmv", "video/x-matroska",
-                                "video/3gpp", "video/3gpp2"};
-                        intent.setType("*/*");
-                        intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
-                        intent.setAction(Intent.ACTION_GET_CONTENT);
-                        startActivityForResult(Intent.createChooser(intent, "Select Video"),
-                                REQUEST_TAKE_GALLERY_VIDEO);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                try {
+                    Intent intent = new Intent();
+                    String[] mimeTypes = {"video/mp4", "video/x-ms-wmv", "video/x-matroska",
+                            "video/3gpp", "video/3gpp2"};
+                    // (video/*) : only get video files
+                    intent.setType("video/*");
+                    intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
+                    intent.setAction(Intent.ACTION_GET_CONTENT);
+                    startActivityForResult(Intent.createChooser(intent, "Select Video"),
+                            REQUEST_TAKE_GALLERY_VIDEO);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
+
         });
 
         return view;
@@ -318,38 +316,26 @@ public class TrimFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
-            if (requestCode == REQUEST_TAKE_GALLERY_VIDEO) {
+        if (requestCode == REQUEST_TAKE_GALLERY_VIDEO) {
+            if (resultCode == RESULT_OK) {
                 // data.getData : uri : Ex : content://media/external/video/media/100044
-                selectedVideoUri = data.getData();
-                // path : String : Ex : /storage/emulated/0/videoplayback.mp4
-                String path = Utils.getRealPathFromURI_API19(getActivity(), selectedVideoUri);
-                if (path != null) {
-                    placeholder.setBackgroundResource(0);
-                    yourselectionpath = path;
-                    mIconNoVideo.setVisibility(View.GONE);
-                    mTextNoVideo.setVisibility(View.GONE);
-                    Glide.with(getActivity()).load(selectedVideoUri).fitCenter().into(placeholder);
-                } else {
-                    Toast.makeText(getActivity(), "Your path is not valid select another video", Toast.LENGTH_SHORT).show();
-                }
+                mSelectedVideoUri = data.getData();
+                // Video Path : String : Ex : /storage/emulated/0/video.mp4
+                mVideoPath = Utils.getRealPathFromURI_API19(getActivity(), mSelectedVideoUri);
+                String[] pathSegments = mVideoPath.split("/");
+                // Video Name : String : Ex : video.mp4
+                mVideoName = pathSegments[pathSegments.length - 1];
+                placeholder.setBackgroundResource(0);
+                mIconNoVideo.setVisibility(View.GONE);
+                mTextNoVideo.setVisibility(View.GONE);
+                Glide.with(getActivity()).load(mSelectedVideoUri).fitCenter().into(placeholder);
             }
         }
     }
 
-    private String createFolder() {
-        File mediaStorageDir2 = new File(Environment.getExternalStorageDirectory(), "FreeCut");
-
-        mergefile = mediaStorageDir2;
-
-        if (!mediaStorageDir2.exists()) {
-            mediaStorageDir2.mkdirs();
-        }
-
-        return mediaStorageDir2.getAbsolutePath();
-    }
-
-    public String createfolder2(String name, String seconds) {
+    /**
+     * */
+    public String createDirectory(String name, String seconds) {
         int num = 1;
         if (new File(Environment.getExternalStorageDirectory(),
                 "FreeCut/FreeCut" + "-" + name + "-" + seconds + "-" + num).exists()) {
@@ -390,6 +376,7 @@ public class TrimFragment extends Fragment {
             String imgURL = "http://forcetouches.com/freecutAdmin/images/" + saldo;
             Glide.with(getActivity()).load(imgURL).into(mBanner);
         }
+
     }
 
     private void getData() throws IOException, JSONException {
@@ -425,13 +412,14 @@ public class TrimFragment extends Fragment {
     }
 
     private void trimErrorCode() {
-        String[] errorCommand = {"-loglevel", "error", "-t", "30", "-i", yourselectionpath, "-f", "null", "-"};
+        String[] errorCommand = {"-loglevel", "error", "-t", "30", "-i",
+                mVideoPath, "-f", "null", "-"};
         FFmpeg.executeAsync(errorCommand, new ExecuteCallback() {
             @Override
             public void apply(long executionId, int returnCode) {
                 if (returnCode == RETURN_CODE_SUCCESS) {
                     Log.d("Em-FFMPEG", "TrimFragment : Trim Error Command Success");
-                    String[] CutCommand = {"-i", yourselectionpath, "-y", "-acodec", "copy",
+                    String[] CutCommand = {"-i", mVideoPath, "-y", "-acodec", "copy",
                             "-f", "segment", "-segment_time", seconds.getText().toString(),
                             "-vcodec", "copy", "-reset_timestamps", "1", "-map", "0", filePath};
                     FFmpeg.executeAsync(CutCommand, new ExecuteCallback() {
@@ -456,13 +444,13 @@ public class TrimFragment extends Fragment {
                 } else {
                     Log.d("Em-FFMPEG", "TrimFragment : Trim Error Command failed " + returnCode);
                     filePrefix = "cut" + seconds.getText().toString() + fileno + "%03d";
-
                     fileExtn_mp4 = ".mp4";
-
                     dest = new File(mypath, filePrefix + fileExtn_mp4);
                     filePath = dest.getAbsolutePath();
-                    final File encodeFile = new File(mypath, new File(yourselectionpath).getName() + fileExtn_mp4);
-                    final String[] encode = {"-i", yourselectionpath, "-c:v", "libx264", "-preset", "ultrafast", encodeFile.getAbsolutePath()};
+                    final File encodeFile = new File(mypath,
+                            new File(mVideoPath).getName() + fileExtn_mp4);
+                    final String[] encode = {"-i", mVideoPath, "-c:v", "libx264",
+                            "-preset", "ultrafast", encodeFile.getAbsolutePath()};
                     FFmpeg.executeAsync(encode, new ExecuteCallback() {
                         @Override
                         public void apply(long executionId, int returnCode) {
@@ -498,5 +486,16 @@ public class TrimFragment extends Fragment {
                 }
             }
         });
+    }
+
+    private String createStorageDirectory(String name){
+        File file = new File(Environment.getExternalStorageDirectory(),
+                "FreeCut/" + name + "/");
+        if (file.mkdirs()){
+            Log.d(TAG, "File created");
+        } else {
+            Log.d(TAG, "File not created");
+        }
+        return file.getAbsolutePath();
     }
 }

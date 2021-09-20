@@ -67,10 +67,7 @@ public class SuccessFragment extends Fragment {
     Button home;
     TextView textMessage;
     private AdView mAdView1;
-    ImageView banner;
     ArrayList<VideoItem> mylist;
-
-    int x = 0;
     TinyDB tinyDB;
     String mylink = "https://www.google.com/";
 
@@ -119,7 +116,6 @@ public class SuccessFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_success, container, false);
-
         mShowVideos = view.findViewById(R.id.showVideos);
         home = view.findViewById(R.id.home);
         textMessage = view.findViewById(R.id.text_message);
@@ -128,7 +124,6 @@ public class SuccessFragment extends Fragment {
         mProgressBar2 = view.findViewById(R.id.progress2);
         mFilesStatus = view.findViewById(R.id.filesStatus);
         mBanner = view.findViewById(R.id.banner);
-
         mBanner.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -163,7 +158,6 @@ public class SuccessFragment extends Fragment {
                 @Override
                 protected String doInBackground(Void... voids) {
                     File directory = new File(tinyDB.getString("cut"));
-                    Log.d(TAG, tinyDB.getString("cut"));
                     File[] files = directory.listFiles();
                     if (files != null) {
                         Arrays.sort(files, new Comparator<File>() {
@@ -195,7 +189,8 @@ public class SuccessFragment extends Fragment {
                             videoItem.setItem_name(f.getName());
                             MediaMetadataRetriever retriever = new MediaMetadataRetriever();
                             retriever.setDataSource(f.getAbsolutePath());
-                            String time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+                            String time =
+                                    retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
                             long timeInmillisec = Long.parseLong(time);
                             videoItem.setTime(Utils.milliSecondsToTimer(timeInmillisec));
                             mylist.add(videoItem);
@@ -256,7 +251,8 @@ public class SuccessFragment extends Fragment {
             }
         });
 
-        File mediaStorageDir = new File(Environment.getExternalStorageDirectory(), "FreeCut Test");
+        File mediaStorageDir =
+                new File(Environment.getExternalStorageDirectory(), "FreeCut Test");
 
         String pathtest = mediaStorageDir.getAbsolutePath();
         File dir = new File(pathtest);
@@ -317,7 +313,8 @@ public class SuccessFragment extends Fragment {
     }
 
     private void getData() throws IOException, JSONException {
-        JSONObject json = readJsonFromUrl("http://www.forcetouches.com/freecutAdmin/getandroidbanners.php");
+        JSONObject json =
+                readJsonFromUrl("http://www.forcetouches.com/freecutAdmin/getandroidbanners.php");
         try {
             String response = json.getString("banner");
             mylink = json.getString("url");

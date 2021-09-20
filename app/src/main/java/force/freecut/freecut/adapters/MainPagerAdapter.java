@@ -14,7 +14,6 @@ import force.freecut.freecut.ui.fragments.TrimFragment;
 
 public class MainPagerAdapter extends FragmentStateAdapter {
 
-
     public MainPagerAdapter(@NonNull FragmentManager fragmentManager, @NonNull Lifecycle lifecycle) {
         super(fragmentManager, lifecycle);
     }
