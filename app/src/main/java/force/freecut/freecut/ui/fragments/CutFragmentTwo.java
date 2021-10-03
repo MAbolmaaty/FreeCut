@@ -75,7 +75,6 @@ public class CutFragmentTwo extends Fragment {
     Long index_dur;
     String index_path;
     String extension;
-    int second_index;
     long plus = 0;
     MediaMetadataRetriever retriever;
     long[] list_durations;
@@ -95,7 +94,6 @@ public class CutFragmentTwo extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.cut_two, container, false);
-        Log.d("Em-FFMPEG", "CutFragmentTwo");
         Log.d(TAG, "CutFragmentTwo onCreateView");
         mPercentage = view.findViewById(R.id.percentage);
         mProgressBar = view.findViewById(R.id.progressBar);
@@ -112,18 +110,29 @@ public class CutFragmentTwo extends Fragment {
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
+                // tinyDB is a ShredPreferences object
                 tinyDB = new TinyDB(getActivity());
-
+                    // tinyDB.getString("cut")
+                    // /storage/emulated/0/FreeCut/FreeCut-videoplayback.mp4-50-1
                 cutfile = new File(tinyDB.getString("cut"));
+                    // seconds : 50
                 seconds = tinyDB.getString("seconds");
+                    // extension : .mp4
                 extension = tinyDB.getString("extension");
+                    // start : 1, 3, 4
                 start = Integer.parseInt(tinyDB.getString("start"));
+
                 mFileNumber.setText("");
                 mFileNumber.setText(getString(R.string.prepare_file_number) + " " + (start + 1));
+                    // end : 2
                 end = Integer.parseInt(tinyDB.getString("end"));
+                    // fault : true
                 fault = tinyDB.getString("fault");
+                    // cuts : 8
                 cuts = Integer.parseInt(tinyDB.getString("cuts"));
+                    // plus : 50
                 plus = Integer.parseInt(tinyDB.getString("plus"));
+
                 retriever = new MediaMetadataRetriever();
                 listvideos = new ArrayList<>();
                 Dur_videos = new ArrayList<>();
@@ -133,38 +142,60 @@ public class CutFragmentTwo extends Fragment {
             protected String doInBackground(Void... params) {
                 Dur_videos = tinyDB.getListString("durations");
                 listvideos = tinyDB.getListString("videos");
+
                 type = MimeTypeMap.getFileExtensionFromUrl(cutfile.getAbsolutePath());
-                File mediaStorageDir = new File(Environment.getExternalStorageDirectory(), "FreeCut Test");
-                Log.d("App", "Mypath: " + mediaStorageDir.getAbsolutePath());
+                    // type : mp4-50-1
+
+                File mediaStorageDir = new File(Environment.getExternalStorageDirectory(),
+                        "FreeCut Test");
+
                 if (!mediaStorageDir.exists()) {
                     if (!mediaStorageDir.mkdirs()) {
                         Log.d("App", "failed to create directory");
                     }
                 }
+
                 testpath = mediaStorageDir.getAbsolutePath();
+                    // testpath: /storage/emulated/0/FreeCut Test
+
                 testFolder = testpath;
+                    // testFolder: /storage/emulated/0/FreeCut Test
+
                 list_videos = new String[listvideos.size()];
                 list_durations = new long[listvideos.size()];
 
+                    // totalSeconds : 50
                 totalSeconds = Integer.parseInt(seconds);
 
+                    // seconds_user : 50
                 int seconds_user = totalSeconds % 60;
+                    // totalMinutes : 0
                 int totalMinutes = totalSeconds / 60;
+                    // minutes_user : 0
                 int minutes_user = totalMinutes % 60;
+                    // hours_user : 0
                 int hours_user = totalMinutes / 60;
 
                 if (seconds_user < 10)
                     second_loop1 = "0" + seconds_user;
                 else
                     second_loop1 = seconds_user + "";
+
+                    // second_loop1 : 50
+
                 if (minutes_user < 10)
                     minutes_loop1 = "0" + minutes_user;
                 else
                     minutes_loop1 = minutes_user + "";
+
+                    // minutes_loop1 : 00
+
                 if (hours_user < 10)
                     hours_loop1 = "0" + hours_user;
                 else
                     hours_loop1 = hours_user + "";
+
+                    // hours_loop1 : 00
 
                 for (int i = 0; i < list_videos.length; i++) {
                     list_videos[i] = listvideos.get(i);
@@ -177,39 +208,48 @@ public class CutFragmentTwo extends Fragment {
             protected void onPostExecute(String s) {
                 super.onPostExecute(s);
                 cut_part_path0 = testpath + "/" + "cut" + cuts++ + "." + extension;
+                    // cut_part_path0 : /storage/emulated/0/FreeCut Test/cut8..mp4
+                    // cut_part_path0 : /storage/emulated/0/FreeCut Test/cut22..mp4
+                    // cut_part_path0 : /storage/emulated/0/FreeCut Test/cut29..mp4
                 cut_part_path1 = testpath + "/" + "cut" + cuts++ + "." + extension;
+                    // cut_part_path1 : /storage/emulated/0/FreeCut Test/cut9..mp4
+                    // cut_part_path1 : /storage/emulated/0/FreeCut Test/cut23..mp4
+                    // cut_part_path1 : /storage/emulated/0/FreeCut Test/cut30..mp4
                 cut_part_path2 = testpath + "/" + "cut" + cuts++ + "." + extension;
+                    // cut_part_path2 : /storage/emulated/0/FreeCut Test/cut10..mp4
+                    // cut_part_path2 : /storage/emulated/0/FreeCut Test/cut24..mp4
+                    // cut_part_path2 : /storage/emulated/0/FreeCut Test/cut31..mp4
                 cut_part_path3 = testpath + "/" + "cut" + cuts++ + "." + extension;
+                    // cut_part_path3 : /storage/emulated/0/FreeCut Test/cut11..mp4
+                    // cut_part_path3 : /storage/emulated/0/FreeCut Test/cut25..mp4
+                    // cut_part_path3 : /storage/emulated/0/FreeCut Test/cut32..mp4
                 cut_part_path4 = testpath + "/" + "cut" + cuts++ + "." + extension;
+                    // cut_part_path4 : /storage/emulated/0/FreeCut Test/cut12..mp4
+                    // cut_part_path4 : /storage/emulated/0/FreeCut Test/cut26..mp4
+                    // cut_part_path4 : /storage/emulated/0/FreeCut Test/cut33..mp4
                 cut_part_path5 = testpath + "/" + "cut" + cuts++ + "." + "ts";
+                    // cut_part_path5 : /storage/emulated/0/FreeCut Test/cut13..ts
+                    // cut_part_path5 : /storage/emulated/0/FreeCut Test/cut27..ts
+                    // cut_part_path5 : /storage/emulated/0/FreeCut Test/cut34..ts
                 cut_part_path6 = testpath + "/" + "cut" + cuts++ + "." + "ts";
+                    // cut_part_path6 : /storage/emulated/0/FreeCut Test/cut14..ts
+                    // cut_part_path6 : /storage/emulated/0/FreeCut Test/cut28..ts
+                    // cut_part_path6 : /storage/emulated/0/FreeCut Test/cut35..ts
 
-                /*view.post(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        Window window = progressDialog.getWindow();
-                        window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
-                                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
-                        window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-                        view.invalidate();
-                    }
-                });*/
-                /*view.post(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        Window window = progressDialog2.getWindow();
-                        window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
-                                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
-                        window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-                        view.invalidate();
-                    }
-                });*/
+                    // start : 1
                 index_path = list_videos[start];
+                    // index_path:
+                    // /storage/emulated/0/FreeCut/FreeCut-videoplayback.mp4-50-1/cut50101.mp4_2.mp4
+
+                    // start : 1
                 index_dur = list_durations[start];
-                second_index = end;
+                    // index_dur : 50
+
+                    // plus : 50
+                    // totalSeconds : 50
                 plus = plus - totalSeconds;
+                    // plus : 0
+
                 if (plus > 0 && start != list_durations.length - 1) {
                     try {
                         bindEvent();
@@ -230,6 +270,8 @@ public class CutFragmentTwo extends Fragment {
                                 TrimFragment.newInstance(null, null),
                                 false);
                     }
+                    // start : 1
+                    // list_durations.length - 1 : 4
                 } else if (start == list_durations.length - 1) {
                     final String[] ErrorCommand = {"-loglevel", "error",
                             "-t", "30", "-i", list_videos[start], "-f", "null", "-"};
@@ -264,21 +306,36 @@ public class CutFragmentTwo extends Fragment {
                     });
                 } else {
                     tinyDB.putString("seconds", seconds);
+                        // seconds : 50
                     tinyDB.putString("cut", cutfile.getAbsolutePath());
+                        // cutfile.getAbsolutePath() : /storage/emulated/0/FreeCut
+                        // /FreeCut-videoplayback.mp4-50-1
                     tinyDB.putString("plus", list_durations[end] + "");
+                        // end : 2
+                        // list_durations[end] : 49
                     tinyDB.putString("pathtest", testFolder);
+                        // testFolder : /storage/emulated/0/FreeCut Test
                     tinyDB.putString("start", (start + 1) + "");
+                        // start : 1
+                        // (start + 1) : 2
                     tinyDB.putString(fault, fault);
+                        // fault : true
                     tinyDB.putString("extension", extension);
+                        // extension : .mp4
                     tinyDB.putString("Main", "1");
                     tinyDB.putString("end", (end + 1) + "");
+                        // end : 2
+                        // (end + 1) : 3
                     tinyDB.putString("cuts", cuts + "");
+                        // cuts : 15
                     mFileNumber.setText("");
                     mProgress.setText("");
                     mEstimatedTime.setText("");
+
                     tinyDB.putListString("videos", listvideos);
                     tinyDB.putListString("durations", Dur_videos);
 
+                    Log.d(TAG , "Nav From CutFragmentTwo to CutFragmentOne");
                     Fragment fragment = new CutFragmentOne();
                     FragmentManager manager = getActivity().getSupportFragmentManager();
                     FragmentTransaction transaction = manager.beginTransaction();

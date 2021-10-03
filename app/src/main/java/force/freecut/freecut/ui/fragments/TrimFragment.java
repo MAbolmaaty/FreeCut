@@ -4,6 +4,7 @@ import static android.app.Activity.RESULT_OK;
 import static com.arthenica.mobileffmpeg.Config.RETURN_CODE_SUCCESS;
 import static force.freecut.freecut.ui.activities.MainActivity.loadFragment;
 import static force.freecut.freecut.utils.Constants.FILE_PATH;
+import static force.freecut.freecut.utils.Constants.PROCESS_SPEED_TRIM;
 import static force.freecut.freecut.utils.Constants.STORAGE_DIRECTORY;
 import static force.freecut.freecut.utils.Constants.TRIM_NUMBER_OF_SECONDS;
 import static force.freecut.freecut.utils.Constants.TRIM_VIDEO_PATH;
@@ -132,6 +133,9 @@ public class TrimFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_trim, container, false);
+
+        Log.d(TAG, "TrimFragment onCreateView");
+
         mTrimViewModel = ViewModelProviders.of(getActivity()).get(TrimViewModel.class);
 
         mBanner = view.findViewById(R.id.banner);
@@ -225,30 +229,18 @@ public class TrimFragment extends Fragment {
                     @Override
                     public void onClick(View view) {
                         dialog.dismiss();
-                            // mVideoPath : /storage/emulated/0/video.mp4
-                            // fileExtn_mp4 : .mp4
-                        //fileExtn_mp4 = mVideoPath.substring(mVideoPath.lastIndexOf("."));
-                            // mVideoName : video.mp4
-                        //mypath = createDirectory(mVideoName, seconds.getText().toString());
-                            // mypath : /storage/emulated/0/FreeCut/FreeCut-video.mp4-seconds-1
-                        //filePrefix = "cut" + seconds.getText().toString() + fileno + "%02d";
-                            // filePrefix : cut[seconds]1%02d
-                        //dest = new File(mypath, filePrefix + fileExtn_mp4);
-                        //filePath = dest.getAbsolutePath();
-                            // filePath directory : /storage/emulated/0/FreeCut/
-                            // FreeCut-videoplayback.mp4-100-2/cut1001%02d.mp4
-                        // new storage directory
-                        String directory = createStorageDirectory(mVideoName);
+                        String directory = createStorageDirectory(mVideoName,PROCESS_SPEED_TRIM,
+                                seconds.getText().toString());
                         String file =
-                                new File(directory,"speed-trim" + "-" + seconds.getText().toString()
-                                        + "-" + "%02d" + ".mp4").getAbsolutePath();
+                                new File(directory,mVideoName+ "-st-" +
+                                        seconds.getText().toString() + "-" + "%02d" + ".mp4")
+                                        .getAbsolutePath();
                         Bundle bundle = new Bundle();
                         bundle.putString(TRIM_VIDEO_PATH, mVideoPath);
                         bundle.putString(TRIM_NUMBER_OF_SECONDS, seconds.getText().toString());
                         bundle.putString(STORAGE_DIRECTORY, directory);
                         bundle.putString(FILE_PATH, file);
                         mTrimViewModel.setTrimBundle(bundle);
-                        //tinydb.putString("cut", mypath);
                         loadFragment(getActivity().getSupportFragmentManager(),
                                 TrimProcessFragment.newInstance(null, null), false);
                     }
@@ -257,25 +249,21 @@ public class TrimFragment extends Fragment {
                 trim.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Log.d(TAG, "Trim Button Clicked");
                         dialog.dismiss();
-                        // mVideoPath : /storage/emulated/0/videoplayback.mp4
-                        fileExtn_mp4 = mVideoPath.substring(mVideoPath.lastIndexOf("."));
 
-                        //String : /storage/emulated/0/FreeCut/FreeCut-videoplayback.mp4-66-1
+                            // mVideoPath : /storage/emulated/0/video.mp4
+                        fileExtn_mp4 = mVideoPath.substring(mVideoPath.lastIndexOf("."));
+                            // fileExtn_mp4 : .mp4
                         mypath = createDirectory(new File(mVideoPath).getName(),
                                 seconds.getText().toString());
-
-                        //String : cut1001%02d
+                            // mypath : /storage/emulated/0/FreeCut/FreeCut-video.mp4-secs-1
                         filePrefix = "cut" + seconds.getText().toString() + fileno + "%02d";
-
+                            // filePrefix : cut[secs]1%02d
                         dest = new File(mypath, filePrefix + fileExtn_mp4);
-
-                        //String : /storage/emulated/0/FreeCut/FreeCut-videoplayback.mp4-100-2/cut1001%02d.mp4
                         filePath = dest.getAbsolutePath();
-
+                            // filePath : /storage/emulated/0/FreeCut
+                            // /FreeCut-video.mp4-secs-1/cut[secs]1%02d.mp4
                         trimErrorCode();
-
                     }
                 });
             }
@@ -418,7 +406,6 @@ public class TrimFragment extends Fragment {
             @Override
             public void apply(long executionId, int returnCode) {
                 if (returnCode == RETURN_CODE_SUCCESS) {
-                    Log.d("Em-FFMPEG", "TrimFragment : Trim Error Command Success");
                     String[] CutCommand = {"-i", mVideoPath, "-y", "-acodec", "copy",
                             "-f", "segment", "-segment_time", seconds.getText().toString(),
                             "-vcodec", "copy", "-reset_timestamps", "1", "-map", "0", filePath};
@@ -436,6 +423,7 @@ public class TrimFragment extends Fragment {
                             tinydb.putString("end", "1");
                             tinydb.putString("cuts", "1");
                             tinydb.putString("Main", "0");
+                            Log.d(TAG, "Start CutFragmentOne");
                             loadFragment(getActivity().getSupportFragmentManager(),
                                     new CutFragmentOne(),
                                     false);
@@ -488,9 +476,9 @@ public class TrimFragment extends Fragment {
         });
     }
 
-    private String createStorageDirectory(String name){
+    private String createStorageDirectory(String name, String process, String seconds){
         File file = new File(Environment.getExternalStorageDirectory(),
-                "FreeCut/" + name + "/");
+                "FreeCut/" + name + "/" + process + "/" + "secs-" + seconds + "/");
         if (file.mkdirs()){
             Log.d(TAG, "File created");
         } else {

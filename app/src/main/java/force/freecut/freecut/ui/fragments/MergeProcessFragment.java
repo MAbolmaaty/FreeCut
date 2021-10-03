@@ -136,7 +136,9 @@ public class MergeProcessFragment extends Fragment {
                     retriever.release();
                 }
                 tinydb.putString("mer", dest.getAbsolutePath());
-                String RestOrder[] = {"-ab", "48000", "-ac", "2", "-ar", "22050", "-s", "480x640", "-vcodec", "libx264", "-crf", "27", "-preset", "ultrafast", dest.getAbsolutePath()};
+                String RestOrder[] = {"-ab", "48000", "-ac",
+                        "2", "-ar", "22050", "-s", "480x640", "-vcodec",
+                        "libx264", "-crf", "27", "-preset", "ultrafast", dest.getAbsolutePath()};
                 int numOfElements = (array.length * 2) + 18;
                 String[] commandall = new String[numOfElements];
                 commandall[0] = "-y";

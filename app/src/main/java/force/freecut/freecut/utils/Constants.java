@@ -4,6 +4,7 @@ public final class Constants {
     public static final String TRIM_VIDEO_PATH = "trim_video_path";
     public static final String TRIM_NUMBER_OF_SECONDS = "trim_number_of_seconds";
     public static final String STORAGE_DIRECTORY = "storage_directory";
+    public static final String PROCESS_SPEED_TRIM = "speed-trim";
     public static final String FILE_PATH = "file_path";
     public static final int VIDEOS_TRIM = 701;
     public static final int VIDEOS_MERGE = 702;
