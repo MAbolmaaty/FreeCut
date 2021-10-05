@@ -5,12 +5,16 @@ import static com.arthenica.mobileffmpeg.Config.RETURN_CODE_SUCCESS;
 import static force.freecut.freecut.ui.activities.MainActivity.loadFragment;
 import static force.freecut.freecut.utils.Constants.FILE_PATH;
 import static force.freecut.freecut.utils.Constants.PROCESS_SPEED_TRIM;
+import static force.freecut.freecut.utils.Constants.PROCESS_TRIM;
 import static force.freecut.freecut.utils.Constants.STORAGE_DIRECTORY;
-import static force.freecut.freecut.utils.Constants.TRIM_NUMBER_OF_SECONDS;
-import static force.freecut.freecut.utils.Constants.TRIM_VIDEO_PATH;
+import static force.freecut.freecut.utils.Constants.SEGMENT_TIME;
+import static force.freecut.freecut.utils.Constants.VIDEO_DURATION;
+import static force.freecut.freecut.utils.Constants.VIDEO_PATH;
+import static force.freecut.freecut.utils.Constants.VIDEO_URI;
 
 import android.content.Context;
 import android.content.Intent;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -236,13 +240,13 @@ public class TrimFragment extends Fragment {
                                         seconds.getText().toString() + "-" + "%02d" + ".mp4")
                                         .getAbsolutePath();
                         Bundle bundle = new Bundle();
-                        bundle.putString(TRIM_VIDEO_PATH, mVideoPath);
-                        bundle.putString(TRIM_NUMBER_OF_SECONDS, seconds.getText().toString());
+                        bundle.putString(VIDEO_PATH, mVideoPath);
+                        bundle.putString(SEGMENT_TIME, seconds.getText().toString());
                         bundle.putString(STORAGE_DIRECTORY, directory);
                         bundle.putString(FILE_PATH, file);
                         mTrimViewModel.setTrimBundle(bundle);
                         loadFragment(getActivity().getSupportFragmentManager(),
-                                TrimProcessFragment.newInstance(null, null), false);
+                                SpeedTrimProcessFragment.newInstance(null, null), false);
                     }
                 });
 
@@ -250,20 +254,31 @@ public class TrimFragment extends Fragment {
                     @Override
                     public void onClick(View view) {
                         dialog.dismiss();
+//                        fileExtn_mp4 = mVideoPath.substring(mVideoPath.lastIndexOf("."));
+//                        mypath = createDirectory(new File(mVideoPath).getName(),
+//                                seconds.getText().toString());
+//                        filePrefix = "cut" + seconds.getText().toString() + fileno + "%02d";
+//                        dest = new File(mypath, filePrefix + fileExtn_mp4);
+//                        filePath = dest.getAbsolutePath();
+//                        trimErrorCode();
 
-                            // mVideoPath : /storage/emulated/0/video.mp4
-                        fileExtn_mp4 = mVideoPath.substring(mVideoPath.lastIndexOf("."));
-                            // fileExtn_mp4 : .mp4
-                        mypath = createDirectory(new File(mVideoPath).getName(),
+                        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+                        retriever.setDataSource(mVideoPath);
+                        String time =
+                                retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+                        int videoDuration = Integer.parseInt(time) / 1000;
+                        String storageDirectory = createStorageDirectory(mVideoName,PROCESS_TRIM,
                                 seconds.getText().toString());
-                            // mypath : /storage/emulated/0/FreeCut/FreeCut-video.mp4-secs-1
-                        filePrefix = "cut" + seconds.getText().toString() + fileno + "%02d";
-                            // filePrefix : cut[secs]1%02d
-                        dest = new File(mypath, filePrefix + fileExtn_mp4);
-                        filePath = dest.getAbsolutePath();
-                            // filePath : /storage/emulated/0/FreeCut
-                            // /FreeCut-video.mp4-secs-1/cut[secs]1%02d.mp4
-                        trimErrorCode();
+
+                        Bundle bundle = new Bundle();
+                        bundle.putString(STORAGE_DIRECTORY, storageDirectory);
+                        bundle.putString(VIDEO_URI, mSelectedVideoUri.toString());
+                        bundle.putString(VIDEO_PATH, mVideoPath);
+                        bundle.putInt(VIDEO_DURATION, videoDuration);
+                        bundle.putInt(SEGMENT_TIME, Integer.parseInt(seconds.getText().toString()));
+                        mTrimViewModel.setTrimBundle(bundle);
+                        loadFragment(getActivity().getSupportFragmentManager(),
+                                TrimProcessFragment.newInstance(null, null), false);
                     }
                 });
             }
@@ -406,31 +421,32 @@ public class TrimFragment extends Fragment {
             @Override
             public void apply(long executionId, int returnCode) {
                 if (returnCode == RETURN_CODE_SUCCESS) {
-                    String[] CutCommand = {"-i", mVideoPath, "-y", "-acodec", "copy",
-                            "-f", "segment", "-segment_time", seconds.getText().toString(),
-                            "-vcodec", "copy", "-reset_timestamps", "1", "-map", "0", filePath};
-                    FFmpeg.executeAsync(CutCommand, new ExecuteCallback() {
-                        @Override
-                        public void apply(long executionId, int returnCode) {
-                            tinydb.putString("seconds", seconds.getText().toString());
-                            tinydb.putString("cut", mypath);
-                            tinydb.putString("start", "0");
-                            tinydb.putString("extension", ".mp4");
-                            tinydb.putInt("begin", 1);
-                            tinydb.putInt("num1", 0);
-                            tinydb.putInt("num2", 0);
-                            tinydb.putString("fault", "true");
-                            tinydb.putString("end", "1");
-                            tinydb.putString("cuts", "1");
-                            tinydb.putString("Main", "0");
-                            Log.d(TAG, "Start CutFragmentOne");
-                            loadFragment(getActivity().getSupportFragmentManager(),
-                                    new CutFragmentOne(),
-                                    false);
-                        }
-                    });
+//                    String[] CutCommand = {"-i", mVideoPath, "-y", "-acodec", "copy",
+//                            "-f", "segment", "-segment_time", seconds.getText().toString(),
+//                            "-vcodec", "copy", "-reset_timestamps", "1", "-map", "0", filePath};
+//                    FFmpeg.executeAsync(CutCommand, new ExecuteCallback() {
+//                        @Override
+//                        public void apply(long executionId, int returnCode) {
+//                            tinydb.putString("seconds", seconds.getText().toString());
+//                            tinydb.putString("cut", mypath);
+//                            tinydb.putString("start", "0");
+//                            tinydb.putString("extension", ".mp4");
+//                            tinydb.putInt("begin", 1);
+//                            tinydb.putInt("num1", 0);
+//                            tinydb.putInt("num2", 0);
+//                            tinydb.putString("fault", "true");
+//                            tinydb.putString("end", "1");
+//                            tinydb.putString("cuts", "1");
+//                            tinydb.putString("Main", "0");
+//                            Log.d(TAG, "Start CutFragmentOne");
+//                            loadFragment(getActivity().getSupportFragmentManager(),
+//                                    new CutFragmentOne(),
+//                                    false);
+//                        }
+//                    });
+
+
                 } else {
-                    Log.d("Em-FFMPEG", "TrimFragment : Trim Error Command failed " + returnCode);
                     filePrefix = "cut" + seconds.getText().toString() + fileno + "%03d";
                     fileExtn_mp4 = ".mp4";
                     dest = new File(mypath, filePrefix + fileExtn_mp4);
@@ -468,7 +484,6 @@ public class TrimFragment extends Fragment {
                                             false);
                                 }
                             });
-
                         }
                     });
                 }
@@ -479,6 +494,9 @@ public class TrimFragment extends Fragment {
     private String createStorageDirectory(String name, String process, String seconds){
         File file = new File(Environment.getExternalStorageDirectory(),
                 "FreeCut/" + name + "/" + process + "/" + "secs-" + seconds + "/");
+        if (file.exists()){
+            file.delete();
+        }
         if (file.mkdirs()){
             Log.d(TAG, "File created");
         } else {
