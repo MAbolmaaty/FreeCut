@@ -71,4 +71,6 @@
     <string name="progress_loading">المعالجة : جاري التحميل</string>
     <string name="processing">المعالجة&#8230;</string>
     <string name="specify_number_of_seconds">اختر عدد الثواني</string>
+    <string name="small_waiting">انتظار&#8230;</string>
+    <string name="trimming">تقطيع&#8230;</string>
 </resources>

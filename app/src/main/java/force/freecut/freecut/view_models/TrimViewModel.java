@@ -17,6 +17,4 @@ public class TrimViewModel extends ViewModel {
     public LiveData<Bundle> getTrimBundle(){
         return mTrimBundle;
     }
-
-
 }

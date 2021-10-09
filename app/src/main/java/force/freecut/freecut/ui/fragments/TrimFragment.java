@@ -9,6 +9,7 @@ import static force.freecut.freecut.utils.Constants.PROCESS_TRIM;
 import static force.freecut.freecut.utils.Constants.STORAGE_DIRECTORY;
 import static force.freecut.freecut.utils.Constants.SEGMENT_TIME;
 import static force.freecut.freecut.utils.Constants.VIDEO_DURATION;
+import static force.freecut.freecut.utils.Constants.VIDEO_NAME;
 import static force.freecut.freecut.utils.Constants.VIDEO_PATH;
 import static force.freecut.freecut.utils.Constants.VIDEO_URI;
 
@@ -179,13 +180,6 @@ public class TrimFragment extends Fragment {
         textCut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Log.d(TAG, "Trim Button Clicked");
-//                int numOfSeconds = Integer.parseInt(seconds.getText().toString());
-//                int hours = numOfSeconds / 3600;
-//                int minutes = (numOfSeconds % 3600) / 60;
-//                int secondsIn = numOfSeconds % 60;
-//                String s = String.format("%02d:%02d:%02d", hours, minutes, secondsIn);
-//                Log.d(TAG, s);
                 if (mToast != null)
                     mToast.cancel();
 
@@ -272,6 +266,7 @@ public class TrimFragment extends Fragment {
 
                         Bundle bundle = new Bundle();
                         bundle.putString(STORAGE_DIRECTORY, storageDirectory);
+                        bundle.putString(VIDEO_NAME, mVideoName);
                         bundle.putString(VIDEO_URI, mSelectedVideoUri.toString());
                         bundle.putString(VIDEO_PATH, mVideoPath);
                         bundle.putInt(VIDEO_DURATION, videoDuration);
@@ -494,14 +489,15 @@ public class TrimFragment extends Fragment {
     private String createStorageDirectory(String name, String process, String seconds){
         File file = new File(Environment.getExternalStorageDirectory(),
                 "FreeCut/" + name + "/" + process + "/" + "secs-" + seconds + "/");
+
         if (file.exists()){
-            file.delete();
+            for (File video: file.listFiles()) {
+                video.delete();
+            }
         }
-        if (file.mkdirs()){
-            Log.d(TAG, "File created");
-        } else {
-            Log.d(TAG, "File not created");
-        }
+
+        file.mkdirs();
+
         return file.getAbsolutePath();
     }
 }

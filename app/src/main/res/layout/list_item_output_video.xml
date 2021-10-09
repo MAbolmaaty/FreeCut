@@ -16,18 +16,50 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
+    <TextView
+        android:id="@+id/videoName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:maxLines="1"
+        android:textColor="@android:color/white"
+        tools:textColor="@android:color/black"
+        tools:text="trim-07"
+        android:text="@string/small_waiting"
+        android:textSize="@dimen/_10sdp"
+        android:gravity="start"
+        android:layout_marginEnd="@dimen/_8sdp"
+        app:layout_constraintBaseline_toBaselineOf="@+id/progressPercentage"
+        app:layout_constraintStart_toStartOf="@+id/videoProgressBar"
+        app:layout_constraintEnd_toStartOf="@+id/progressPercentage"/>
+
     <ProgressBar
         android:id="@+id/videoProgressBar"
         android:layout_width="0dp"
         android:layout_height="4dp"
-        android:layout_margin="@dimen/_8sdp"
+        android:layout_marginStart="@dimen/_8sdp"
+        android:layout_marginEnd="@dimen/_8sdp"
+        android:layout_marginTop="@dimen/_2sdp"
         style="@style/Widget.AppCompat.ProgressBar.Horizontal"
         android:progress="0"
         android:progressBackgroundTint="@android:color/white"
         android:progressTint="@color/orange"
         app:layout_constraintStart_toEndOf="@+id/videoThumbnail"
-        app:layout_constraintTop_toTopOf="@+id/videoThumbnail"
+        app:layout_constraintTop_toBottomOf="@+id/progressPercentage"
         app:layout_constraintBottom_toBottomOf="@+id/videoThumbnail"
         app:layout_constraintEnd_toEndOf="parent"/>
+
+    <TextView
+        android:id="@+id/progressPercentage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="77 %"
+        android:textColor="@android:color/white"
+        tools:textColor="@android:color/black"
+        android:textSize="@dimen/_10sdp"
+        app:layout_constraintVertical_chainStyle="packed"
+        android:layout_marginBottom="@dimen/_2sdp"
+        app:layout_constraintEnd_toEndOf="@+id/videoProgressBar"
+        app:layout_constraintBottom_toTopOf="@+id/videoProgressBar"
+        app:layout_constraintTop_toTopOf="@+id/videoThumbnail"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
