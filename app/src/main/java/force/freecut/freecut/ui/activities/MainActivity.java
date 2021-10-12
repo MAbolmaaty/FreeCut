@@ -1,8 +1,12 @@
 package force.freecut.freecut.ui.activities;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -37,7 +41,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void attachBaseContext(Context newBase) {
-        String language = SharedPrefUtil.getInstance(newBase).read(LOCALE, Locale.getDefault().getLanguage());
+        String language = SharedPrefUtil.getInstance(newBase).read(LOCALE, Locale.getDefault()
+                .getLanguage());
         Locale locale = new Locale(language);
         Locale.setDefault(locale);
         Configuration configuration = newBase.getResources().getConfiguration();
@@ -50,7 +55,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // Set App Language
-        String language = SharedPrefUtil.getInstance(this).read(LOCALE, Locale.getDefault().getLanguage());
+        String language = SharedPrefUtil.getInstance(this).read(LOCALE, Locale.getDefault()
+                .getLanguage());
         Locale locale = new Locale(language);
         Resources resources = getResources();
         Configuration configuration = resources.getConfiguration();
@@ -62,6 +68,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        if (!checkWriteExternalPermission() || !checkReadExternalPermission()) {
+            startPermissionActivity();
+        }
+
         Log.d(TAG, "Main Activity Created");
 
         mTitle = findViewById(R.id.title);
@@ -72,13 +82,9 @@ public class MainActivity extends AppCompatActivity {
 
         mToolbarViewModel = ViewModelProviders.of(this).get(ToolbarViewModel.class);
         setToolBar();
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                loadFragment(getSupportFragmentManager(),
-                        MainFragment.newInstance(null, null), false);
-            }
-        }, 0);
+        loadFragment(getSupportFragmentManager(),
+                MainFragment.newInstance(null, null), false);
+
     }
 
     private void setToolBar() {
@@ -169,4 +175,21 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private boolean checkWriteExternalPermission() {
+        String permission = android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+        int res = MainActivity.this.checkCallingOrSelfPermission(permission);
+        return (res == PackageManager.PERMISSION_GRANTED);
+    }
+
+    private boolean checkReadExternalPermission() {
+        String permission = Manifest.permission.READ_EXTERNAL_STORAGE;
+        int res = MainActivity.this.checkCallingOrSelfPermission(permission);
+        return (res == PackageManager.PERMISSION_GRANTED);
+    }
+
+    private void startPermissionActivity() {
+        Intent intent = new Intent(MainActivity.this, PermissionActivity.class);
+        startActivity(intent);
+        finish();
+    }
 }

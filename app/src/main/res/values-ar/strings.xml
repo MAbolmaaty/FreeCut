@@ -73,4 +73,6 @@
     <string name="specify_number_of_seconds">اختر عدد الثواني</string>
     <string name="small_waiting">انتظار&#8230;</string>
     <string name="trimming">تقطيع&#8230;</string>
+    <string name="gallery">الاستديو</string>
+    <string name="pick_up_trim">اختر الفيديو الذي تريد تجزئته</string>
 </resources>

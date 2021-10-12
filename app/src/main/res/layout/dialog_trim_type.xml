@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/background_rectangle_stroke"
+    android:background="@color/colorPrimaryDark"
     android:padding="@dimen/_24sdp">
 
     <Button
@@ -11,8 +11,7 @@
         android:layout_width="0dp"
         android:layout_height="@dimen/_32sdp"
         android:layout_marginTop="@dimen/_8sdp"
-        android:background="@drawable/background_rectangle_corners_18"
-        android:backgroundTint="@color/orange"
+        android:background="@drawable/background_rectangle_multi_colors"
         android:elevation="@dimen/_12sdp"
         android:fontFamily="@font/cairo_semi_bold"
         android:stateListAnimator="@null"
@@ -33,7 +32,7 @@
         android:fontFamily="@font/cairo_semi_bold"
         android:text="@string/speed_trim_hint"
         android:textColor="@color/white"
-        android:textSize="@dimen/_8sdp"
+        android:textSize="@dimen/_10sdp"
         app:layout_constraintEnd_toEndOf="@id/speedTrim"
         app:layout_constraintTop_toBottomOf="@+id/speedTrim" />
 
@@ -42,8 +41,7 @@
         android:layout_width="0dp"
         android:layout_height="@dimen/_32sdp"
         android:layout_marginTop="@dimen/_16sdp"
-        android:background="@drawable/background_rectangle_corners_18"
-        android:backgroundTint="@color/orange"
+        android:background="@drawable/background_rectangle_multi_colors"
         android:elevation="@dimen/_12sdp"
         android:fontFamily="@font/cairo_semi_bold"
         android:stateListAnimator="@null"
@@ -63,7 +61,7 @@
         android:fontFamily="@font/cairo_semi_bold"
         android:text="@string/trim_hint"
         android:textColor="@color/white"
-        android:textSize="@dimen/_8sdp"
+        android:textSize="@dimen/_10sdp"
         app:layout_constraintEnd_toEndOf="@id/trim"
         app:layout_constraintTop_toBottomOf="@+id/trim" />
 

@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="@dimen/_36sdp"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@color/shadow_top">
+    android:background="@color/colorPrimaryDark">
 
     <TextView
         android:id="@+id/title"

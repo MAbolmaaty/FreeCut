@@ -39,7 +39,8 @@ public class OutputVideosAdapter
         mNumberOfVideos = numberOfVideos;
         mTrimmedVideos = new TrimmedVideo[mNumberOfVideos];
         for (int i = 0 ; i < mNumberOfVideos ; i++){
-            mTrimmedVideos[i] = new TrimmedVideo(null, 0);
+            mTrimmedVideos[i] = new TrimmedVideo(null, 0,
+                    String.format(Locale.ENGLISH, "video-%02d", i+1));
         }
     }
 
@@ -60,13 +61,14 @@ public class OutputVideosAdapter
         holder.mVideoProgress.setProgress(mTrimmedVideos[position].getTrimProgress(), true);
         holder.mProgressPercentage.setText(String.format(Locale.ENGLISH,"%d%%" ,
                 mTrimmedVideos[position].getTrimProgress()));
+        holder.mVideoName.setText(mTrimmedVideos[position].getVideoName());
 
         if (mTrimmedVideos[position].getTrimProgress() > 0){
-            holder.mVideoName.setText(mContext.getString(R.string.trimming));
+            holder.mVideoProgressStatus.setText(mContext.getString(R.string.trimming));
         }
 
         if (mTrimmedVideos[position].getVideoFile() != null) {
-            holder.mVideoName.setText(mTrimmedVideos[position].getVideoFile().getName());
+            holder.mVideoProgressStatus.setText("");
             Glide.with(mContext).load(mTrimmedVideos[position].getVideoFile()).fitCenter()
                     .into(holder.mVideoThumbnail);
         }
@@ -83,6 +85,7 @@ public class OutputVideosAdapter
         private TextView mVideoName;
         private ProgressBar mVideoProgress;
         private TextView mProgressPercentage;
+        private TextView mVideoProgressStatus;
 
         public OutputVideoViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -90,11 +93,11 @@ public class OutputVideosAdapter
             mVideoProgress = itemView.findViewById(R.id.videoProgressBar);
             mVideoName = itemView.findViewById(R.id.videoName);
             mProgressPercentage = itemView.findViewById(R.id.progressPercentage);
+            mVideoProgressStatus = itemView.findViewById(R.id.videoProgressStatus);
         }
 
         public void updateProgressBar(int progress){
             mVideoProgress.setProgress(progress);
-
         }
 
         public void updatePercentage(int progress){

@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@drawable/app_background">
+    android:background="@color/colorPrimaryDark">
 
     <Button
         android:id="@+id/perm_button"
@@ -12,26 +12,13 @@
         android:textColor="@color/white"
         android:layout_margin="@dimen/_24sdp"
         android:textSize="@dimen/_12sdp"
-        android:background="@drawable/background_rectangle_corners_18"
-        android:backgroundTint="@color/orange"
+        android:background="@drawable/background_rectangle_multi_colors"
         android:text="@string/permission"
         android:fontFamily="@font/cairo_semi_bold"
         android:textAllCaps="false"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
-
-    <TextView
-        android:id="@+id/signature"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/force_touches"
-        android:textColor="@android:color/white"
-        android:textSize="@dimen/_10sdp"
-        android:fontFamily="@font/vo_italic"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

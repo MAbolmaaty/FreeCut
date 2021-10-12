@@ -22,6 +22,12 @@
         <activity
             android:name=".ui.activities.SplashActivity"
             android:screenOrientation="portrait">
+
+        </activity>
+
+        <activity android:name=".ui.activities.MainActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />
@@ -29,8 +35,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".ui.activities.MainActivity"></activity>
 
         <activity
             android:name=".ui.activities.PermissionActivity"

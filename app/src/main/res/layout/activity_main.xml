@@ -21,7 +21,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar"
-        android:background="#18202B"/>
+        android:background="@android:color/white"/>
+
+    <View
+        android:layout_width="4dp"
+        android:layout_height="1dp"
+        android:background="@color/colorPrimaryDark"
+        app:layout_constraintHorizontal_bias="0.8"
+        app:layout_constraintStart_toStartOf="@+id/divider"
+        app:layout_constraintEnd_toEndOf="@+id/divider"
+        app:layout_constraintTop_toTopOf="@+id/divider"
+        app:layout_constraintBottom_toBottomOf="@+id/divider"/>
 
     <FrameLayout
         android:id="@+id/container"

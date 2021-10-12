@@ -75,4 +75,6 @@ cut video in two ways:
     <string name="specify_number_of_seconds">Specify Number Of Seconds</string>
     <string name="small_waiting">waiting&#8230;</string>
     <string name="trimming">trimming&#8230;</string>
+    <string name="gallery">Gallery</string>
+    <string name="pick_up_trim">Pick up video you want to trim</string>
 </resources>

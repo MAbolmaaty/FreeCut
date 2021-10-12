@@ -12,21 +12,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/videoSeekBarMiddle"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1"
+        app:layout_constraintVertical_bias="0.2"
         tools:layout_height="200dp" />
 
     <View
         android:id="@+id/videoSeekBarMiddle"
         android:layout_width="0dp"
         android:layout_height="1dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="@+id/guideline40Percent"
-        app:layout_constraintTop_toTopOf="@+id/videoSeekBar"/>
+        app:layout_constraintStart_toStartOf="@id/videoView"
+        app:layout_constraintEnd_toEndOf="@id/videoView"
+        app:layout_constraintBottom_toBottomOf="@id/videoView" />
 
     <androidx.appcompat.widget.AppCompatSeekBar
         android:id="@+id/videoSeekBar"
@@ -37,16 +36,64 @@
         android:thumbOffset="@dimen/_3sdp"
         android:paddingStart="0dp"
         android:paddingEnd="0dp"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/guideline40Percent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:alpha="0"
+        tools:alpha="1"
+        tools:progress="50"
+        app:layout_constraintTop_toTopOf="@+id/videoSeekBarMiddle"
+        app:layout_constraintBottom_toBottomOf="@+id/videoSeekBarMiddle"
+        app:layout_constraintEnd_toEndOf="@id/videoView"
+        app:layout_constraintStart_toStartOf="@id/videoView" />
+
+    <ImageView
+        android:id="@+id/icVideoControl"
+        android:layout_width="@dimen/_40sdp"
+        android:layout_height="@dimen/_40sdp"
+        android:src="@drawable/ic_pause"
+        android:padding="@dimen/_10sdp"
+        android:alpha="0"
+        tools:alpha="1"
+        app:layout_constraintBottom_toBottomOf="@id/videoView"
+        app:layout_constraintEnd_toEndOf="@id/videoView"
+        app:layout_constraintStart_toStartOf="@id/videoView"
+        app:layout_constraintTop_toTopOf="@id/videoView"
+        app:tint="@android:color/white" />
+
+    <TextView
+        android:id="@+id/videoTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="0:05 / 4:30"
+        android:alpha="0"
+        tools:alpha="1"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/_10sdp"
+        android:layout_margin="@dimen/_8sdp"
+        app:layout_constraintStart_toStartOf="@+id/videoView"
+        app:layout_constraintBottom_toBottomOf="@id/videoView"/>
+
+    <ImageView
+        android:id="@+id/voiceControl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_8sdp"
+        android:src="@drawable/ic_speaker"
+        android:clickable="false"
+        app:tint="@android:color/white"
+        android:alpha="0"
+        tools:alpha="1"
+        android:paddingTop="@dimen/_10sdp"
+        android:paddingStart="@dimen/_10sdp"
+        android:paddingEnd="@dimen/_10sdp"
+        app:layout_constraintEnd_toEndOf="@+id/videoView"
+        app:layout_constraintBottom_toBottomOf="@+id/videoView"/>
 
     <TextView
         android:id="@+id/videoName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/_4sdp"
+        android:layout_marginStart="@dimen/_8sdp"
+        android:layout_marginEnd="@dimen/_8sdp"
         android:textColor="@android:color/white"
         android:textSize="@dimen/_10sdp"
         app:layout_constraintEnd_toEndOf="@+id/videoView"
@@ -54,36 +101,16 @@
         app:layout_constraintTop_toBottomOf="@+id/videoSeekBar"
         tools:text="Pirates Of Caribbean" />
 
-    <ImageView
-        android:id="@+id/ic_video_control"
-        android:layout_width="@dimen/_20sdp"
-        android:layout_height="@dimen/_20sdp"
-        android:alpha="0.6"
-        android:src="@drawable/ic_pause"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="@id/videoView"
-        app:layout_constraintEnd_toEndOf="@id/videoView"
-        app:layout_constraintStart_toStartOf="@id/videoView"
-        app:layout_constraintTop_toTopOf="@id/videoView"
-        app:tint="@android:color/white" />
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_videos"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="@dimen/_16sdp"
+        android:layout_marginStart="@dimen/_8sdp"
         android:layout_marginTop="@dimen/_16sdp"
-        android:layout_marginEnd="@dimen/_16sdp"
+        android:layout_marginEnd="@dimen/_8sdp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/videoName" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline40Percent"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.4" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -6,10 +6,12 @@ public class TrimmedVideo {
 
     private File mVideoFile;
     private int mTrimProgress;
+    private String mVideoName;
 
-    public TrimmedVideo(File videoFile, int trimProgress) {
+    public TrimmedVideo(File videoFile, int trimProgress, String videoName) {
         mVideoFile = videoFile;
         mTrimProgress = trimProgress;
+        mVideoName = videoName;
     }
 
     public void setVideoFile(File videoFile) {
@@ -26,5 +28,9 @@ public class TrimmedVideo {
 
     public int getTrimProgress() {
         return mTrimProgress;
+    }
+
+    public String getVideoName() {
+        return mVideoName;
     }
 }

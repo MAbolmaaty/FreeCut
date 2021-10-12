@@ -1,75 +1,116 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/darkBlue"
-    android:fillViewport="true"
-    android:scrollbars="none"
+    android:background="@color/colorPrimaryDark"
     tools:context=".ui.fragments.SpeedTrimProcessFragment">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+    <VideoView
+        android:id="@+id/videoView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.2"
+        tools:layout_height="200dp" />
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/_96sdp"
-            android:src="@drawable/copyrights"
-            android:layout_marginTop="@dimen/_8sdp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+    <View
+        android:id="@+id/videoSeekBarMiddle"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        app:layout_constraintStart_toStartOf="@id/videoView"
+        app:layout_constraintEnd_toEndOf="@id/videoView"
+        app:layout_constraintBottom_toBottomOf="@id/videoView" />
 
-        <ImageView
-            android:id="@+id/gears"
-            android:layout_width="@dimen/_68sdp"
-            android:layout_height="@dimen/_68sdp"
-            android:src="@drawable/ic_gears"
-            android:tint="@color/orange"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+    <androidx.appcompat.widget.AppCompatSeekBar
+        android:id="@+id/videoSeekBar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:progressTint="@android:color/white"
+        android:thumbTint="@android:color/white"
+        android:thumbOffset="@dimen/_3sdp"
+        android:paddingStart="0dp"
+        android:paddingEnd="0dp"
+        android:alpha="0"
+        tools:alpha="1"
+        tools:progress="50"
+        app:layout_constraintTop_toTopOf="@+id/videoSeekBarMiddle"
+        app:layout_constraintBottom_toBottomOf="@+id/videoSeekBarMiddle"
+        app:layout_constraintEnd_toEndOf="@id/videoView"
+        app:layout_constraintStart_toStartOf="@id/videoView" />
 
-        <ProgressBar
-            android:id="@+id/progressBar"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/_2sdp"
-            android:progressBackgroundTint="@android:color/white"
-            android:progressTint="@color/orange"
-            android:progress="0"
-            android:layout_marginStart="@dimen/_24sdp"
-            android:layout_marginTop="@dimen/_8sdp"
-            android:layout_marginEnd="@dimen/_24sdp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/gears" />
+    <ImageView
+        android:id="@+id/icVideoControl"
+        android:layout_width="@dimen/_40sdp"
+        android:layout_height="@dimen/_40sdp"
+        android:src="@drawable/ic_pause"
+        android:padding="@dimen/_10sdp"
+        android:alpha="0"
+        tools:alpha="1"
+        app:layout_constraintBottom_toBottomOf="@id/videoView"
+        app:layout_constraintEnd_toEndOf="@id/videoView"
+        app:layout_constraintStart_toStartOf="@id/videoView"
+        app:layout_constraintTop_toTopOf="@id/videoView"
+        app:tint="@android:color/white" />
 
-        <TextView
-            android:id="@+id/percentage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/cairo_semi_bold"
-            android:textColor="@android:color/white"
-            android:textSize="@dimen/_12sdp"
-            android:layout_marginTop="@dimen/_8sdp"
-            app:layout_constraintEnd_toEndOf="@+id/progressBar"
-            app:layout_constraintTop_toBottomOf="@+id/progressBar"/>
+    <TextView
+        android:id="@+id/videoTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="0:05 / 4:30"
+        android:alpha="0"
+        tools:alpha="1"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/_10sdp"
+        android:layout_margin="@dimen/_8sdp"
+        app:layout_constraintStart_toStartOf="@+id/videoView"
+        app:layout_constraintBottom_toBottomOf="@id/videoView"/>
 
-        <TextView
-            android:id="@+id/progress"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/cairo_semi_bold"
-            android:textColor="@android:color/white"
-            android:textSize="@dimen/_10sdp"
-            android:layout_marginTop="@dimen/_8sdp"
-            app:layout_constraintStart_toStartOf="@+id/progressBar"
-            app:layout_constraintTop_toBottomOf="@+id/progressBar"/>
+    <ImageView
+        android:id="@+id/voiceControl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_8sdp"
+        android:src="@drawable/ic_speaker"
+        android:clickable="false"
+        app:tint="@android:color/white"
+        android:alpha="0"
+        tools:alpha="1"
+        android:paddingTop="@dimen/_10sdp"
+        android:paddingStart="@dimen/_10sdp"
+        android:paddingEnd="@dimen/_10sdp"
+        app:layout_constraintEnd_toEndOf="@+id/videoView"
+        app:layout_constraintBottom_toBottomOf="@+id/videoView"/>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    <TextView
+        android:id="@+id/videoName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_4sdp"
+        android:layout_marginStart="@dimen/_8sdp"
+        android:layout_marginEnd="@dimen/_8sdp"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/_10sdp"
+        app:layout_constraintEnd_toEndOf="@+id/videoView"
+        app:layout_constraintStart_toStartOf="@+id/videoView"
+        app:layout_constraintTop_toBottomOf="@+id/videoSeekBar"
+        tools:text="Pirates Of Caribbean" />
 
-</ScrollView>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_videos"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="@dimen/_8sdp"
+        android:layout_marginTop="@dimen/_16sdp"
+        android:layout_marginEnd="@dimen/_8sdp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/videoName" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -3,25 +3,26 @@ package force.freecut.freecut.ui.fragments;
 import static android.app.Activity.RESULT_OK;
 import static com.arthenica.mobileffmpeg.Config.RETURN_CODE_SUCCESS;
 import static force.freecut.freecut.ui.activities.MainActivity.loadFragment;
-import static force.freecut.freecut.utils.Constants.FILE_PATH;
 import static force.freecut.freecut.utils.Constants.PROCESS_SPEED_TRIM;
 import static force.freecut.freecut.utils.Constants.PROCESS_TRIM;
-import static force.freecut.freecut.utils.Constants.STORAGE_DIRECTORY;
 import static force.freecut.freecut.utils.Constants.SEGMENT_TIME;
+import static force.freecut.freecut.utils.Constants.STORAGE_DIRECTORY;
 import static force.freecut.freecut.utils.Constants.VIDEO_DURATION;
 import static force.freecut.freecut.utils.Constants.VIDEO_NAME;
 import static force.freecut.freecut.utils.Constants.VIDEO_PATH;
-import static force.freecut.freecut.utils.Constants.VIDEO_URI;
 
 import android.content.Context;
 import android.content.Intent;
 import android.media.MediaMetadataRetriever;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
@@ -29,11 +30,13 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ScrollView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.AppCompatSeekBar;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
@@ -55,6 +58,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.Locale;
 
 import force.freecut.freecut.Data.TinyDB;
 import force.freecut.freecut.Data.Utils;
@@ -75,6 +79,7 @@ public class TrimFragment extends Fragment {
 
     private String mVideoPath;
     private String mVideoName;
+    private int mVideoDuration;
 
     private String mParam1;
     private String mParam2;
@@ -82,27 +87,51 @@ public class TrimFragment extends Fragment {
     boolean fault = false;
     int fileno = 1;
     String filePath, fileExtn_mp4;
-    Button textCut;
     Uri mSelectedVideoUri;
-    EditText seconds;
     String mypath;
     // TinyDB : Implementation for Shared Preferences
     TinyDB tinydb;
     File dest;
     String filePrefix;
     String mylink = "https://www.google.com/";
-    ImageView placeholder;
+
     ImageView mBanner;
     private static final int REQUEST_TAKE_GALLERY_VIDEO = 100;
-    private ScrollView mRootView;
     String saldo = "";
 
     private PreferenceHelper helpers;
 
     private TrimViewModel mTrimViewModel;
-    private ImageView mIconNoVideo;
-    private TextView mTextNoVideo;
     private Toast mToast;
+    private ImageView mIcVideo;
+    private Button mOpenGallery;
+    private TextView mPickUpTrim;
+
+    private VideoView mVideoView;
+    private AppCompatSeekBar mVideoSeekBar;
+    private ImageView mIcVideoControl;
+    private ImageView mVoiceControl;
+    private TextView mVideoTime;
+    private TextView mEnterSeconds;
+    private EditText mNumberOfSeconds;
+    private Button mTrim;
+
+    private boolean mBlockSeekBar = true;
+    private boolean mVideoControlsVisible = false;
+    private boolean mVideoMuted = false;
+    private MediaPlayer mMediaPlayer;
+    private Handler updateHandler = new Handler();
+    private Runnable updateVideoTime = new Runnable() {
+        @Override
+        public void run() {
+            long currentPosition = mVideoView.getCurrentPosition();
+            mVideoSeekBar.setProgress((int) currentPosition);
+            mVideoTime.setText(String.format(Locale.ENGLISH, "%s / %s",
+                    getVideoTime((int) currentPosition / 1000),
+                    getVideoTime(mVideoView.getDuration() / 1000)));
+            updateHandler.postDelayed(this, 100);
+        }
+    };
 
     public TrimFragment() {
     }
@@ -144,8 +173,17 @@ public class TrimFragment extends Fragment {
         mTrimViewModel = ViewModelProviders.of(getActivity()).get(TrimViewModel.class);
 
         mBanner = view.findViewById(R.id.banner);
-        mIconNoVideo = view.findViewById(R.id.imageView_noVideo);
-        mTextNoVideo = view.findViewById(R.id.textView_noVideo);
+        mIcVideo = view.findViewById(R.id.icVideo);
+        mOpenGallery = view.findViewById(R.id.openGallery);
+        mPickUpTrim = view.findViewById(R.id.pickUpTrim);
+        mVideoView = view.findViewById(R.id.videoView);
+        mVideoSeekBar = view.findViewById(R.id.videoSeekBar);
+        mIcVideoControl = view.findViewById(R.id.icVideoControl);
+        mVideoTime = view.findViewById(R.id.videoTime);
+        mVoiceControl = view.findViewById(R.id.voiceControl);
+        mEnterSeconds = view.findViewById(R.id.enterSeconds);
+        mNumberOfSeconds = view.findViewById(R.id.numberOfSeconds);
+        mTrim = view.findViewById(R.id.trim);
 
         mBanner.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -162,36 +200,22 @@ public class TrimFragment extends Fragment {
         MobileAds.initialize(getActivity(), "ca-app-pub-6503532425142366~2924525320");
         AdView adView = view.findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
-        adView.loadAd(adRequest);
-
-        mRootView = view.findViewById(R.id.rootView);
+        //adView.loadAd(adRequest);
 
         // Initialize SharedPreference
         tinydb = new TinyDB(getActivity());
 
-        placeholder = view.findViewById(R.id.view_videoView);
-
-        textCut = view.findViewById(R.id.trim);
-
-        seconds = view.findViewById(R.id.numberOfSeconds);
 
         new GetDataSync().execute();
 
-        textCut.setOnClickListener(new View.OnClickListener() {
+        mTrim.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mToast != null)
                     mToast.cancel();
 
-                if (mSelectedVideoUri == null) {
-                    placeholder.startAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.shake50));
-                    mIconNoVideo.startAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.shake50));
-                    mTextNoVideo.startAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.shake50));
-                    return;
-                }
-
-                if (seconds.getText().toString().isEmpty()) {
-                    seconds.startAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.shake50));
+                if (mNumberOfSeconds.getText().toString().isEmpty()) {
+                    mNumberOfSeconds.startAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.shake50));
                     mToast = Toast.makeText(getActivity(),
                             getString(R.string.specify_number_of_seconds), Toast.LENGTH_SHORT);
                     mToast.show();
@@ -211,7 +235,7 @@ public class TrimFragment extends Fragment {
                             (InputMethodManager) getActivity()
                                     .getSystemService(Context.INPUT_METHOD_SERVICE);
 
-                    imm.hideSoftInputFromWindow(seconds.getWindowToken(), 0);
+                    imm.hideSoftInputFromWindow(mNumberOfSeconds.getWindowToken(), 0);
                 } else {
                     Toast.makeText(getActivity(),
                             "You Don't have free space in your internal memory",
@@ -227,17 +251,15 @@ public class TrimFragment extends Fragment {
                     @Override
                     public void onClick(View view) {
                         dialog.dismiss();
-                        String directory = createStorageDirectory(mVideoName,PROCESS_SPEED_TRIM,
-                                seconds.getText().toString());
-                        String file =
-                                new File(directory,mVideoName+ "-st-" +
-                                        seconds.getText().toString() + "-" + "%02d" + ".mp4")
-                                        .getAbsolutePath();
+
+                        String storageDirectory = createStorageDirectory(mVideoName,
+                                PROCESS_SPEED_TRIM, mNumberOfSeconds.getText().toString());
+
                         Bundle bundle = new Bundle();
+                        bundle.putString(SEGMENT_TIME, mNumberOfSeconds.getText().toString());
+                        bundle.putString(VIDEO_NAME, mVideoName);
                         bundle.putString(VIDEO_PATH, mVideoPath);
-                        bundle.putString(SEGMENT_TIME, seconds.getText().toString());
-                        bundle.putString(STORAGE_DIRECTORY, directory);
-                        bundle.putString(FILE_PATH, file);
+                        bundle.putString(STORAGE_DIRECTORY, storageDirectory);
                         mTrimViewModel.setTrimBundle(bundle);
                         loadFragment(getActivity().getSupportFragmentManager(),
                                 SpeedTrimProcessFragment.newInstance(null, null), false);
@@ -256,21 +278,16 @@ public class TrimFragment extends Fragment {
 //                        filePath = dest.getAbsolutePath();
 //                        trimErrorCode();
 
-                        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-                        retriever.setDataSource(mVideoPath);
-                        String time =
-                                retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-                        int videoDuration = Integer.parseInt(time) / 1000;
-                        String storageDirectory = createStorageDirectory(mVideoName,PROCESS_TRIM,
-                                seconds.getText().toString());
+
+                        String storageDirectory = createStorageDirectory(mVideoName, PROCESS_TRIM,
+                                mNumberOfSeconds.getText().toString());
 
                         Bundle bundle = new Bundle();
                         bundle.putString(STORAGE_DIRECTORY, storageDirectory);
                         bundle.putString(VIDEO_NAME, mVideoName);
-                        bundle.putString(VIDEO_URI, mSelectedVideoUri.toString());
                         bundle.putString(VIDEO_PATH, mVideoPath);
-                        bundle.putInt(VIDEO_DURATION, videoDuration);
-                        bundle.putInt(SEGMENT_TIME, Integer.parseInt(seconds.getText().toString()));
+                        bundle.putInt(VIDEO_DURATION, mVideoDuration);
+                        bundle.putInt(SEGMENT_TIME, Integer.parseInt(mNumberOfSeconds.getText().toString()));
                         mTrimViewModel.setTrimBundle(bundle);
                         loadFragment(getActivity().getSupportFragmentManager(),
                                 TrimProcessFragment.newInstance(null, null), false);
@@ -282,7 +299,7 @@ public class TrimFragment extends Fragment {
         /**
          * Pick up video file
          * */
-        placeholder.setOnClickListener(new View.OnClickListener() {
+        mOpenGallery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
@@ -316,23 +333,24 @@ public class TrimFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_TAKE_GALLERY_VIDEO) {
             if (resultCode == RESULT_OK) {
-                // data.getData : uri : Ex : content://media/external/video/media/100044
                 mSelectedVideoUri = data.getData();
-                // Video Path : String : Ex : /storage/emulated/0/video.mp4
                 mVideoPath = Utils.getRealPathFromURI_API19(getActivity(), mSelectedVideoUri);
                 String[] pathSegments = mVideoPath.split("/");
-                // Video Name : String : Ex : video.mp4
                 mVideoName = pathSegments[pathSegments.length - 1];
-                placeholder.setBackgroundResource(0);
-                mIconNoVideo.setVisibility(View.GONE);
-                mTextNoVideo.setVisibility(View.GONE);
-                Glide.with(getActivity()).load(mSelectedVideoUri).fitCenter().into(placeholder);
+                mVideoDuration = getVideoDuration(mVideoPath);
+                mIcVideo.setVisibility(View.INVISIBLE);
+                mOpenGallery.setVisibility(View.INVISIBLE);
+                mPickUpTrim.setVisibility(View.INVISIBLE);
+
+                displayVideo(true);
+                prepareVideo(mSelectedVideoUri);
             }
         }
     }
 
     /**
-     * */
+     *
+     */
     public String createDirectory(String name, String seconds) {
         int num = 1;
         if (new File(Environment.getExternalStorageDirectory(),
@@ -442,7 +460,7 @@ public class TrimFragment extends Fragment {
 
 
                 } else {
-                    filePrefix = "cut" + seconds.getText().toString() + fileno + "%03d";
+                    filePrefix = "cut" + mNumberOfSeconds.getText().toString() + fileno + "%03d";
                     fileExtn_mp4 = ".mp4";
                     dest = new File(mypath, filePrefix + fileExtn_mp4);
                     filePath = dest.getAbsolutePath();
@@ -455,7 +473,7 @@ public class TrimFragment extends Fragment {
                         public void apply(long executionId, int returnCode) {
                             final String[] CutCommand = {"-i", encodeFile.getAbsolutePath(),
                                     "-y", "-acodec", "copy", "-f", "segment", "-segment_time",
-                                    seconds.getText().toString(), "-vcodec", "copy",
+                                    mNumberOfSeconds.getText().toString(), "-vcodec", "copy",
                                     "-reset_timestamps", "1", "-map", "0", filePath};
 
                             FFmpeg.executeAsync(CutCommand, new ExecuteCallback() {
@@ -463,7 +481,7 @@ public class TrimFragment extends Fragment {
                                 public void apply(long executionId, int returnCode) {
                                     encodeFile.delete();
 
-                                    tinydb.putString("seconds", seconds.getText().toString());
+                                    tinydb.putString("seconds", mNumberOfSeconds.getText().toString());
                                     tinydb.putString("cut", mypath);
                                     tinydb.putString("start", "0");
                                     tinydb.putString("extension", ".mp4");
@@ -486,12 +504,12 @@ public class TrimFragment extends Fragment {
         });
     }
 
-    private String createStorageDirectory(String name, String process, String seconds){
+    private String createStorageDirectory(String name, String process, String seconds) {
         File file = new File(Environment.getExternalStorageDirectory(),
                 "FreeCut/" + name + "/" + process + "/" + "secs-" + seconds + "/");
 
-        if (file.exists()){
-            for (File video: file.listFiles()) {
+        if (file.exists()) {
+            for (File video : file.listFiles()) {
                 video.delete();
             }
         }
@@ -499,5 +517,192 @@ public class TrimFragment extends Fragment {
         file.mkdirs();
 
         return file.getAbsolutePath();
+    }
+
+    private void displayVideo(boolean visible) {
+        if (visible) {
+            mVideoView.setVisibility(View.VISIBLE);
+            mVideoSeekBar.setVisibility(View.VISIBLE);
+            mIcVideoControl.setVisibility(View.VISIBLE);
+            mVoiceControl.setVisibility(View.VISIBLE);
+            mVideoTime.setVisibility(View.VISIBLE);
+            mEnterSeconds.setVisibility(View.VISIBLE);
+            mNumberOfSeconds.setVisibility(View.VISIBLE);
+            mTrim.setVisibility(View.VISIBLE);
+        } else {
+            mVideoView.setVisibility(View.INVISIBLE);
+            mVideoSeekBar.setVisibility(View.INVISIBLE);
+            mIcVideoControl.setVisibility(View.INVISIBLE);
+            mVoiceControl.setVisibility(View.INVISIBLE);
+            mVideoTime.setVisibility(View.INVISIBLE);
+            mEnterSeconds.setVisibility(View.INVISIBLE);
+            mNumberOfSeconds.setVisibility(View.INVISIBLE);
+            mTrim.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    private void prepareVideo(Uri videoUri) {
+        mVideoView.setVideoURI(videoUri);
+        mVideoView.start();
+        mVideoView.setVisibility(View.VISIBLE);
+        mVideoView.requestFocus();
+
+        mIcVideoControl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mIcVideoControl.getAlpha() == 0) {
+                    mBlockSeekBar = false;
+                    mVideoSeekBar.animate().alpha(1);
+                    mIcVideoControl.animate().alpha(1);
+                    mVoiceControl.setClickable(true);
+                    mVoiceControl.animate().alpha(1);
+                    mVideoTime.animate().alpha(1);
+                    mVideoControlsVisible = true;
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (mVideoView.isPlaying() && mVideoControlsVisible) {
+                                mVideoSeekBar.animate().alpha(0);
+                                mBlockSeekBar = true;
+                                mIcVideoControl.animate().alpha(0);
+                                mVideoTime.animate().alpha(0);
+                                mVoiceControl.setClickable(false);
+                                mVoiceControl.animate().alpha(0);
+                                mVideoControlsVisible = false;
+                            }
+                        }
+                    }, 3000);
+                    return;
+                }
+                if (mVideoView.isPlaying()) {
+                    mIcVideoControl.setImageResource(R.drawable.ic_play);
+                    mVideoView.pause();
+                } else {
+                    mIcVideoControl.setImageResource(R.drawable.ic_pause);
+                    mVideoView.start();
+                    mBlockSeekBar = true;
+                    mVideoSeekBar.setAlpha(0);
+                    mIcVideoControl.setAlpha((float) 0);
+                    mVideoTime.setAlpha(0);
+                    mVoiceControl.setClickable(false);
+                    mVoiceControl.setAlpha((float) 0);
+                    mVideoControlsVisible = false;
+                }
+            }
+        });
+
+        mVideoView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mVideoControlsVisible) {
+                    mVideoSeekBar.animate().alpha(0);
+                    mBlockSeekBar = true;
+                    mIcVideoControl.animate().alpha(0);
+                    mVideoTime.animate().alpha(0);
+                    mVoiceControl.setClickable(false);
+                    mVoiceControl.animate().alpha(0);
+                    mVideoControlsVisible = false;
+                } else {
+                    mBlockSeekBar = false;
+                    mVideoSeekBar.animate().alpha(1);
+                    mIcVideoControl.animate().alpha(1);
+                    mVideoTime.animate().alpha(1);
+                    mVoiceControl.setClickable(true);
+                    mVoiceControl.animate().alpha(1);
+                    mVideoControlsVisible = true;
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (mVideoView.isPlaying() && mVideoControlsVisible) {
+                                mVideoSeekBar.animate().alpha(0);
+                                mBlockSeekBar = true;
+                                mIcVideoControl.animate().alpha(0);
+                                mVideoTime.animate().alpha(0);
+                                mVoiceControl.setClickable(false);
+                                mVoiceControl.animate().alpha(0);
+                                mVideoControlsVisible = false;
+                            }
+                        }
+                    }, 3000);
+                }
+            }
+        });
+
+        mVideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                mMediaPlayer = mp;
+                mVideoSeekBar.setProgress(0);
+                mVideoSeekBar.setMax(mVideoView.getDuration());
+
+                mVideoTime.setText(String.format(Locale.ENGLISH, "%s / %s",
+                        getVideoTime(0),
+                        getVideoTime(mVideoView.getDuration() / 1000)));
+                updateHandler.postDelayed(updateVideoTime, 100);
+            }
+        });
+
+        mVideoSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) {
+                    mVideoView.seekTo(progress);
+                    mVideoTime.setText(String.format(Locale.ENGLISH, "%s / %s",
+                            getVideoTime(progress / 1000),
+                            getVideoTime(mVideoView.getDuration() / 1000)));
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        mVideoSeekBar.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return mBlockSeekBar;
+            }
+        });
+
+        mVoiceControl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mVideoMuted) {
+                    mMediaPlayer.setVolume(1.0f, 1.0f);
+                    mVoiceControl.setImageResource(R.drawable.ic_speaker);
+                    mVideoMuted = false;
+                } else {
+                    mMediaPlayer.setVolume(0, 0);
+                    mVoiceControl.setImageResource(R.drawable.ic_silent);
+                    mVideoMuted = true;
+                }
+            }
+        });
+    }
+
+    private String getVideoTime(int seconds) {
+        long second = seconds % 60;
+        long minute = (seconds / 60) % 60;
+        long hour = (seconds / (60 * 60)) % 24;
+
+        if (hour > 0)
+            return String.format(Locale.ENGLISH, "%d:%d:%02d", hour, minute, second);
+        else
+            return String.format(Locale.ENGLISH, "%d:%02d", minute, second);
+    }
+
+    private int getVideoDuration(String videoPath) {
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        retriever.setDataSource(videoPath);
+        String time =
+                retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+        return Integer.parseInt(time) / 1000;
     }
 }

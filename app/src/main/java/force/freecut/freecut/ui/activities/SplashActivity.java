@@ -25,13 +25,10 @@ import static force.freecut.freecut.utils.Constants.LOCALE;
 
 public class SplashActivity extends AppCompatActivity {
 
-    TinyDB tinydb;
-    String LANG_CURRENT;
-    private PreferenceHelper helpers;
-
     @Override
     protected void attachBaseContext(Context newBase) {
-        String language = SharedPrefUtil.getInstance(newBase).read(LOCALE, Locale.getDefault().getLanguage());
+        String language = SharedPrefUtil.getInstance(newBase).read(LOCALE, Locale.getDefault()
+                .getLanguage());
         Locale locale = new Locale(language);
         Locale.setDefault(locale);
         Configuration configuration = newBase.getResources().getConfiguration();
@@ -44,7 +41,8 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // Set App Language
-        String language = SharedPrefUtil.getInstance(this).read(LOCALE, Locale.getDefault().getLanguage());
+        String language = SharedPrefUtil.getInstance(this).read(LOCALE, Locale.getDefault()
+                .getLanguage());
         Locale locale = new Locale(language);
         Resources resources = getResources();
         Configuration configuration = resources.getConfiguration();
@@ -55,11 +53,8 @@ public class SplashActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        helpers = new PreferenceHelper(this);
 
         setContentView(R.layout.activity_splash);
-
-        tinydb = new TinyDB(SplashActivity.this);
 
         new Handler().postDelayed(new Runnable() {
             @Override

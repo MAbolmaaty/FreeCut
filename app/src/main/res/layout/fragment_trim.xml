@@ -1,126 +1,222 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/rootView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/darkBlue"
-    android:fillViewport="true"
-    android:scrollbars="none"
+    android:background="@color/colorPrimaryDark"
     tools:context=".ui.fragments.TrimFragment">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+    <ImageView
+        android:id="@+id/banner"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/_46sdp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/gid"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:id="@+id/banner"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/_46sdp"
-            android:scaleType="centerCrop"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:src="@drawable/gid" />
+    <ImageView
+        android:id="@+id/icVideo"
+        android:layout_width="@dimen/_40sdp"
+        android:layout_height="@dimen/_40sdp"
+        android:src="@drawable/ic_video"
+        app:layout_constraintBottom_toTopOf="@+id/openGallery"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
 
-        <ImageView
-            android:id="@+id/view_videoView"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_margin="@dimen/_16sdp"
-            android:background="@drawable/background_rectangle_corners_stroke_18"
-            android:elevation="@dimen/_8sdp"
-            android:fontFamily="@font/cairo_semi_bold"
-            app:layout_constraintBottom_toTopOf="@+id/textView_enterSeconds"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/banner" />
+    <Button
+        android:id="@+id/openGallery"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_8sdp"
+        android:background="@drawable/background_rectangle_multi_colors"
+        android:fontFamily="@font/cairo_semi_bold"
+        android:stateListAnimator="@null"
+        android:text="@string/gallery"
+        android:paddingStart="@dimen/_30sdp"
+        android:paddingEnd="@dimen/_30sdp"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="@dimen/_12sdp"
+        app:layout_constraintTop_toBottomOf="@+id/icVideo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/pickUpTrim"/>
 
-        <ImageView
-            android:id="@+id/imageView_noVideo"
-            android:layout_width="@dimen/_36sdp"
-            android:layout_height="@dimen/_36sdp"
-            android:background="@drawable/icons_video"
-            app:tint="@android:color/white"
-            android:elevation="@dimen/_8sdp"
-            app:layout_constraintBottom_toBottomOf="@id/view_videoView"
-            app:layout_constraintEnd_toEndOf="@id/view_videoView"
-            app:layout_constraintStart_toStartOf="@id/view_videoView"
-            app:layout_constraintTop_toTopOf="@id/view_videoView" />
+    <TextView
+        android:id="@+id/pickUpTrim"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/pick_up_trim"
+        android:textColor="@android:color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/openGallery" />
 
-        <TextView
-            android:id="@+id/textView_noVideo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/_8sdp"
-            android:text="@string/no_video"
-            android:textColor="@android:color/white"
-            android:textSize="@dimen/_12sdp"
-            android:elevation="@dimen/_8sdp"
-            android:fontFamily="@font/cairo_semi_bold"
-            app:layout_constraintEnd_toEndOf="@id/view_videoView"
-            app:layout_constraintStart_toStartOf="@id/view_videoView"
-            app:layout_constraintTop_toBottomOf="@+id/imageView_noVideo" />
+    <VideoView
+        android:id="@+id/videoView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/enterSeconds"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:layout_height="200dp" />
 
-        <TextView
-            android:id="@+id/textView_enterSeconds"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/_8sdp"
-            android:text="@string/enter_seconds"
-            android:textColor="@color/orange"
-            android:textSize="@dimen/_12sdp"
-            android:fontFamily="@font/cairo_semi_bold"
-            app:layout_constraintBottom_toTopOf="@+id/numberOfSeconds"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+    <View
+        android:id="@+id/videoSeekBarMiddle"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/videoView" />
 
-        <EditText
-            android:id="@+id/numberOfSeconds"
-            android:layout_width="@dimen/_118sdp"
-            android:layout_height="@dimen/_38sdp"
-            android:layout_marginBottom="@dimen/_8sdp"
-            android:background="@drawable/background_rectangle_corners_stroke_18"
-            android:gravity="center"
-            android:hint="@string/default_number_of_seconds"
-            android:inputType="number"
-            android:textColor="@android:color/white"
-            android:textSize="@dimen/_12sdp"
-            android:fontFamily="@font/cairo_semi_bold"
-            android:windowSoftInputMode="adjustPan"
-            app:layout_constraintBottom_toTopOf="@+id/trim"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+    <androidx.appcompat.widget.AppCompatSeekBar
+        android:id="@+id/videoSeekBar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:progressTint="@android:color/white"
+        android:thumbTint="@android:color/white"
+        android:thumbOffset="@dimen/_3sdp"
+        android:paddingStart="0dp"
+        android:paddingEnd="0dp"
+        android:alpha="0"
+        tools:alpha="1"
+        tools:progress="50"
+        android:visibility="invisible"
+        app:layout_constraintTop_toTopOf="@id/videoSeekBarMiddle"
+        app:layout_constraintBottom_toBottomOf="@id/videoSeekBarMiddle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
-        <Button
-            android:id="@+id/trim"
-            android:layout_width="@dimen/_118sdp"
-            android:layout_height="@dimen/_38sdp"
-            android:layout_margin="@dimen/_8sdp"
-            android:background="@drawable/background_rectangle_corners_18"
-            android:backgroundTint="@color/orange"
-            android:elevation="@dimen/_12sdp"
-            android:stateListAnimator="@null"
-            android:text="@string/trim"
-            android:textAllCaps="false"
-            android:textColor="@color/white"
-            android:textSize="@dimen/_12sdp"
-            android:fontFamily="@font/cairo_semi_bold"
-            app:layout_constraintBottom_toTopOf="@+id/adView"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+    <ImageView
+        android:id="@+id/icVideoControl"
+        android:layout_width="@dimen/_40sdp"
+        android:layout_height="@dimen/_40sdp"
+        android:src="@drawable/ic_pause"
+        android:padding="@dimen/_10sdp"
+        android:alpha="0"
+        tools:alpha="1"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@id/videoView"
+        app:layout_constraintEnd_toEndOf="@id/videoView"
+        app:layout_constraintStart_toStartOf="@id/videoView"
+        app:layout_constraintTop_toTopOf="@id/videoView"
+        app:tint="@android:color/white" />
 
-        <com.google.android.gms.ads.AdView
-            android:id="@+id/adView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/_8sdp"
-            app:adSize="BANNER"
-            app:adUnitId="ca-app-pub-6503532425142366/6199804785"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+    <TextView
+        android:id="@+id/videoTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="0:05 / 4:30"
+        android:alpha="0"
+        tools:alpha="1"
+        android:visibility="invisible"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/_10sdp"
+        android:layout_margin="@dimen/_8sdp"
+        app:layout_constraintStart_toStartOf="@+id/videoView"
+        app:layout_constraintBottom_toBottomOf="@id/videoView"/>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</ScrollView>
+    <ImageView
+        android:id="@+id/voiceControl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_8sdp"
+        android:src="@drawable/ic_speaker"
+        android:clickable="false"
+        app:tint="@android:color/white"
+        android:alpha="0"
+        tools:alpha="1"
+        android:visibility="invisible"
+        android:paddingTop="@dimen/_10sdp"
+        android:paddingStart="@dimen/_10sdp"
+        android:paddingEnd="@dimen/_10sdp"
+        app:layout_constraintEnd_toEndOf="@+id/videoView"
+        app:layout_constraintBottom_toBottomOf="@+id/videoView"/>
+
+    <TextView
+        android:id="@+id/videoName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_4sdp"
+        android:layout_marginStart="@dimen/_8sdp"
+        android:layout_marginEnd="@dimen/_8sdp"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/_10sdp"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="@+id/videoView"
+        app:layout_constraintStart_toStartOf="@+id/videoView"
+        app:layout_constraintTop_toBottomOf="@+id/videoSeekBar"
+        tools:text="Pirates Of Caribbean" />
+
+    <TextView
+        android:id="@+id/enterSeconds"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/_8sdp"
+        android:fontFamily="@font/cairo_semi_bold"
+        android:text="@string/enter_seconds"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/_12sdp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/numberOfSeconds"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <EditText
+        android:id="@+id/numberOfSeconds"
+        android:layout_width="@dimen/_118sdp"
+        android:layout_height="@dimen/_38sdp"
+        android:layout_marginBottom="@dimen/_8sdp"
+        android:background="@drawable/background_rectangle_corners_stroke_18"
+        android:fontFamily="@font/cairo_semi_bold"
+        android:gravity="center"
+        android:hint="@string/default_number_of_seconds"
+        android:inputType="number"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/_12sdp"
+        android:visibility="invisible"
+        android:windowSoftInputMode="adjustPan"
+        app:layout_constraintBottom_toTopOf="@+id/trim"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/trim"
+        android:layout_width="@dimen/_118sdp"
+        android:layout_height="@dimen/_38sdp"
+        android:layout_margin="@dimen/_8sdp"
+        android:background="@drawable/background_rectangle_multi_colors"
+        android:elevation="@dimen/_12sdp"
+        android:fontFamily="@font/cairo_semi_bold"
+        android:stateListAnimator="@null"
+        android:text="@string/trim"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="@dimen/_12sdp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/adView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_8sdp"
+        android:visibility="gone"
+        app:adSize="BANNER"
+        app:adUnitId="ca-app-pub-6503532425142366/6199804785"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
