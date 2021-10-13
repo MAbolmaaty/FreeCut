@@ -3,14 +3,12 @@ package force.freecut.freecut.ui.fragments;
 import static com.arthenica.mobileffmpeg.Config.RETURN_CODE_SUCCESS;
 import static force.freecut.freecut.utils.Constants.SEGMENT_TIME;
 import static force.freecut.freecut.utils.Constants.STORAGE_DIRECTORY;
-import static force.freecut.freecut.utils.Constants.VIDEO_DURATION;
 import static force.freecut.freecut.utils.Constants.VIDEO_NAME;
 import static force.freecut.freecut.utils.Constants.VIDEO_PATH;
 
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -164,6 +162,11 @@ public class TrimProcessFragment extends Fragment {
                         int numberOfVideos = (int) Math.ceil((double) videoDuration
                                 / bundle.getInt(SEGMENT_TIME));
 
+                        showVideoControls();
+                        controlVideo();
+                        controlVideoSeekbar();
+                        controlVideoVoice();
+
                         mMediaPlayer = mp;
                         mVideoSeekBar.setProgress(0);
                         mVideoSeekBar.setMax(mVideoView.getDuration());
@@ -191,131 +194,6 @@ public class TrimProcessFragment extends Fragment {
                         trim(bundle.getString(STORAGE_DIRECTORY), bundle.getString(VIDEO_PATH),
                                 bundle.getInt(SEGMENT_TIME), videoDuration,
                                 0, 1);
-                    }
-                });
-
-                mIcVideoControl.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (mIcVideoControl.getAlpha() == 0) {
-                            mBlockSeekBar = false;
-                            mVideoSeekBar.animate().alpha(1);
-                            mIcVideoControl.animate().alpha(1);
-                            mVoiceControl.setClickable(true);
-                            mVoiceControl.animate().alpha(1);
-                            mVideoTime.animate().alpha(1);
-                            mVideoControlsVisible = true;
-                            new Handler().postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (mVideoView.isPlaying() && mVideoControlsVisible) {
-                                        mVideoSeekBar.animate().alpha(0);
-                                        mBlockSeekBar = true;
-                                        mIcVideoControl.animate().alpha(0);
-                                        mVideoTime.animate().alpha(0);
-                                        mVoiceControl.setClickable(false);
-                                        mVoiceControl.animate().alpha(0);
-                                        mVideoControlsVisible = false;
-                                    }
-                                }
-                            }, 3000);
-                            return;
-                        }
-                        if (mVideoView.isPlaying()) {
-                            mIcVideoControl.setImageResource(R.drawable.ic_play);
-                            mVideoView.pause();
-                        } else {
-                            mIcVideoControl.setImageResource(R.drawable.ic_pause);
-                            mVideoView.start();
-                            mBlockSeekBar = true;
-                            mVideoSeekBar.setAlpha(0);
-                            mIcVideoControl.setAlpha((float) 0);
-                            mVideoTime.setAlpha(0);
-                            mVoiceControl.setClickable(false);
-                            mVoiceControl.setAlpha((float) 0);
-                            mVideoControlsVisible = false;
-                        }
-                    }
-                });
-
-                mVideoView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        if (mVideoControlsVisible) {
-                            mVideoSeekBar.animate().alpha(0);
-                            mBlockSeekBar = true;
-                            mIcVideoControl.animate().alpha(0);
-                            mVideoTime.animate().alpha(0);
-                            mVoiceControl.setClickable(false);
-                            mVoiceControl.animate().alpha(0);
-                            mVideoControlsVisible = false;
-                        } else {
-                            mBlockSeekBar = false;
-                            mVideoSeekBar.animate().alpha(1);
-                            mIcVideoControl.animate().alpha(1);
-                            mVideoTime.animate().alpha(1);
-                            mVoiceControl.setClickable(true);
-                            mVoiceControl.animate().alpha(1);
-                            mVideoControlsVisible = true;
-                            new Handler().postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (mVideoView.isPlaying() && mVideoControlsVisible) {
-                                        mVideoSeekBar.animate().alpha(0);
-                                        mBlockSeekBar = true;
-                                        mIcVideoControl.animate().alpha(0);
-                                        mVideoTime.animate().alpha(0);
-                                        mVoiceControl.setClickable(false);
-                                        mVoiceControl.animate().alpha(0);
-                                        mVideoControlsVisible = false;
-                                    }
-                                }
-                            }, 3000);
-                        }
-                    }
-                });
-
-                mVideoSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                    @Override
-                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                        if (fromUser) {
-                            mVideoView.seekTo(progress);
-                            mVideoTime.setText(String.format(Locale.ENGLISH, "%s / %s",
-                                    getVideoTime(progress / 1000),
-                                    getVideoTime(mVideoView.getDuration() / 1000)));
-                        }
-                    }
-
-                    @Override
-                    public void onStartTrackingTouch(SeekBar seekBar) {
-
-                    }
-
-                    @Override
-                    public void onStopTrackingTouch(SeekBar seekBar) {
-
-                    }
-                });
-
-                mVideoSeekBar.setOnTouchListener(new View.OnTouchListener() {
-                    @Override
-                    public boolean onTouch(View v, MotionEvent event) {
-                        return mBlockSeekBar;
-                    }
-                });
-
-                mVoiceControl.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (mVideoMuted) {
-                            mMediaPlayer.setVolume(1.0f, 1.0f);
-                            mVoiceControl.setImageResource(R.drawable.ic_speaker);
-                            mVideoMuted = false;
-                        } else {
-                            mMediaPlayer.setVolume(0, 0);
-                            mVoiceControl.setImageResource(R.drawable.ic_silent);
-                            mVideoMuted = true;
-                        }
                     }
                 });
             }
@@ -362,8 +240,8 @@ public class TrimProcessFragment extends Fragment {
             @Override
             public void apply(long executionId, int returnCode) {
                 if (returnCode == RETURN_CODE_SUCCESS) {
-                    mVideosAdapter.setVideoProgress(counter - 1, 100);
                     mVideosAdapter.setVideoPath(counter - 1, file);
+                    mVideosAdapter.setVideoProgress(counter - 1, 100);
                     mVideoStatisticsViewModel.setVideoStatisticsStatus(false);
                     trim(storageDirectory, videoPath,
                             segmentTime, videoDuration, start + segmentTime,
@@ -427,5 +305,138 @@ public class TrimProcessFragment extends Fragment {
             return String.format(Locale.ENGLISH, "%d:%d:%02d", hour, minute, second);
         else
             return String.format(Locale.ENGLISH, "%d:%02d", minute, second);
+    }
+
+    private void controlVideo(){
+        mIcVideoControl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mIcVideoControl.getAlpha() == 0) {
+                    mBlockSeekBar = false;
+                    mVideoSeekBar.animate().alpha(1);
+                    mIcVideoControl.animate().alpha(1);
+                    mVoiceControl.setClickable(true);
+                    mVoiceControl.animate().alpha(1);
+                    mVideoTime.animate().alpha(1);
+                    mVideoControlsVisible = true;
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (mVideoView.isPlaying() && mVideoControlsVisible) {
+                                mVideoSeekBar.animate().alpha(0);
+                                mBlockSeekBar = true;
+                                mIcVideoControl.animate().alpha(0);
+                                mVideoTime.animate().alpha(0);
+                                mVoiceControl.setClickable(false);
+                                mVoiceControl.animate().alpha(0);
+                                mVideoControlsVisible = false;
+                            }
+                        }
+                    }, 3000);
+                    return;
+                }
+                if (mVideoView.isPlaying()) {
+                    mIcVideoControl.setImageResource(R.drawable.ic_play);
+                    mVideoView.pause();
+                } else {
+                    mIcVideoControl.setImageResource(R.drawable.ic_pause);
+                    mVideoView.start();
+                    mBlockSeekBar = true;
+                    mVideoSeekBar.setAlpha(0);
+                    mIcVideoControl.setAlpha((float) 0);
+                    mVideoTime.setAlpha(0);
+                    mVoiceControl.setClickable(false);
+                    mVoiceControl.setAlpha((float) 0);
+                    mVideoControlsVisible = false;
+                }
+            }
+        });
+    }
+
+    private void showVideoControls(){
+        mVideoView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mVideoControlsVisible) {
+                    mVideoSeekBar.animate().alpha(0);
+                    mBlockSeekBar = true;
+                    mIcVideoControl.animate().alpha(0);
+                    mVideoTime.animate().alpha(0);
+                    mVoiceControl.setClickable(false);
+                    mVoiceControl.animate().alpha(0);
+                    mVideoControlsVisible = false;
+                } else {
+                    mBlockSeekBar = false;
+                    mVideoSeekBar.animate().alpha(1);
+                    mIcVideoControl.animate().alpha(1);
+                    mVideoTime.animate().alpha(1);
+                    mVoiceControl.setClickable(true);
+                    mVoiceControl.animate().alpha(1);
+                    mVideoControlsVisible = true;
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (mVideoView.isPlaying() && mVideoControlsVisible) {
+                                mVideoSeekBar.animate().alpha(0);
+                                mBlockSeekBar = true;
+                                mIcVideoControl.animate().alpha(0);
+                                mVideoTime.animate().alpha(0);
+                                mVoiceControl.setClickable(false);
+                                mVoiceControl.animate().alpha(0);
+                                mVideoControlsVisible = false;
+                            }
+                        }
+                    }, 3000);
+                }
+            }
+        });
+    }
+
+    private void controlVideoSeekbar(){
+        mVideoSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) {
+                    mVideoView.seekTo(progress);
+                    mVideoTime.setText(String.format(Locale.ENGLISH, "%s / %s",
+                            getVideoTime(progress / 1000),
+                            getVideoTime(mVideoView.getDuration() / 1000)));
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        mVideoSeekBar.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return mBlockSeekBar;
+            }
+        });
+    }
+
+    private void controlVideoVoice(){
+        mVoiceControl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mVideoMuted) {
+                    mMediaPlayer.setVolume(1.0f, 1.0f);
+                    mVoiceControl.setImageResource(R.drawable.ic_speaker);
+                    mVideoMuted = false;
+                } else {
+                    mMediaPlayer.setVolume(0, 0);
+                    mVoiceControl.setImageResource(R.drawable.ic_silent);
+                    mVideoMuted = true;
+                }
+            }
+        });
     }
 }

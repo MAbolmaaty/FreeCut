@@ -4,8 +4,9 @@
     <color name="colorPrimaryDark">#001F34</color>
     <color name="colorAccent">#01a6fe</color>
     <color name="colorAccent2">#0188FE</color>
-
-
+    <color name="black1">#60000000</color>
+    <color name="black2">#30000000</color>
+    <color name="black3">#00000000</color>
     <color name="button">#eca820</color>
     <color name="button2">#eca518</color>
     <color name="white">#ffffff</color>
@@ -17,10 +18,9 @@
     <color name="edit">#71efefef</color>
     <color name="shadow">#d6161d26</color>
     <color name="shadow_top">#263346</color>
-    <color name="black">#ff000000</color>
+
     <color name="view_color">#cccccc</color>
     <color name="black_trans_dark">#CC000000</color>
-
     <color name="orange">#eca820</color>
     <color name="grey">#606060</color>
     <color name="lightGrey">#808080</color>

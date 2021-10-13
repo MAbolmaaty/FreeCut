@@ -7,7 +7,6 @@ import static force.freecut.freecut.utils.Constants.PROCESS_SPEED_TRIM;
 import static force.freecut.freecut.utils.Constants.PROCESS_TRIM;
 import static force.freecut.freecut.utils.Constants.SEGMENT_TIME;
 import static force.freecut.freecut.utils.Constants.STORAGE_DIRECTORY;
-import static force.freecut.freecut.utils.Constants.VIDEO_DURATION;
 import static force.freecut.freecut.utils.Constants.VIDEO_NAME;
 import static force.freecut.freecut.utils.Constants.VIDEO_PATH;
 
@@ -79,7 +78,6 @@ public class TrimFragment extends Fragment {
 
     private String mVideoPath;
     private String mVideoName;
-    private int mVideoDuration;
 
     private String mParam1;
     private String mParam2;
@@ -108,6 +106,8 @@ public class TrimFragment extends Fragment {
     private TextView mPickUpTrim;
 
     private VideoView mVideoView;
+    private View mViewShadow;
+    private ImageView mIcShare;
     private AppCompatSeekBar mVideoSeekBar;
     private ImageView mIcVideoControl;
     private ImageView mVoiceControl;
@@ -177,6 +177,8 @@ public class TrimFragment extends Fragment {
         mOpenGallery = view.findViewById(R.id.openGallery);
         mPickUpTrim = view.findViewById(R.id.pickUpTrim);
         mVideoView = view.findViewById(R.id.videoView);
+        mViewShadow = view.findViewById(R.id.shadow);
+        mIcShare = view.findViewById(R.id.ic_share);
         mVideoSeekBar = view.findViewById(R.id.videoSeekBar);
         mIcVideoControl = view.findViewById(R.id.icVideoControl);
         mVideoTime = view.findViewById(R.id.videoTime);
@@ -256,10 +258,11 @@ public class TrimFragment extends Fragment {
                                 PROCESS_SPEED_TRIM, mNumberOfSeconds.getText().toString());
 
                         Bundle bundle = new Bundle();
-                        bundle.putString(SEGMENT_TIME, mNumberOfSeconds.getText().toString());
+                        bundle.putString(STORAGE_DIRECTORY, storageDirectory);
+                        bundle.putInt(SEGMENT_TIME,
+                                Integer.parseInt(mNumberOfSeconds.getText().toString()));
                         bundle.putString(VIDEO_NAME, mVideoName);
                         bundle.putString(VIDEO_PATH, mVideoPath);
-                        bundle.putString(STORAGE_DIRECTORY, storageDirectory);
                         mTrimViewModel.setTrimBundle(bundle);
                         loadFragment(getActivity().getSupportFragmentManager(),
                                 SpeedTrimProcessFragment.newInstance(null, null), false);
@@ -286,8 +289,8 @@ public class TrimFragment extends Fragment {
                         bundle.putString(STORAGE_DIRECTORY, storageDirectory);
                         bundle.putString(VIDEO_NAME, mVideoName);
                         bundle.putString(VIDEO_PATH, mVideoPath);
-                        bundle.putInt(VIDEO_DURATION, mVideoDuration);
-                        bundle.putInt(SEGMENT_TIME, Integer.parseInt(mNumberOfSeconds.getText().toString()));
+                        bundle.putInt(SEGMENT_TIME,
+                                Integer.parseInt(mNumberOfSeconds.getText().toString()));
                         mTrimViewModel.setTrimBundle(bundle);
                         loadFragment(getActivity().getSupportFragmentManager(),
                                 TrimProcessFragment.newInstance(null, null), false);
@@ -337,7 +340,6 @@ public class TrimFragment extends Fragment {
                 mVideoPath = Utils.getRealPathFromURI_API19(getActivity(), mSelectedVideoUri);
                 String[] pathSegments = mVideoPath.split("/");
                 mVideoName = pathSegments[pathSegments.length - 1];
-                mVideoDuration = getVideoDuration(mVideoPath);
                 mIcVideo.setVisibility(View.INVISIBLE);
                 mOpenGallery.setVisibility(View.INVISIBLE);
                 mPickUpTrim.setVisibility(View.INVISIBLE);
@@ -523,6 +525,8 @@ public class TrimFragment extends Fragment {
         if (visible) {
             mVideoView.setVisibility(View.VISIBLE);
             mVideoSeekBar.setVisibility(View.VISIBLE);
+            mViewShadow.setVisibility(View.VISIBLE);
+            mIcShare.setVisibility(View.VISIBLE);
             mIcVideoControl.setVisibility(View.VISIBLE);
             mVoiceControl.setVisibility(View.VISIBLE);
             mVideoTime.setVisibility(View.VISIBLE);
@@ -532,6 +536,8 @@ public class TrimFragment extends Fragment {
         } else {
             mVideoView.setVisibility(View.INVISIBLE);
             mVideoSeekBar.setVisibility(View.INVISIBLE);
+            mViewShadow.setVisibility(View.INVISIBLE);
+            mIcShare.setVisibility(View.INVISIBLE);
             mIcVideoControl.setVisibility(View.INVISIBLE);
             mVoiceControl.setVisibility(View.INVISIBLE);
             mVideoTime.setVisibility(View.INVISIBLE);
@@ -547,28 +553,26 @@ public class TrimFragment extends Fragment {
         mVideoView.setVisibility(View.VISIBLE);
         mVideoView.requestFocus();
 
+        mIcShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("video/*");
+                shareIntent.putExtra(Intent.EXTRA_STREAM, videoUri);
+                getActivity().startActivity(Intent.createChooser(shareIntent, ""));
+            }
+        });
+
         mIcVideoControl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mIcVideoControl.getAlpha() == 0) {
-                    mBlockSeekBar = false;
-                    mVideoSeekBar.animate().alpha(1);
-                    mIcVideoControl.animate().alpha(1);
-                    mVoiceControl.setClickable(true);
-                    mVoiceControl.animate().alpha(1);
-                    mVideoTime.animate().alpha(1);
-                    mVideoControlsVisible = true;
+                    showVideoControls(true);
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
                             if (mVideoView.isPlaying() && mVideoControlsVisible) {
-                                mVideoSeekBar.animate().alpha(0);
-                                mBlockSeekBar = true;
-                                mIcVideoControl.animate().alpha(0);
-                                mVideoTime.animate().alpha(0);
-                                mVoiceControl.setClickable(false);
-                                mVoiceControl.animate().alpha(0);
-                                mVideoControlsVisible = false;
+                                showVideoControls(false);
                             }
                         }
                     }, 3000);
@@ -582,6 +586,8 @@ public class TrimFragment extends Fragment {
                     mVideoView.start();
                     mBlockSeekBar = true;
                     mVideoSeekBar.setAlpha(0);
+                    mViewShadow.setAlpha(0);
+                    mIcShare.setAlpha((float) 0);
                     mIcVideoControl.setAlpha((float) 0);
                     mVideoTime.setAlpha(0);
                     mVoiceControl.setClickable(false);
@@ -595,32 +601,14 @@ public class TrimFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 if (mVideoControlsVisible) {
-                    mVideoSeekBar.animate().alpha(0);
-                    mBlockSeekBar = true;
-                    mIcVideoControl.animate().alpha(0);
-                    mVideoTime.animate().alpha(0);
-                    mVoiceControl.setClickable(false);
-                    mVoiceControl.animate().alpha(0);
-                    mVideoControlsVisible = false;
+                    showVideoControls(false);
                 } else {
-                    mBlockSeekBar = false;
-                    mVideoSeekBar.animate().alpha(1);
-                    mIcVideoControl.animate().alpha(1);
-                    mVideoTime.animate().alpha(1);
-                    mVoiceControl.setClickable(true);
-                    mVoiceControl.animate().alpha(1);
-                    mVideoControlsVisible = true;
+                    showVideoControls(true);
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
                             if (mVideoView.isPlaying() && mVideoControlsVisible) {
-                                mVideoSeekBar.animate().alpha(0);
-                                mBlockSeekBar = true;
-                                mIcVideoControl.animate().alpha(0);
-                                mVideoTime.animate().alpha(0);
-                                mVoiceControl.setClickable(false);
-                                mVoiceControl.animate().alpha(0);
-                                mVideoControlsVisible = false;
+                                showVideoControls(false);
                             }
                         }
                     }, 3000);
@@ -696,6 +684,30 @@ public class TrimFragment extends Fragment {
             return String.format(Locale.ENGLISH, "%d:%d:%02d", hour, minute, second);
         else
             return String.format(Locale.ENGLISH, "%d:%02d", minute, second);
+    }
+
+    private void showVideoControls(boolean show){
+        if (show){
+            mBlockSeekBar = false;
+            mVideoSeekBar.animate().alpha(1);
+            mViewShadow.animate().alpha(1);
+            mIcShare.animate().alpha(1);
+            mIcVideoControl.animate().alpha(1);
+            mVoiceControl.setClickable(true);
+            mVoiceControl.animate().alpha(1);
+            mVideoTime.animate().alpha(1);
+            mVideoControlsVisible = true;
+        } else {
+            mVideoSeekBar.animate().alpha(0);
+            mBlockSeekBar = true;
+            mIcVideoControl.animate().alpha(0);
+            mViewShadow.animate().alpha(0);
+            mIcShare.animate().alpha(0);
+            mVideoTime.animate().alpha(0);
+            mVoiceControl.setClickable(false);
+            mVoiceControl.animate().alpha(0);
+            mVideoControlsVisible = false;
+        }
     }
 
     private int getVideoDuration(String videoPath) {

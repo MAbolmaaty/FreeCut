@@ -1,7 +1,7 @@
 package force.freecut.freecut.adapters;
 
 import android.content.Context;
-import android.util.Log;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,14 +12,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.arthenica.mobileffmpeg.Config;
-import com.arthenica.mobileffmpeg.Statistics;
-import com.arthenica.mobileffmpeg.StatisticsCallback;
 import com.bumptech.glide.Glide;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 import force.freecut.freecut.Data.TrimmedVideo;
@@ -71,6 +66,7 @@ public class OutputVideosAdapter
             holder.mVideoProgressStatus.setText("");
             Glide.with(mContext).load(mTrimmedVideos[position].getVideoFile()).fitCenter()
                     .into(holder.mVideoThumbnail);
+            hideVideoProgress(holder);
         }
     }
 
@@ -86,6 +82,13 @@ public class OutputVideosAdapter
         private ProgressBar mVideoProgress;
         private TextView mProgressPercentage;
         private TextView mVideoProgressStatus;
+        private ImageView mIcTikTok;
+        private ImageView mIcFacebook;
+        private ImageView mIcInstagram;
+        private ImageView mIcTwitter;
+        private ImageView mIcSnapchat;
+        private ImageView mIcWhatsapp;
+        private ImageView mIcPlayVideo;
 
         public OutputVideoViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -94,6 +97,13 @@ public class OutputVideosAdapter
             mVideoName = itemView.findViewById(R.id.videoName);
             mProgressPercentage = itemView.findViewById(R.id.progressPercentage);
             mVideoProgressStatus = itemView.findViewById(R.id.videoProgressStatus);
+            mIcTikTok = itemView.findViewById(R.id.ic_share);
+            mIcFacebook = itemView.findViewById(R.id.ic_facebook);
+            mIcInstagram = itemView.findViewById(R.id.ic_instagram);
+            mIcTwitter = itemView.findViewById(R.id.ic_twitter);
+            mIcSnapchat = itemView.findViewById(R.id.ic_snapchat);
+            mIcWhatsapp = itemView.findViewById(R.id.ic_whatsapp);
+            mIcPlayVideo = itemView.findViewById(R.id.ic_playVideo);
         }
 
         public void updateProgressBar(int progress){
@@ -112,6 +122,36 @@ public class OutputVideosAdapter
 
     public void setVideoPath(int position, File file){
         mTrimmedVideos[position].setVideoFile(file);
-        notifyItemChanged(position);
+    }
+
+    private void hideVideoProgress(OutputVideoViewHolder holder){
+        holder.mVideoProgress.animate().alpha(0).setDuration(500);
+        holder.mProgressPercentage.animate().alpha(0).setDuration(500);
+        holder.mVideoProgressStatus.animate().alpha(0).setDuration(500);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                holder.mVideoProgress.setVisibility(View.INVISIBLE);
+                holder.mProgressPercentage.setVisibility(View.INVISIBLE);
+                holder.mVideoProgressStatus.setVisibility(View.INVISIBLE);
+
+                holder.mIcTikTok.setVisibility(View.VISIBLE);
+                holder.mIcFacebook.setVisibility(View.VISIBLE);
+                holder.mIcInstagram.setVisibility(View.VISIBLE);
+                holder.mIcTwitter.setVisibility(View.VISIBLE);
+                holder.mIcSnapchat.setVisibility(View.VISIBLE);
+                holder.mIcWhatsapp.setVisibility(View.VISIBLE);
+                holder.mIcPlayVideo.setVisibility(View.VISIBLE);
+
+                holder.mIcTikTok.animate().alpha(1).setDuration(500);
+                holder.mIcFacebook.animate().alpha(1).setDuration(500);
+                holder.mIcInstagram.animate().alpha(1).setDuration(500);
+                holder.mIcTwitter.animate().alpha(1).setDuration(500);
+                holder.mIcSnapchat.animate().alpha(1).setDuration(500);
+                holder.mIcWhatsapp.animate().alpha(1).setDuration(500);
+                holder.mIcPlayVideo.animate().alpha(1).setDuration(500);
+            }
+        }, 500);
+
     }
 }

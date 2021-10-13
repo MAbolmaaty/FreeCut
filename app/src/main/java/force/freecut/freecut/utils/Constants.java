@@ -3,7 +3,6 @@ package force.freecut.freecut.utils;
 public final class Constants {
     public static final String VIDEO_PATH = "video_path";
     public static final String VIDEO_NAME = "video_name";
-    public static final String VIDEO_DURATION = "video_duration";
     public static final String SEGMENT_TIME = "segment_time";
     public static final String PROCESS_SPEED_TRIM = "speed-trim";
     public static final String PROCESS_TRIM = "trim";

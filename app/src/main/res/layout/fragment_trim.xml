@@ -71,6 +71,31 @@
         tools:layout_height="200dp" />
 
     <View
+        android:id="@+id/shadow"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/bg_multi_blacks"
+        android:visibility="invisible"
+        android:alpha="0"
+        app:layout_constraintStart_toStartOf="@+id/videoView"
+        app:layout_constraintEnd_toEndOf="@+id/videoView"
+        app:layout_constraintTop_toTopOf="@+id/videoView"
+        app:layout_constraintBottom_toTopOf="@+id/icVideoControl"/>
+
+    <ImageView
+        android:id="@+id/ic_share"
+        android:layout_width="@dimen/_20sdp"
+        android:layout_height="@dimen/_20sdp"
+        android:src="@drawable/ic_cloud"
+        android:alpha="0"
+        tools:alpha="1"
+        android:visibility="invisible"
+        tools:visibility="visible"
+        android:layout_margin="@dimen/_8sdp"
+        app:layout_constraintEnd_toEndOf="@+id/videoView"
+        app:layout_constraintTop_toTopOf="@+id/videoView" />
+
+    <View
         android:id="@+id/videoSeekBarMiddle"
         android:layout_width="0dp"
         android:layout_height="1dp"
