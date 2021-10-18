@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#1d0335</color>
-    <color name="colorPrimaryDark">#001F34</color>
+    <color name="colorPrimary">#272A3B</color>
+    <color name="colorPrimaryDark">#272A3B</color>
     <color name="colorAccent">#01a6fe</color>
     <color name="colorAccent2">#0188FE</color>
     <color name="black1">#60000000</color>
@@ -12,7 +12,9 @@
     <color name="white">#ffffff</color>
     <color name="app_background">#263346</color>
     <color name="upload_background">#af959799</color>
-
+    <color name="bg1">#181921</color>
+    <color name="bg2">#1C1F29</color>
+    <color name="bg3">#262A3A</color>
     <color name="lighter_gray">#ddd</color>
     <color name="darker_gray">#aaa</color>
     <color name="edit">#71efefef</color>

@@ -34,7 +34,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.AppCompatSeekBar;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
@@ -108,13 +107,17 @@ public class TrimFragment extends Fragment {
     private VideoView mVideoView;
     private View mViewShadow;
     private ImageView mIcShare;
+    private ImageView mIcRemove;
     private AppCompatSeekBar mVideoSeekBar;
     private ImageView mIcVideoControl;
     private ImageView mVoiceControl;
     private TextView mVideoTime;
+    private TextView mTextViewVideoName;
     private TextView mEnterSeconds;
     private EditText mNumberOfSeconds;
     private Button mTrim;
+    private Button mSpeedTrim;
+    private View mVideoViewBackground;
 
     private boolean mBlockSeekBar = true;
     private boolean mVideoControlsVisible = false;
@@ -168,8 +171,6 @@ public class TrimFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_trim, container, false);
 
-        Log.d(TAG, "TrimFragment onCreateView");
-
         mTrimViewModel = ViewModelProviders.of(getActivity()).get(TrimViewModel.class);
 
         mBanner = view.findViewById(R.id.banner);
@@ -177,15 +178,19 @@ public class TrimFragment extends Fragment {
         mOpenGallery = view.findViewById(R.id.openGallery);
         mPickUpTrim = view.findViewById(R.id.pickUpTrim);
         mVideoView = view.findViewById(R.id.videoView);
+        mVideoViewBackground = view.findViewById(R.id.videoViewBackground);
         mViewShadow = view.findViewById(R.id.shadow);
         mIcShare = view.findViewById(R.id.ic_share);
+        mIcRemove = view.findViewById(R.id.ic_remove);
         mVideoSeekBar = view.findViewById(R.id.videoSeekBar);
         mIcVideoControl = view.findViewById(R.id.icVideoControl);
         mVideoTime = view.findViewById(R.id.videoTime);
+        mTextViewVideoName = view.findViewById(R.id.videoName);
         mVoiceControl = view.findViewById(R.id.voiceControl);
         mEnterSeconds = view.findViewById(R.id.enterSeconds);
         mNumberOfSeconds = view.findViewById(R.id.numberOfSeconds);
         mTrim = view.findViewById(R.id.trim);
+        mSpeedTrim = view.findViewById(R.id.speedTrim);
 
         mBanner.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -207,7 +212,6 @@ public class TrimFragment extends Fragment {
         // Initialize SharedPreference
         tinydb = new TinyDB(getActivity());
 
-
         new GetDataSync().execute();
 
         mTrim.setOnClickListener(new View.OnClickListener() {
@@ -217,17 +221,13 @@ public class TrimFragment extends Fragment {
                     mToast.cancel();
 
                 if (mNumberOfSeconds.getText().toString().isEmpty()) {
-                    mNumberOfSeconds.startAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.shake50));
+                    mNumberOfSeconds.startAnimation(AnimationUtils.loadAnimation(getActivity(),
+                            R.anim.shake50));
                     mToast = Toast.makeText(getActivity(),
                             getString(R.string.specify_number_of_seconds), Toast.LENGTH_SHORT);
                     mToast.show();
                     return;
                 }
-
-                final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder.setView(inflater.inflate(R.layout.dialog_trim_type, null));
-                final AlertDialog dialog = builder.create();
-                dialog.show();
 
                 File file = new File(mSelectedVideoUri.toString());
 
@@ -242,60 +242,69 @@ public class TrimFragment extends Fragment {
                     Toast.makeText(getActivity(),
                             "You Don't have free space in your internal memory",
                             Toast.LENGTH_SHORT).show();
-                    dialog.dismiss();
+                    //dialog.dismiss();
                     return;
                 }
 
-                Button speedTrim = dialog.findViewById(R.id.speedTrim);
-                Button trim = dialog.findViewById(R.id.trim);
+                String storageDirectory = createStorageDirectory(mVideoName, PROCESS_TRIM,
+                        mNumberOfSeconds.getText().toString());
 
-                speedTrim.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        dialog.dismiss();
+                Bundle bundle = new Bundle();
+                bundle.putString(STORAGE_DIRECTORY, storageDirectory);
+                bundle.putString(VIDEO_NAME, mVideoName);
+                bundle.putString(VIDEO_PATH, mVideoPath);
+                bundle.putInt(SEGMENT_TIME,
+                        Integer.parseInt(mNumberOfSeconds.getText().toString()));
+                mTrimViewModel.setTrimBundle(bundle);
+                loadFragment(getActivity().getSupportFragmentManager(),
+                        TrimProcessFragment.newInstance(null, null), true);
+            }
+        });
 
-                        String storageDirectory = createStorageDirectory(mVideoName,
-                                PROCESS_SPEED_TRIM, mNumberOfSeconds.getText().toString());
+        mSpeedTrim.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mToast != null)
+                    mToast.cancel();
 
-                        Bundle bundle = new Bundle();
-                        bundle.putString(STORAGE_DIRECTORY, storageDirectory);
-                        bundle.putInt(SEGMENT_TIME,
-                                Integer.parseInt(mNumberOfSeconds.getText().toString()));
-                        bundle.putString(VIDEO_NAME, mVideoName);
-                        bundle.putString(VIDEO_PATH, mVideoPath);
-                        mTrimViewModel.setTrimBundle(bundle);
-                        loadFragment(getActivity().getSupportFragmentManager(),
-                                SpeedTrimProcessFragment.newInstance(null, null), false);
-                    }
-                });
+                if (mNumberOfSeconds.getText().toString().isEmpty()) {
+                    mNumberOfSeconds.startAnimation(AnimationUtils.loadAnimation(getActivity(),
+                            R.anim.shake50));
+                    mToast = Toast.makeText(getActivity(),
+                            getString(R.string.specify_number_of_seconds), Toast.LENGTH_SHORT);
+                    mToast.show();
+                    return;
+                }
 
-                trim.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        dialog.dismiss();
-//                        fileExtn_mp4 = mVideoPath.substring(mVideoPath.lastIndexOf("."));
-//                        mypath = createDirectory(new File(mVideoPath).getName(),
-//                                seconds.getText().toString());
-//                        filePrefix = "cut" + seconds.getText().toString() + fileno + "%02d";
-//                        dest = new File(mypath, filePrefix + fileExtn_mp4);
-//                        filePath = dest.getAbsolutePath();
-//                        trimErrorCode();
+                File file = new File(mSelectedVideoUri.toString());
 
+                long file_size = Integer.parseInt(String.valueOf(file.length()));
+                if (Utils.getInternalAvailableSpace() > file_size) {
+                    InputMethodManager imm =
+                            (InputMethodManager) getActivity()
+                                    .getSystemService(Context.INPUT_METHOD_SERVICE);
 
-                        String storageDirectory = createStorageDirectory(mVideoName, PROCESS_TRIM,
-                                mNumberOfSeconds.getText().toString());
+                    imm.hideSoftInputFromWindow(mNumberOfSeconds.getWindowToken(), 0);
+                } else {
+                    Toast.makeText(getActivity(),
+                            "You Don't have free space in your internal memory",
+                            Toast.LENGTH_SHORT).show();
+                    //dialog.dismiss();
+                    return;
+                }
 
-                        Bundle bundle = new Bundle();
-                        bundle.putString(STORAGE_DIRECTORY, storageDirectory);
-                        bundle.putString(VIDEO_NAME, mVideoName);
-                        bundle.putString(VIDEO_PATH, mVideoPath);
-                        bundle.putInt(SEGMENT_TIME,
-                                Integer.parseInt(mNumberOfSeconds.getText().toString()));
-                        mTrimViewModel.setTrimBundle(bundle);
-                        loadFragment(getActivity().getSupportFragmentManager(),
-                                TrimProcessFragment.newInstance(null, null), false);
-                    }
-                });
+                String storageDirectory = createStorageDirectory(mVideoName,
+                        PROCESS_SPEED_TRIM, mNumberOfSeconds.getText().toString());
+
+                Bundle bundle = new Bundle();
+                bundle.putString(STORAGE_DIRECTORY, storageDirectory);
+                bundle.putInt(SEGMENT_TIME,
+                        Integer.parseInt(mNumberOfSeconds.getText().toString()));
+                bundle.putString(VIDEO_NAME, mVideoName);
+                bundle.putString(VIDEO_PATH, mVideoPath);
+                mTrimViewModel.setTrimBundle(bundle);
+                loadFragment(getActivity().getSupportFragmentManager(),
+                        SpeedTrimProcessFragment.newInstance(null, null), false);
             }
         });
 
@@ -326,12 +335,6 @@ public class TrimFragment extends Fragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        //mToolbarViewModel.setToolbarTitle(getString(R.string.trim));
-    }
-
-    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_TAKE_GALLERY_VIDEO) {
@@ -340,10 +343,7 @@ public class TrimFragment extends Fragment {
                 mVideoPath = Utils.getRealPathFromURI_API19(getActivity(), mSelectedVideoUri);
                 String[] pathSegments = mVideoPath.split("/");
                 mVideoName = pathSegments[pathSegments.length - 1];
-                mIcVideo.setVisibility(View.INVISIBLE);
-                mOpenGallery.setVisibility(View.INVISIBLE);
-                mPickUpTrim.setVisibility(View.INVISIBLE);
-
+                showPickupVideo(false);
                 displayVideo(true);
                 prepareVideo(mSelectedVideoUri);
             }
@@ -521,29 +521,49 @@ public class TrimFragment extends Fragment {
         return file.getAbsolutePath();
     }
 
+    private void showPickupVideo(boolean visible){
+        if (visible){
+            mIcVideo.setVisibility(View.VISIBLE);
+            mOpenGallery.setVisibility(View.VISIBLE);
+            mPickUpTrim.setVisibility(View.VISIBLE);
+        } else {
+            mIcVideo.setVisibility(View.INVISIBLE);
+            mOpenGallery.setVisibility(View.INVISIBLE);
+            mPickUpTrim.setVisibility(View.INVISIBLE);
+        }
+    }
+
     private void displayVideo(boolean visible) {
         if (visible) {
             mVideoView.setVisibility(View.VISIBLE);
+            mVideoViewBackground.setVisibility(View.VISIBLE);
             mVideoSeekBar.setVisibility(View.VISIBLE);
             mViewShadow.setVisibility(View.VISIBLE);
             mIcShare.setVisibility(View.VISIBLE);
+            mIcRemove.setVisibility(View.VISIBLE);
             mIcVideoControl.setVisibility(View.VISIBLE);
             mVoiceControl.setVisibility(View.VISIBLE);
             mVideoTime.setVisibility(View.VISIBLE);
+            mTextViewVideoName.setVisibility(View.VISIBLE);
             mEnterSeconds.setVisibility(View.VISIBLE);
             mNumberOfSeconds.setVisibility(View.VISIBLE);
             mTrim.setVisibility(View.VISIBLE);
+            mSpeedTrim.setVisibility(View.VISIBLE);
         } else {
             mVideoView.setVisibility(View.INVISIBLE);
+            mVideoViewBackground.setVisibility(View.INVISIBLE);
             mVideoSeekBar.setVisibility(View.INVISIBLE);
             mViewShadow.setVisibility(View.INVISIBLE);
             mIcShare.setVisibility(View.INVISIBLE);
+            mIcRemove.setVisibility(View.INVISIBLE);
             mIcVideoControl.setVisibility(View.INVISIBLE);
             mVoiceControl.setVisibility(View.INVISIBLE);
             mVideoTime.setVisibility(View.INVISIBLE);
+            mTextViewVideoName.setVisibility(View.INVISIBLE);
             mEnterSeconds.setVisibility(View.INVISIBLE);
             mNumberOfSeconds.setVisibility(View.INVISIBLE);
             mTrim.setVisibility(View.INVISIBLE);
+            mSpeedTrim.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -552,6 +572,7 @@ public class TrimFragment extends Fragment {
         mVideoView.start();
         mVideoView.setVisibility(View.VISIBLE);
         mVideoView.requestFocus();
+        mTextViewVideoName.setText(mVideoName);
 
         mIcShare.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -560,6 +581,14 @@ public class TrimFragment extends Fragment {
                 shareIntent.setType("video/*");
                 shareIntent.putExtra(Intent.EXTRA_STREAM, videoUri);
                 getActivity().startActivity(Intent.createChooser(shareIntent, ""));
+            }
+        });
+
+        mIcRemove.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showPickupVideo(true);
+                displayVideo(false);
             }
         });
 
@@ -588,6 +617,7 @@ public class TrimFragment extends Fragment {
                     mVideoSeekBar.setAlpha(0);
                     mViewShadow.setAlpha(0);
                     mIcShare.setAlpha((float) 0);
+                    mIcRemove.setAlpha((float) 0);
                     mIcVideoControl.setAlpha((float) 0);
                     mVideoTime.setAlpha(0);
                     mVoiceControl.setClickable(false);
@@ -686,12 +716,13 @@ public class TrimFragment extends Fragment {
             return String.format(Locale.ENGLISH, "%d:%02d", minute, second);
     }
 
-    private void showVideoControls(boolean show){
-        if (show){
+    private void showVideoControls(boolean show) {
+        if (show) {
             mBlockSeekBar = false;
             mVideoSeekBar.animate().alpha(1);
             mViewShadow.animate().alpha(1);
             mIcShare.animate().alpha(1);
+            mIcRemove.animate().alpha(1);
             mIcVideoControl.animate().alpha(1);
             mVoiceControl.setClickable(true);
             mVoiceControl.animate().alpha(1);
@@ -703,18 +734,11 @@ public class TrimFragment extends Fragment {
             mIcVideoControl.animate().alpha(0);
             mViewShadow.animate().alpha(0);
             mIcShare.animate().alpha(0);
+            mIcRemove.animate().alpha(0);
             mVideoTime.animate().alpha(0);
             mVoiceControl.setClickable(false);
             mVoiceControl.animate().alpha(0);
             mVideoControlsVisible = false;
         }
-    }
-
-    private int getVideoDuration(String videoPath) {
-        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-        retriever.setDataSource(videoPath);
-        String time =
-                retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-        return Integer.parseInt(time) / 1000;
     }
 }

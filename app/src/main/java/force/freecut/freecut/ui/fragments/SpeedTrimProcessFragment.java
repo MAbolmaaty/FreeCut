@@ -162,7 +162,7 @@ public class SpeedTrimProcessFragment extends Fragment {
                                 getVideoTime(videoDuration)));
                         updateHandler.postDelayed(updateVideoTime, 100);
 
-                        mVideosAdapter = new OutputVideosAdapter(getActivity(), numberOfVideos);
+                        //mVideosAdapter = new OutputVideosAdapter(getActivity(), numberOfVideos);
 
                         speedTrim(bundle.getString(STORAGE_DIRECTORY), bundle.getString(VIDEO_PATH),
                                 bundle.getInt(SEGMENT_TIME));

@@ -1,198 +1,134 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:background="@color/colorPrimaryDark"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    android:layout_marginBottom="@dimen/_8sdp"
+    android:background="@drawable/bg_translucent"
+    tools:background="@color/colorPrimary"
+    android:paddingStart="@dimen/_8sdp"
+    android:paddingEnd="@dimen/_8sdp">
 
-    <ImageView
+    <androidx.cardview.widget.CardView
+        android:id="@+id/videoThumbnailCardView"
+        android:layout_width="@dimen/_48sdp"
+        android:layout_height="@dimen/_48sdp"
+        android:layout_marginTop="@dimen/_8sdp"
+        android:layout_marginEnd="@dimen/_8sdp"
+        android:layout_marginBottom="@dimen/_8sdp"
+        app:cardElevation="@dimen/_1sdp"
+        app:cardCornerRadius="@dimen/_2sdp"
+        app:cardPreventCornerOverlap="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/videoThumbnail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_multi_blacks"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:scaleType="centerCrop" />
+
+    </androidx.cardview.widget.CardView>
+    <!--<ImageView
         android:id="@+id/videoThumbnail"
         android:layout_width="@dimen/_48sdp"
         android:layout_height="@dimen/_48sdp"
         android:scaleType="centerCrop"
-        android:background="@android:color/black"
+        android:background="@drawable/bg_frame"
         android:layout_marginEnd="@dimen/_8sdp"
         android:layout_marginBottom="@dimen/_8sdp"
         android:layout_marginTop="@dimen/_8sdp"
+        android:padding="4dp"
+        android:cropToPadding="true"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintBottom_toBottomOf="parent"/>-->
 
     <TextView
         android:id="@+id/videoName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@android:color/white"
-        tools:text="video-07"
-        android:textSize="@dimen/_12sdp"
-        android:layout_marginEnd="@dimen/_8sdp"
         android:layout_marginStart="@dimen/_8sdp"
-        app:layout_constraintTop_toTopOf="@+id/videoThumbnail"
-        app:layout_constraintBottom_toBottomOf="@+id/videoThumbnail"
-        app:layout_constraintStart_toEndOf="@+id/videoThumbnail"/>
+        android:layout_marginEnd="@dimen/_8sdp"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/_12sdp"
+        app:layout_constraintBottom_toBottomOf="@+id/videoThumbnailCardView"
+        app:layout_constraintStart_toEndOf="@+id/videoThumbnailCardView"
+        app:layout_constraintTop_toTopOf="@+id/videoThumbnailCardView"
+        tools:text="video-07" />
 
     <ProgressBar
         android:id="@+id/videoProgressBar"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
         android:layout_width="0dp"
         android:layout_height="4dp"
         android:layout_marginStart="@dimen/_8sdp"
-        android:layout_marginEnd="@dimen/_8sdp"
         android:layout_marginTop="@dimen/_2sdp"
-        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
         android:progress="0"
-        tools:progress="50"
-        android:progressBackgroundTint="@android:color/white"
-        android:progressTint="@color/colorAccent2"
-        app:layout_constraintStart_toEndOf="@+id/videoThumbnail"
+        android:progressDrawable="@drawable/custom_progressbar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/videoThumbnailCardView"
         app:layout_constraintTop_toBottomOf="@+id/videoName"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        tools:progress="50" />
 
     <TextView
         android:id="@+id/progressPercentage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:text="77 %"
+        android:layout_marginBottom="@dimen/_2sdp"
         android:textColor="@android:color/white"
         android:textSize="@dimen/_10sdp"
-        android:layout_marginBottom="@dimen/_2sdp"
+        app:layout_constraintBottom_toTopOf="@+id/videoProgressBar"
         app:layout_constraintEnd_toEndOf="@+id/videoProgressBar"
-        app:layout_constraintBottom_toTopOf="@+id/videoProgressBar" />
+        tools:text="77 %" />
 
     <TextView
         android:id="@+id/videoProgressStatus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/small_waiting"
-        android:textSize="@dimen/_8sdp"
         android:textColor="@android:color/white"
+        android:textSize="@dimen/_8sdp"
         app:layout_constraintEnd_toEndOf="@+id/videoProgressBar"
-        app:layout_constraintTop_toBottomOf="@+id/videoProgressBar"/>
+        app:layout_constraintTop_toBottomOf="@+id/videoProgressBar" />
 
     <ImageView
         android:id="@+id/ic_share"
-        android:layout_width="@dimen/_25sdp"
-        android:layout_height="@dimen/_25sdp"
-        android:src="@drawable/ic_tiktok"
-        app:tint="@android:color/white"
-        android:background="@drawable/background_rectangle_corners_6"
-        android:backgroundTint="@color/colorPrimary"
-        android:padding="@dimen/_4sdp"
-        android:alpha="0"
-        tools:alpha="1"
-        android:visibility="invisible"
-        tools:visibility="visible"
+        android:layout_width="@dimen/_30sdp"
+        android:layout_height="@dimen/_30sdp"
         android:layout_marginStart="@dimen/_8sdp"
+        android:alpha="0"
+        android:padding="@dimen/_6sdp"
+        android:src="@drawable/ic_cloud"
+        app:layout_constraintBottom_toBottomOf="@+id/videoName"
+        app:layout_constraintEnd_toStartOf="@+id/ic_playVideo"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toEndOf="@+id/videoName"
         app:layout_constraintTop_toTopOf="@+id/videoName"
-        app:layout_constraintBottom_toBottomOf="@+id/videoName"/>
-
-    <ImageView
-        android:id="@+id/ic_facebook"
-        android:layout_width="@dimen/_25sdp"
-        android:layout_height="@dimen/_25sdp"
-        android:src="@drawable/ic_facebook"
         app:tint="@android:color/white"
-        android:background="@drawable/background_rectangle_corners_6"
-        android:backgroundTint="@color/colorPrimary"
-        android:padding="@dimen/_4sdp"
-        android:alpha="0"
         tools:alpha="1"
-        android:visibility="invisible"
-        tools:visibility="visible"
-        android:layout_marginStart="@dimen/_4sdp"
-        app:layout_constraintStart_toEndOf="@+id/ic_share"
-        app:layout_constraintTop_toTopOf="@+id/videoName"
-        app:layout_constraintBottom_toBottomOf="@+id/videoName"/>
-
-    <ImageView
-        android:id="@+id/ic_instagram"
-        android:layout_width="@dimen/_25sdp"
-        android:layout_height="@dimen/_25sdp"
-        android:src="@drawable/ic_instagram"
-        app:tint="@android:color/white"
-        android:background="@drawable/background_rectangle_corners_6"
-        android:backgroundTint="@color/colorPrimary"
-        android:padding="@dimen/_4sdp"
-        android:alpha="0"
-        tools:alpha="1"
-        android:visibility="invisible"
-        tools:visibility="visible"
-        android:layout_marginStart="@dimen/_4sdp"
-        app:layout_constraintStart_toEndOf="@+id/ic_facebook"
-        app:layout_constraintTop_toTopOf="@+id/videoName"
-        app:layout_constraintBottom_toBottomOf="@+id/videoName"/>
-
-    <ImageView
-        android:id="@+id/ic_twitter"
-        android:layout_width="@dimen/_25sdp"
-        android:layout_height="@dimen/_25sdp"
-        android:src="@drawable/ic_twitter"
-        app:tint="@android:color/white"
-        android:background="@drawable/background_rectangle_corners_6"
-        android:backgroundTint="@color/colorPrimary"
-        android:padding="@dimen/_4sdp"
-        android:alpha="0"
-        tools:alpha="1"
-        android:visibility="invisible"
-        tools:visibility="visible"
-        android:layout_marginStart="@dimen/_4sdp"
-        app:layout_constraintStart_toEndOf="@+id/ic_instagram"
-        app:layout_constraintTop_toTopOf="@+id/videoName"
-        app:layout_constraintBottom_toBottomOf="@+id/videoName"/>
-
-    <ImageView
-        android:id="@+id/ic_snapchat"
-        android:layout_width="@dimen/_25sdp"
-        android:layout_height="@dimen/_25sdp"
-        android:src="@drawable/ic_snapchat"
-        app:tint="@android:color/white"
-        android:background="@drawable/background_rectangle_corners_6"
-        android:backgroundTint="@color/colorPrimary"
-        android:padding="@dimen/_4sdp"
-        android:alpha="0"
-        tools:alpha="1"
-        android:visibility="invisible"
-        tools:visibility="visible"
-        android:layout_marginStart="@dimen/_4sdp"
-        app:layout_constraintStart_toEndOf="@+id/ic_twitter"
-        app:layout_constraintTop_toTopOf="@+id/videoName"
-        app:layout_constraintBottom_toBottomOf="@+id/videoName"/>
-
-    <ImageView
-        android:id="@+id/ic_whatsapp"
-        android:layout_width="@dimen/_25sdp"
-        android:layout_height="@dimen/_25sdp"
-        android:src="@drawable/ic_whatsapp"
-        app:tint="@android:color/white"
-        android:background="@drawable/background_rectangle_corners_6"
-        android:backgroundTint="@color/colorPrimary"
-        android:padding="@dimen/_4sdp"
-        android:alpha="0"
-        tools:alpha="1"
-        android:visibility="invisible"
-        tools:visibility="visible"
-        android:layout_marginStart="@dimen/_4sdp"
-        app:layout_constraintStart_toEndOf="@+id/ic_snapchat"
-        app:layout_constraintTop_toTopOf="@+id/videoName"
-        app:layout_constraintBottom_toBottomOf="@+id/videoName"/>
+        tools:visibility="visible" />
 
     <ImageView
         android:id="@+id/ic_playVideo"
-        android:layout_width="@dimen/_25sdp"
-        android:layout_height="@dimen/_25sdp"
-        android:src="@drawable/ic_play"
-        app:tint="@android:color/white"
-        android:background="@drawable/background_rectangle_corners_6"
-        android:backgroundTint="@color/colorPrimary"
-        android:padding="@dimen/_4sdp"
+        android:layout_width="@dimen/_30sdp"
+        android:layout_height="@dimen/_30sdp"
         android:alpha="0"
-        tools:alpha="1"
-        android:visibility="invisible"
-        tools:visibility="visible"
-        android:layout_marginStart="@dimen/_4sdp"
-        app:layout_constraintStart_toEndOf="@+id/ic_whatsapp"
+        android:padding="@dimen/_8sdp"
+        android:src="@drawable/ic_play"
+        app:layout_constraintBottom_toBottomOf="@+id/videoName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/ic_share"
         app:layout_constraintTop_toTopOf="@+id/videoName"
-        app:layout_constraintBottom_toBottomOf="@+id/videoName"/>
+        app:tint="@android:color/white"
+        tools:alpha="1"
+        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

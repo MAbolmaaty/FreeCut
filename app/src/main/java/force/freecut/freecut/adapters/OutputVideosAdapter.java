@@ -2,6 +2,7 @@ package force.freecut.freecut.adapters;
 
 import android.content.Context;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,17 +27,18 @@ public class OutputVideosAdapter
     private static final String TAG = OutputVideosAdapter.class.getSimpleName();
 
     private Context mContext;
-    private int mNumberOfVideos;
     private TrimmedVideo [] mTrimmedVideos;
+    private VideoPlayClickListener mVideoPlayClickListener;
 
-    public OutputVideosAdapter(Context context, int numberOfVideos) {
+    public interface VideoPlayClickListener{
+        void onPlayClickListener(int videoClicked);
+    }
+
+    public OutputVideosAdapter(Context context, TrimmedVideo [] trimmedVideos,
+                               VideoPlayClickListener videoPlayClickListener) {
         mContext = context;
-        mNumberOfVideos = numberOfVideos;
-        mTrimmedVideos = new TrimmedVideo[mNumberOfVideos];
-        for (int i = 0 ; i < mNumberOfVideos ; i++){
-            mTrimmedVideos[i] = new TrimmedVideo(null, 0,
-                    String.format(Locale.ENGLISH, "video-%02d", i+1));
-        }
+        mTrimmedVideos = trimmedVideos;
+        mVideoPlayClickListener = videoPlayClickListener;
     }
 
     @NonNull
@@ -53,26 +55,24 @@ public class OutputVideosAdapter
 
     @Override
     public void onBindViewHolder(@NonNull OutputVideoViewHolder holder, int position) {
-        holder.mVideoProgress.setProgress(mTrimmedVideos[position].getTrimProgress(), true);
-        holder.mProgressPercentage.setText(String.format(Locale.ENGLISH,"%d%%" ,
-                mTrimmedVideos[position].getTrimProgress()));
         holder.mVideoName.setText(mTrimmedVideos[position].getVideoName());
-
-        if (mTrimmedVideos[position].getTrimProgress() > 0){
-            holder.mVideoProgressStatus.setText(mContext.getString(R.string.trimming));
-        }
-
-        if (mTrimmedVideos[position].getVideoFile() != null) {
-            holder.mVideoProgressStatus.setText("");
-            Glide.with(mContext).load(mTrimmedVideos[position].getVideoFile()).fitCenter()
-                    .into(holder.mVideoThumbnail);
-            hideVideoProgress(holder);
-        }
+        holder.mVideoProgressStatus.setText(mTrimmedVideos[position].getTrimmingStatus());
+        holder.mVideoProgress.setAlpha(mTrimmedVideos[position].getProgressVisibility());
+        holder.mProgressPercentage.setAlpha(mTrimmedVideos[position].getProgressVisibility());
+        holder.mVideoProgressStatus.setAlpha(mTrimmedVideos[position].getProgressVisibility());
+        holder.mProgressPercentage.setText(String.format(Locale.ENGLISH,"%d%%",
+                mTrimmedVideos[position].getProgress()));
+        holder.mVideoProgress.setProgress(mTrimmedVideos[position].getProgress());
+        holder.mIcShare.setAlpha(mTrimmedVideos[position].getOptionsVisibility());
+        holder.mIcPlayVideo.setAlpha(mTrimmedVideos[position].getOptionsVisibility());
+        holder.mIcPlayVideo.setImageResource(mTrimmedVideos[position].getVideoStatus());
+        Glide.with(mContext).load(mTrimmedVideos[position].getVideoFile()).fitCenter()
+                .into(holder.mVideoThumbnail);
     }
 
     @Override
     public int getItemCount() {
-        return mNumberOfVideos;
+        return mTrimmedVideos.length;
     }
 
     public class OutputVideoViewHolder extends RecyclerView.ViewHolder{
@@ -82,12 +82,7 @@ public class OutputVideosAdapter
         private ProgressBar mVideoProgress;
         private TextView mProgressPercentage;
         private TextView mVideoProgressStatus;
-        private ImageView mIcTikTok;
-        private ImageView mIcFacebook;
-        private ImageView mIcInstagram;
-        private ImageView mIcTwitter;
-        private ImageView mIcSnapchat;
-        private ImageView mIcWhatsapp;
+        private ImageView mIcShare;
         private ImageView mIcPlayVideo;
 
         public OutputVideoViewHolder(@NonNull View itemView) {
@@ -97,61 +92,30 @@ public class OutputVideosAdapter
             mVideoName = itemView.findViewById(R.id.videoName);
             mProgressPercentage = itemView.findViewById(R.id.progressPercentage);
             mVideoProgressStatus = itemView.findViewById(R.id.videoProgressStatus);
-            mIcTikTok = itemView.findViewById(R.id.ic_share);
-            mIcFacebook = itemView.findViewById(R.id.ic_facebook);
-            mIcInstagram = itemView.findViewById(R.id.ic_instagram);
-            mIcTwitter = itemView.findViewById(R.id.ic_twitter);
-            mIcSnapchat = itemView.findViewById(R.id.ic_snapchat);
-            mIcWhatsapp = itemView.findViewById(R.id.ic_whatsapp);
+            mIcShare = itemView.findViewById(R.id.ic_share);
             mIcPlayVideo = itemView.findViewById(R.id.ic_playVideo);
+
+            mIcPlayVideo.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mVideoPlayClickListener.onPlayClickListener(getAdapterPosition());
+                }
+            });
         }
 
-        public void updateProgressBar(int progress){
-            mVideoProgress.setProgress(progress);
-        }
-
-        public void updatePercentage(int progress){
+        public void updateProgress(int progress){
             mProgressPercentage.setText(String.format(Locale.ENGLISH,"%d%%" , progress));
+            mVideoProgress.setProgress(progress);
         }
     }
 
-    public void setVideoProgress(int position, int progress){
-        mTrimmedVideos[position].setTrimProgress(progress);
+    public void setTrimmedVideo(int position, TrimmedVideo trimmedVideo){
+        mTrimmedVideos[position] = trimmedVideo;
         notifyItemChanged(position);
     }
 
-    public void setVideoPath(int position, File file){
-        mTrimmedVideos[position].setVideoFile(file);
-    }
-
-    private void hideVideoProgress(OutputVideoViewHolder holder){
-        holder.mVideoProgress.animate().alpha(0).setDuration(500);
-        holder.mProgressPercentage.animate().alpha(0).setDuration(500);
-        holder.mVideoProgressStatus.animate().alpha(0).setDuration(500);
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                holder.mVideoProgress.setVisibility(View.INVISIBLE);
-                holder.mProgressPercentage.setVisibility(View.INVISIBLE);
-                holder.mVideoProgressStatus.setVisibility(View.INVISIBLE);
-
-                holder.mIcTikTok.setVisibility(View.VISIBLE);
-                holder.mIcFacebook.setVisibility(View.VISIBLE);
-                holder.mIcInstagram.setVisibility(View.VISIBLE);
-                holder.mIcTwitter.setVisibility(View.VISIBLE);
-                holder.mIcSnapchat.setVisibility(View.VISIBLE);
-                holder.mIcWhatsapp.setVisibility(View.VISIBLE);
-                holder.mIcPlayVideo.setVisibility(View.VISIBLE);
-
-                holder.mIcTikTok.animate().alpha(1).setDuration(500);
-                holder.mIcFacebook.animate().alpha(1).setDuration(500);
-                holder.mIcInstagram.animate().alpha(1).setDuration(500);
-                holder.mIcTwitter.animate().alpha(1).setDuration(500);
-                holder.mIcSnapchat.animate().alpha(1).setDuration(500);
-                holder.mIcWhatsapp.animate().alpha(1).setDuration(500);
-                holder.mIcPlayVideo.animate().alpha(1).setDuration(500);
-            }
-        }, 500);
-
+    public void setTrimmedVideoStatus(int position, int status){
+        mTrimmedVideos[position].setVideoStatus(status);
+        notifyItemChanged(position);
     }
 }
