@@ -6,9 +6,19 @@
     android:layout_height="wrap_content"
     android:layout_marginBottom="@dimen/_8sdp"
     android:background="@drawable/bg_translucent"
-    tools:background="@color/colorPrimary"
     android:paddingStart="@dimen/_8sdp"
-    android:paddingEnd="@dimen/_8sdp">
+    tools:background="@color/colorPrimary">
+
+    <View
+        android:id="@+id/playIndicator"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/bg_multi_colors"
+        android:alpha="0"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/guideline"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/videoThumbnailCardView"
@@ -17,8 +27,8 @@
         android:layout_marginTop="@dimen/_8sdp"
         android:layout_marginEnd="@dimen/_8sdp"
         android:layout_marginBottom="@dimen/_8sdp"
-        app:cardElevation="@dimen/_1sdp"
         app:cardCornerRadius="@dimen/_2sdp"
+        app:cardElevation="@dimen/_1sdp"
         app:cardPreventCornerOverlap="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -28,10 +38,10 @@
             android:id="@+id/videoThumbnail"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/bg_multi_blacks"
             android:layout_alignParentStart="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
+            android:background="@drawable/bg_multi_blacks"
             android:scaleType="centerCrop" />
 
     </androidx.cardview.widget.CardView>
@@ -63,6 +73,22 @@
         app:layout_constraintTop_toTopOf="@+id/videoThumbnailCardView"
         tools:text="video-07" />
 
+    <TextView
+        android:id="@+id/videoTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/_4sdp"
+        android:layout_marginBottom="@dimen/_2sdp"
+        android:alpha="0"
+        android:elevation="@dimen/_1sdp"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/_8sdp"
+        app:layout_constraintBottom_toBottomOf="@+id/videoThumbnailCardView"
+        app:layout_constraintEnd_toEndOf="@+id/videoThumbnailCardView"
+        tools:alpha="1"
+        tools:text="0:10"
+        tools:textColor="@android:color/black" />
+
     <ProgressBar
         android:id="@+id/videoProgressBar"
         style="@style/Widget.AppCompat.ProgressBar.Horizontal"
@@ -70,6 +96,7 @@
         android:layout_height="4dp"
         android:layout_marginStart="@dimen/_8sdp"
         android:layout_marginTop="@dimen/_2sdp"
+        android:layout_marginEnd="@dimen/_8sdp"
         android:progress="0"
         android:progressDrawable="@drawable/custom_progressbar"
         app:layout_constraintEnd_toEndOf="parent"
@@ -120,6 +147,7 @@
         android:id="@+id/ic_playVideo"
         android:layout_width="@dimen/_30sdp"
         android:layout_height="@dimen/_30sdp"
+        android:layout_marginEnd="@dimen/_8sdp"
         android:alpha="0"
         android:padding="@dimen/_8sdp"
         android:src="@drawable/ic_play"
@@ -130,5 +158,12 @@
         app:tint="@android:color/white"
         tools:alpha="1"
         tools:visibility="visible" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.93" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

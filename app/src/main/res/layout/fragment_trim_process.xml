@@ -50,6 +50,7 @@
         android:alpha="0"
         tools:alpha="1"
         android:clickable="false"
+        android:visibility="invisible"
         android:src="@drawable/ic_cloud"
         app:layout_constraintEnd_toEndOf="@+id/videoViewBackground"
         app:layout_constraintTop_toTopOf="@+id/videoViewBackground"
