@@ -6,24 +6,23 @@ import java.io.File;
 
 public class TrimmedVideo {
 
+    public enum Mode{
+        PLAY, PAUSE
+    }
+
     private File mVideoFile;
     private String mVideoName;
     private String mTrimmingStatus;
-    private float mProgressVisibility;
     private int mProgress;
-    private float mOptionsVisibility;
-    private int mVideoStatus;
+    private Mode mVideoMode;
 
     public TrimmedVideo(File videoFile, String videoName,
-                        String trimmingStatus, float progressVisibility, int progress,
-                        float optionsVisibility, int videoStatus) {
+                        String trimmingStatus, int progress, Mode videoMode) {
         mVideoFile = videoFile;
         mVideoName = videoName;
         mTrimmingStatus = trimmingStatus;
-        mProgressVisibility = progressVisibility;
         mProgress = progress;
-        mOptionsVisibility = optionsVisibility;
-        mVideoStatus = videoStatus;
+        mVideoMode = videoMode;
     }
 
     public void setVideoFile(File videoFile) {
@@ -34,47 +33,36 @@ public class TrimmedVideo {
         return mVideoFile;
     }
 
-    public String getVideoName() {
-        return mVideoName;
+    public void setVideoName(String videoName) {
+        mVideoName = videoName;
     }
 
-    public String getTrimmingStatus() {
-        return mTrimmingStatus;
+    public String getVideoName() {
+        return mVideoName;
     }
 
     public void setTrimmingStatus(String trimmingStatus) {
         mTrimmingStatus = trimmingStatus;
     }
 
-    public float getProgressVisibility() {
-        return mProgressVisibility;
+    public String getTrimmingStatus() {
+        return mTrimmingStatus;
     }
 
-    public void setProgressVisibility(float progressVisibility) {
-        mProgressVisibility = progressVisibility;
+
+    public void setProgress(int progress) {
+        mProgress = progress;
     }
 
     public int getProgress() {
         return mProgress;
     }
 
-    public void setProgress(int progress) {
-        mProgress = progress;
+    public void setVideoMode(Mode videoMode) {
+        mVideoMode = videoMode;
     }
 
-    public float getOptionsVisibility() {
-        return mOptionsVisibility;
-    }
-
-    public void setOptionsVisibility(float optionsVisibility) {
-        mOptionsVisibility = optionsVisibility;
-    }
-
-    public int getVideoStatus() {
-        return mVideoStatus;
-    }
-
-    public void setVideoStatus(int videoStatus) {
-        mVideoStatus = videoStatus;
+    public Mode getVideoMode() {
+        return mVideoMode;
     }
 }

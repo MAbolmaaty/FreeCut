@@ -246,8 +246,7 @@ public class TrimProcessFragment extends Fragment {
                         for (int i = 0; i < numberOfVideos; i++) {
                             mTrimmedVideos[i] = new TrimmedVideo(null,
                                     String.format(Locale.ENGLISH, "video-%02d", i + 1),
-                                    getString(R.string.waiting), 1f, 0,
-                                    0f, R.drawable.ic_play);
+                                    getString(R.string.waiting),  0, TrimmedVideo.Mode.PAUSE);
                         }
 
                         mVideosAdapter = new OutputVideosAdapter(getActivity(), mTrimmedVideos,
@@ -259,20 +258,14 @@ public class TrimProcessFragment extends Fragment {
                                                 .getVideoFile().getAbsolutePath());
                                         mVideoName.setText(mTrimmedVideos[videoClicked]
                                                 .getVideoName());
+
                                         if (mLastClickedVideo != -1) {
-                                            mVideosAdapter.setTrimmedVideoStatus(mLastClickedVideo,
-                                                    R.drawable.ic_play);
+
+                                            mVideosAdapter.notifyItemChanged(mLastClickedVideo);
                                         }
                                         mLastClickedVideo = videoClicked;
-                                        mVideosAdapter.setTrimmedVideoStatus(videoClicked,
-                                                R.drawable.ic_pause);
-                                        new Handler().postDelayed(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                mVideosAdapter.setTrimmedVideoStatus(videoClicked,
-                                                        R.drawable.ic_play);
-                                            }
-                                        }, bundle.getInt(SEGMENT_TIME) * 1000);
+
+                                        mVideosAdapter.notifyItemChanged(videoClicked);
                                     }
                                 }, new OutputVideosAdapter.VideoShareClickListener() {
                             @Override
@@ -350,9 +343,11 @@ public class TrimProcessFragment extends Fragment {
             public void apply(long executionId, int returnCode) {
                 if (returnCode == RETURN_CODE_SUCCESS) {
                     mVideoStatisticsViewModel.setVideoStatisticsStatus(false);
-                    mVideosAdapter.setTrimmedVideo(counter - 1, new TrimmedVideo(file,
-                            name, getString(R.string.trimming), 0f, 100,
-                            1f, R.drawable.ic_play));
+                    mTrimmedVideos[counter-1].setVideoFile(file);
+                    //mTrimmedVideos[counter-1].setProgressVisibility(0f);
+                    mTrimmedVideos[counter-1].setProgress(100);
+                    //mTrimmedVideos[counter-1].setOptionsVisibility(1f);
+                    mVideosAdapter.notifyItemChanged(counter-1);
                     trim(storageDirectory, videoPath,
                             segmentTime, videoDuration, start + segmentTime,
                             counter + 1);
@@ -365,7 +360,7 @@ public class TrimProcessFragment extends Fragment {
             public void run() {
                 mVideoStatisticsViewModel.setVideoStatisticsStatus(true);
             }
-        }, 500);
+        }, 0);
 
         mVideoStatisticsViewModel.getVideoStatisticsStatus().observe(this, new Observer<Boolean>() {
             @Override

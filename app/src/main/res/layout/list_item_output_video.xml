@@ -9,16 +9,16 @@
     android:paddingStart="@dimen/_8sdp"
     tools:background="@color/colorPrimary">
 
-    <View
-        android:id="@+id/playIndicator"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="@drawable/bg_multi_colors"
-        android:alpha="0"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@id/guideline"
-        app:layout_constraintTop_toTopOf="parent" />
+<!--    <View-->
+<!--        android:id="@+id/playIndicator"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="0dp"-->
+<!--        android:alpha="0"-->
+<!--        android:background="@drawable/bg_multi_colors"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="@id/guideline"-->
+<!--        app:layout_constraintTop_toTopOf="parent" />-->
 
     <androidx.cardview.widget.CardView
         android:id="@+id/videoThumbnailCardView"
@@ -43,22 +43,7 @@
             android:layout_alignParentTop="true"
             android:background="@drawable/bg_multi_blacks"
             android:scaleType="centerCrop" />
-
     </androidx.cardview.widget.CardView>
-    <!--<ImageView
-        android:id="@+id/videoThumbnail"
-        android:layout_width="@dimen/_48sdp"
-        android:layout_height="@dimen/_48sdp"
-        android:scaleType="centerCrop"
-        android:background="@drawable/bg_frame"
-        android:layout_marginEnd="@dimen/_8sdp"
-        android:layout_marginBottom="@dimen/_8sdp"
-        android:layout_marginTop="@dimen/_8sdp"
-        android:padding="4dp"
-        android:cropToPadding="true"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>-->
 
     <TextView
         android:id="@+id/videoName"
@@ -73,21 +58,21 @@
         app:layout_constraintTop_toTopOf="@+id/videoThumbnailCardView"
         tools:text="video-07" />
 
-    <TextView
-        android:id="@+id/videoTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/_4sdp"
-        android:layout_marginBottom="@dimen/_2sdp"
-        android:alpha="0"
-        android:elevation="@dimen/_1sdp"
-        android:textColor="@android:color/white"
-        android:textSize="@dimen/_8sdp"
-        app:layout_constraintBottom_toBottomOf="@+id/videoThumbnailCardView"
-        app:layout_constraintEnd_toEndOf="@+id/videoThumbnailCardView"
-        tools:alpha="1"
-        tools:text="0:10"
-        tools:textColor="@android:color/black" />
+<!--    <TextView-->
+<!--        android:id="@+id/videoTime"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginEnd="@dimen/_4sdp"-->
+<!--        android:layout_marginBottom="@dimen/_2sdp"-->
+<!--        android:alpha="0"-->
+<!--        android:elevation="@dimen/_1sdp"-->
+<!--        android:textColor="@android:color/white"-->
+<!--        android:textSize="@dimen/_8sdp"-->
+<!--        app:layout_constraintBottom_toBottomOf="@+id/videoThumbnailCardView"-->
+<!--        app:layout_constraintEnd_toEndOf="@+id/videoThumbnailCardView"-->
+<!--        tools:alpha="1"-->
+<!--        tools:text="0:10"-->
+<!--        tools:textColor="@android:color/black" />-->
 
     <ProgressBar
         android:id="@+id/videoProgressBar"
@@ -125,45 +110,45 @@
         app:layout_constraintEnd_toEndOf="@+id/videoProgressBar"
         app:layout_constraintTop_toBottomOf="@+id/videoProgressBar" />
 
-    <ImageView
-        android:id="@+id/ic_share"
-        android:layout_width="@dimen/_30sdp"
-        android:layout_height="@dimen/_30sdp"
-        android:layout_marginStart="@dimen/_8sdp"
-        android:alpha="0"
-        android:padding="@dimen/_6sdp"
-        android:src="@drawable/ic_cloud"
-        app:layout_constraintBottom_toBottomOf="@+id/videoName"
-        app:layout_constraintEnd_toStartOf="@+id/ic_playVideo"
-        app:layout_constraintHorizontal_bias="1"
-        app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintStart_toEndOf="@+id/videoName"
-        app:layout_constraintTop_toTopOf="@+id/videoName"
-        app:tint="@android:color/white"
-        tools:alpha="1"
-        tools:visibility="visible" />
+<!--    <ImageView-->
+<!--        android:id="@+id/ic_share"-->
+<!--        android:layout_width="@dimen/_30sdp"-->
+<!--        android:layout_height="@dimen/_30sdp"-->
+<!--        android:layout_marginStart="@dimen/_8sdp"-->
+<!--        android:alpha="0"-->
+<!--        android:padding="@dimen/_6sdp"-->
+<!--        android:src="@drawable/ic_cloud"-->
+<!--        app:layout_constraintBottom_toBottomOf="@+id/videoName"-->
+<!--        app:layout_constraintEnd_toStartOf="@+id/ic_playVideo"-->
+<!--        app:layout_constraintHorizontal_bias="1"-->
+<!--        app:layout_constraintHorizontal_chainStyle="packed"-->
+<!--        app:layout_constraintStart_toEndOf="@+id/videoName"-->
+<!--        app:layout_constraintTop_toTopOf="@+id/videoName"-->
+<!--        app:tint="@android:color/white"-->
+<!--        tools:alpha="1"-->
+<!--        tools:visibility="visible" />-->
 
-    <ImageView
-        android:id="@+id/ic_playVideo"
-        android:layout_width="@dimen/_30sdp"
-        android:layout_height="@dimen/_30sdp"
-        android:layout_marginEnd="@dimen/_8sdp"
-        android:alpha="0"
-        android:padding="@dimen/_8sdp"
-        android:src="@drawable/ic_play"
-        app:layout_constraintBottom_toBottomOf="@+id/videoName"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/ic_share"
-        app:layout_constraintTop_toTopOf="@+id/videoName"
-        app:tint="@android:color/white"
-        tools:alpha="1"
-        tools:visibility="visible" />
+<!--    <ImageView-->
+<!--        android:id="@+id/ic_playVideo"-->
+<!--        android:layout_width="@dimen/_30sdp"-->
+<!--        android:layout_height="@dimen/_30sdp"-->
+<!--        android:layout_marginEnd="@dimen/_8sdp"-->
+<!--        android:alpha="0"-->
+<!--        android:padding="@dimen/_8sdp"-->
+<!--        android:src="@drawable/ic_play"-->
+<!--        app:layout_constraintBottom_toBottomOf="@+id/videoName"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toEndOf="@+id/ic_share"-->
+<!--        app:layout_constraintTop_toTopOf="@+id/videoName"-->
+<!--        app:tint="@android:color/white"-->
+<!--        tools:alpha="1"-->
+<!--        tools:visibility="visible" />-->
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.93" />
+<!--    <androidx.constraintlayout.widget.Guideline-->
+<!--        android:id="@+id/guideline"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:orientation="vertical"-->
+<!--        app:layout_constraintGuide_percent="0.93" />-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

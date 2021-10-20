@@ -2,8 +2,6 @@ package force.freecut.freecut.adapters;
 
 import android.content.Context;
 import android.media.MediaMetadataRetriever;
-import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +21,7 @@ import force.freecut.freecut.Data.TrimmedVideo;
 import force.freecut.freecut.R;
 
 public class OutputVideosAdapter
-        extends RecyclerView.Adapter<OutputVideosAdapter.OutputVideoViewHolder>{
+        extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
     private static final String TAG = OutputVideosAdapter.class.getSimpleName();
 
@@ -31,6 +29,8 @@ public class OutputVideosAdapter
     private TrimmedVideo [] mTrimmedVideos;
     private VideoPlayClickListener mVideoPlayClickListener;
     private VideoShareClickListener mVideoShareClickListener;
+    private static final int TRIMMING = 0;
+    private static final int TRIMMED = 1;
 
     public interface VideoPlayClickListener{
         void onPlayClickListener(int videoClicked);
@@ -49,43 +49,76 @@ public class OutputVideosAdapter
         mVideoShareClickListener = videoShareClickListener;
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        if (mTrimmedVideos[position].getProgress() == 100){
+            return TRIMMED;
+        } else {
+            return TRIMMING;
+        }
+    }
+
     @NonNull
     @Override
-    public OutputVideoViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         Context context = parent.getContext();
-        int layoutIdForListItem = R.layout.list_item_output_video;
+        int layoutIdForTrimmingVideo = R.layout.list_item_output_video;
+        int layoutIdForTrimmedVideo = R.layout.list_item_trimmed_video;
         LayoutInflater inflater = LayoutInflater.from(context);
 
-        View view = inflater.inflate(layoutIdForListItem, parent, false);
-        OutputVideoViewHolder viewHolder = new OutputVideoViewHolder(view);
-        return viewHolder;
+        View viewForTrimmingVideo =
+                inflater.inflate(layoutIdForTrimmingVideo, parent, false);
+
+        View viewForTrimmedVideo =
+                inflater.inflate(layoutIdForTrimmedVideo, parent, false);
+
+        switch (viewType){
+            case TRIMMING:
+                OutputVideoViewHolder viewHolderTrimmingVideo =
+                        new OutputVideoViewHolder(viewForTrimmingVideo);
+                return viewHolderTrimmingVideo;
+            case TRIMMED:
+                TrimmedVideoViewHolder trimmedVideoViewHolder =
+                        new TrimmedVideoViewHolder(viewForTrimmedVideo);
+                return trimmedVideoViewHolder;
+        }
+
+        return null;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull OutputVideoViewHolder holder, int position) {
-        holder.mVideoName.setText(mTrimmedVideos[position].getVideoName());
-        holder.mVideoTime.setAlpha(mTrimmedVideos[position].getOptionsVisibility());
-        holder.mVideoProgressStatus.setText(mTrimmedVideos[position].getTrimmingStatus());
-        holder.mVideoProgress.setAlpha(mTrimmedVideos[position].getProgressVisibility());
-        holder.mProgressPercentage.setAlpha(mTrimmedVideos[position].getProgressVisibility());
-        holder.mVideoProgressStatus.setAlpha(mTrimmedVideos[position].getProgressVisibility());
-        holder.mProgressPercentage.setText(String.format(Locale.ENGLISH,"%d%%",
-                mTrimmedVideos[position].getProgress()));
-        holder.mVideoProgress.setProgress(mTrimmedVideos[position].getProgress());
-        holder.mIcShare.setAlpha(mTrimmedVideos[position].getOptionsVisibility());
-        holder.mIcPlayVideo.setAlpha(mTrimmedVideos[position].getOptionsVisibility());
-        holder.mIcPlayVideo.setImageResource(mTrimmedVideos[position].getVideoStatus());
-        Glide.with(mContext).load(mTrimmedVideos[position].getVideoFile()).fitCenter()
-                .into(holder.mVideoThumbnail);
-        holder.mVideoTime.setText(getVideoDuration(mTrimmedVideos[position].getVideoFile()));
-        switch (mTrimmedVideos[position].getVideoStatus()){
-            case R.drawable.ic_play:
-                holder.mPlayIndicator.setAlpha(0);
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        switch (holder.getItemViewType()){
+            case TRIMMING:
+                OutputVideoViewHolder outputVideoViewHolder = (OutputVideoViewHolder)holder;
+                outputVideoViewHolder.mVideoName.setText(mTrimmedVideos[position].getVideoName());
+                outputVideoViewHolder.mVideoProgressStatus.setText(mTrimmedVideos[position]
+                        .getTrimmingStatus());
+                outputVideoViewHolder.mProgressPercentage
+                        .setText(String.format(Locale.ENGLISH,"%d%%",
+                                mTrimmedVideos[position].getProgress()));
+                outputVideoViewHolder.mVideoProgress
+                        .setProgress(mTrimmedVideos[position].getProgress());
                 break;
-            case R.drawable.ic_pause:
-                holder.mPlayIndicator.setAlpha(1);
+            case TRIMMED:
+                TrimmedVideoViewHolder trimmedVideoViewHolder = (TrimmedVideoViewHolder) holder;
+                trimmedVideoViewHolder.mVideoName.setText(mTrimmedVideos[position].getVideoName());
+//                trimmedVideoViewHolder.mIcPlayVideo
+//                        .setImageResource(mTrimmedVideos[position].getVideoStatus());
+                Glide.with(mContext).load(mTrimmedVideos[position].getVideoFile()).fitCenter()
+                        .into(trimmedVideoViewHolder.mVideoThumbnail);
+//                trimmedVideoViewHolder.mVideoTime
+//                        .setText(getVideoDuration(mTrimmedVideos[position].getVideoFile()));
                 break;
         }
+//        switch (mTrimmedVideos[position].getVideoStatus()){
+//            case R.drawable.ic_play:
+//                holder.mPlayIndicator.setAlpha(0);
+//                break;
+//            case R.drawable.ic_pause:
+//                holder.mPlayIndicator.setAlpha(1);
+//                break;
+//        }
     }
 
     @Override
@@ -95,41 +128,41 @@ public class OutputVideosAdapter
 
     public class OutputVideoViewHolder extends RecyclerView.ViewHolder{
 
-        private ImageView mVideoThumbnail;
+        //private ImageView mVideoThumbnail;
         private TextView mVideoName;
-        private TextView mVideoTime;
+        //private TextView mVideoTime;
         private ProgressBar mVideoProgress;
         private TextView mProgressPercentage;
         private TextView mVideoProgressStatus;
-        private ImageView mIcShare;
-        private ImageView mIcPlayVideo;
-        private View mPlayIndicator;
+        //private ImageView mIcShare;
+        //private ImageView mIcPlayVideo;
+        //private View mPlayIndicator;
 
         public OutputVideoViewHolder(@NonNull View itemView) {
             super(itemView);
-            mVideoThumbnail = itemView.findViewById(R.id.videoThumbnail);
+            //mVideoThumbnail = itemView.findViewById(R.id.videoThumbnail);
             mVideoProgress = itemView.findViewById(R.id.videoProgressBar);
             mVideoName = itemView.findViewById(R.id.videoName);
-            mVideoTime = itemView.findViewById(R.id.videoTime);
+            //mVideoTime = itemView.findViewById(R.id.videoTime);
             mProgressPercentage = itemView.findViewById(R.id.progressPercentage);
             mVideoProgressStatus = itemView.findViewById(R.id.videoProgressStatus);
-            mIcShare = itemView.findViewById(R.id.ic_share);
-            mIcPlayVideo = itemView.findViewById(R.id.ic_playVideo);
-            mPlayIndicator = itemView.findViewById(R.id.playIndicator);
+            //mIcShare = itemView.findViewById(R.id.ic_share);
+            //mIcPlayVideo = itemView.findViewById(R.id.ic_playVideo);
+            //mPlayIndicator = itemView.findViewById(R.id.playIndicator);
 
-            mIcPlayVideo.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mVideoPlayClickListener.onPlayClickListener(getAdapterPosition());
-                }
-            });
-
-            mIcShare.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mVideoShareClickListener.onShareClickListener(getAdapterPosition());
-                }
-            });
+//            mIcPlayVideo.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    mVideoPlayClickListener.onPlayClickListener(getAdapterPosition());
+//                }
+//            });
+//
+//            mIcShare.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    mVideoShareClickListener.onShareClickListener(getAdapterPosition());
+//                }
+//            });
         }
 
         public void updateProgress(int progress){
@@ -138,14 +171,30 @@ public class OutputVideosAdapter
         }
     }
 
-    public void setTrimmedVideo(int position, TrimmedVideo trimmedVideo){
-        mTrimmedVideos[position] = trimmedVideo;
-        notifyItemChanged(position);
-    }
+    public class TrimmedVideoViewHolder extends RecyclerView.ViewHolder{
 
-    public void setTrimmedVideoStatus(int position, int status){
-        mTrimmedVideos[position].setVideoStatus(status);
-        notifyItemChanged(position);
+        private ImageView mVideoThumbnail;
+        private TextView mVideoName;
+        private TextView mVideoTime;
+        private ImageView mShare;
+        private ImageView mVideoMode;
+        private View mPlayIndicator;
+
+        public TrimmedVideoViewHolder(@NonNull View itemView) {
+            super(itemView);
+            mVideoThumbnail = itemView.findViewById(R.id.videoThumbnail);
+            mVideoName = itemView.findViewById(R.id.videoName);
+            mVideoTime = itemView.findViewById(R.id.videoTime);
+            mShare = itemView.findViewById(R.id.ic_share);
+            mVideoMode = itemView.findViewById(R.id.ic_videoMode);
+            mPlayIndicator = itemView.findViewById(R.id.playIndicator);
+
+            mVideoMode.setOnClickListener(v ->
+                    mVideoPlayClickListener.onPlayClickListener(getAdapterPosition()));
+
+            mShare.setOnClickListener(v ->
+                    mVideoShareClickListener.onShareClickListener(getAdapterPosition()));
+        }
     }
 
     private String getVideoDuration(File videoFile) {
