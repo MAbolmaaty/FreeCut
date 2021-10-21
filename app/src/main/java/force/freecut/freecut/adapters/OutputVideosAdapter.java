@@ -128,41 +128,17 @@ public class OutputVideosAdapter
 
     public class OutputVideoViewHolder extends RecyclerView.ViewHolder{
 
-        //private ImageView mVideoThumbnail;
         private TextView mVideoName;
-        //private TextView mVideoTime;
         private ProgressBar mVideoProgress;
         private TextView mProgressPercentage;
         private TextView mVideoProgressStatus;
-        //private ImageView mIcShare;
-        //private ImageView mIcPlayVideo;
-        //private View mPlayIndicator;
 
         public OutputVideoViewHolder(@NonNull View itemView) {
             super(itemView);
-            //mVideoThumbnail = itemView.findViewById(R.id.videoThumbnail);
             mVideoProgress = itemView.findViewById(R.id.videoProgressBar);
             mVideoName = itemView.findViewById(R.id.videoName);
-            //mVideoTime = itemView.findViewById(R.id.videoTime);
             mProgressPercentage = itemView.findViewById(R.id.progressPercentage);
             mVideoProgressStatus = itemView.findViewById(R.id.videoProgressStatus);
-            //mIcShare = itemView.findViewById(R.id.ic_share);
-            //mIcPlayVideo = itemView.findViewById(R.id.ic_playVideo);
-            //mPlayIndicator = itemView.findViewById(R.id.playIndicator);
-
-//            mIcPlayVideo.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    mVideoPlayClickListener.onPlayClickListener(getAdapterPosition());
-//                }
-//            });
-//
-//            mIcShare.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    mVideoShareClickListener.onShareClickListener(getAdapterPosition());
-//                }
-//            });
         }
 
         public void updateProgress(int progress){
