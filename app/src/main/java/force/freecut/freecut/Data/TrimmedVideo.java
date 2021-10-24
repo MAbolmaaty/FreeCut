@@ -12,14 +12,16 @@ public class TrimmedVideo {
 
     private File mVideoFile;
     private String mVideoName;
+    private String mVideoDuration;
     private String mTrimmingStatus;
     private int mProgress;
     private Mode mVideoMode;
 
-    public TrimmedVideo(File videoFile, String videoName,
+    public TrimmedVideo(File videoFile, String videoName, String videoDuration,
                         String trimmingStatus, int progress, Mode videoMode) {
         mVideoFile = videoFile;
         mVideoName = videoName;
+        mVideoDuration = videoDuration;
         mTrimmingStatus = trimmingStatus;
         mProgress = progress;
         mVideoMode = videoMode;
@@ -64,5 +66,13 @@ public class TrimmedVideo {
 
     public Mode getVideoMode() {
         return mVideoMode;
+    }
+
+    public void setVideoDuration(String videoDuration) {
+        mVideoDuration = videoDuration;
+    }
+
+    public String getVideoDuration() {
+        return mVideoDuration;
     }
 }

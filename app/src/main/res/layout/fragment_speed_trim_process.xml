@@ -7,6 +7,17 @@
     android:background="@color/colorPrimaryDark"
     tools:context=".ui.fragments.SpeedTrimProcessFragment">
 
+    <View
+        android:id="@+id/videoViewBackground"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/_170sdp"
+        android:background="@android:color/black"
+        android:visibility="invisible"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/videoView"
+        app:layout_constraintBottom_toBottomOf="@+id/videoView"/>
+
     <VideoView
         android:id="@+id/videoView"
         android:layout_width="wrap_content"
@@ -20,12 +31,23 @@
         tools:layout_height="200dp" />
 
     <View
+        android:id="@+id/shadow"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:alpha="0"
+        android:background="@drawable/bg_multi_blacks"
+        app:layout_constraintBottom_toTopOf="@+id/icVideoControl"
+        app:layout_constraintEnd_toEndOf="@+id/videoViewBackground"
+        app:layout_constraintStart_toStartOf="@+id/videoViewBackground"
+        app:layout_constraintTop_toTopOf="@+id/videoViewBackground" />
+
+    <View
         android:id="@+id/videoSeekBarMiddle"
         android:layout_width="0dp"
         android:layout_height="1dp"
-        app:layout_constraintStart_toStartOf="@id/videoView"
-        app:layout_constraintEnd_toEndOf="@id/videoView"
-        app:layout_constraintBottom_toBottomOf="@id/videoView" />
+        app:layout_constraintStart_toStartOf="@id/videoViewBackground"
+        app:layout_constraintEnd_toEndOf="@id/videoViewBackground"
+        app:layout_constraintBottom_toBottomOf="@id/videoViewBackground" />
 
     <androidx.appcompat.widget.AppCompatSeekBar
         android:id="@+id/videoSeekBar"
@@ -41,8 +63,8 @@
         tools:progress="50"
         app:layout_constraintTop_toTopOf="@+id/videoSeekBarMiddle"
         app:layout_constraintBottom_toBottomOf="@+id/videoSeekBarMiddle"
-        app:layout_constraintEnd_toEndOf="@id/videoView"
-        app:layout_constraintStart_toStartOf="@id/videoView" />
+        app:layout_constraintEnd_toEndOf="@id/videoViewBackground"
+        app:layout_constraintStart_toStartOf="@id/videoViewBackground" />
 
     <ImageView
         android:id="@+id/icVideoControl"
@@ -52,10 +74,10 @@
         android:padding="@dimen/_10sdp"
         android:alpha="0"
         tools:alpha="1"
-        app:layout_constraintBottom_toBottomOf="@id/videoView"
-        app:layout_constraintEnd_toEndOf="@id/videoView"
-        app:layout_constraintStart_toStartOf="@id/videoView"
-        app:layout_constraintTop_toTopOf="@id/videoView"
+        app:layout_constraintBottom_toBottomOf="@id/videoViewBackground"
+        app:layout_constraintEnd_toEndOf="@id/videoViewBackground"
+        app:layout_constraintStart_toStartOf="@id/videoViewBackground"
+        app:layout_constraintTop_toTopOf="@id/videoViewBackground"
         app:tint="@android:color/white" />
 
     <TextView
@@ -68,8 +90,8 @@
         android:textColor="@android:color/white"
         android:textSize="@dimen/_10sdp"
         android:layout_margin="@dimen/_8sdp"
-        app:layout_constraintStart_toStartOf="@+id/videoView"
-        app:layout_constraintBottom_toBottomOf="@id/videoView"/>
+        app:layout_constraintStart_toStartOf="@+id/videoViewBackground"
+        app:layout_constraintBottom_toBottomOf="@id/videoViewBackground"/>
 
     <ImageView
         android:id="@+id/voiceControl"
@@ -84,8 +106,8 @@
         android:paddingTop="@dimen/_10sdp"
         android:paddingStart="@dimen/_10sdp"
         android:paddingEnd="@dimen/_10sdp"
-        app:layout_constraintEnd_toEndOf="@+id/videoView"
-        app:layout_constraintBottom_toBottomOf="@+id/videoView"/>
+        app:layout_constraintEnd_toEndOf="@+id/videoViewBackground"
+        app:layout_constraintBottom_toBottomOf="@+id/videoViewBackground"/>
 
     <TextView
         android:id="@+id/videoName"
@@ -96,8 +118,8 @@
         android:layout_marginEnd="@dimen/_8sdp"
         android:textColor="@android:color/white"
         android:textSize="@dimen/_10sdp"
-        app:layout_constraintEnd_toEndOf="@+id/videoView"
-        app:layout_constraintStart_toStartOf="@+id/videoView"
+        app:layout_constraintEnd_toEndOf="@+id/videoViewBackground"
+        app:layout_constraintStart_toStartOf="@+id/videoViewBackground"
         app:layout_constraintTop_toBottomOf="@+id/videoSeekBar"
         tools:text="Pirates Of Caribbean" />
 

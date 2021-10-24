@@ -11,7 +11,8 @@
     <application
         android:name=".helper.FreeCutApp"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_launcher_free_cut"
+        android:roundIcon="@mipmap/ic_launcher_free_cut"
         android:label="@string/app_name"
         android:supportsRtl="false"
         android:largeHeap="true"

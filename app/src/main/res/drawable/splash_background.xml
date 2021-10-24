@@ -4,7 +4,10 @@
         <color android:color="@color/colorPrimaryDark"/>
     </item>
 
-    <item android:drawable="@drawable/logo_splash"
+    <item android:drawable="@drawable/ic_launcher"
         android:gravity="center"/>
+
+    <item android:drawable="@drawable/ic_force_touches"
+        android:gravity="bottom|center"/>
 
 </layer-list>

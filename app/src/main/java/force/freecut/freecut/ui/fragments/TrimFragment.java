@@ -12,7 +12,6 @@ import static force.freecut.freecut.utils.Constants.VIDEO_PATH;
 
 import android.content.Context;
 import android.content.Intent;
-import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -59,9 +58,12 @@ import java.nio.charset.Charset;
 import java.util.Locale;
 
 import force.freecut.freecut.Data.TinyDB;
+import force.freecut.freecut.Data.TrimmedVideo;
 import force.freecut.freecut.Data.Utils;
 import force.freecut.freecut.R;
 import force.freecut.freecut.helper.PreferenceHelper;
+import force.freecut.freecut.view_models.MainViewPagerSwipingViewModel;
+import force.freecut.freecut.view_models.ToolbarViewModel;
 import force.freecut.freecut.view_models.TrimViewModel;
 
 /**
@@ -118,13 +120,16 @@ public class TrimFragment extends Fragment {
     private Button mTrim;
     private Button mSpeedTrim;
     private View mVideoViewBackground;
-
+    private ToolbarViewModel mToolbarViewModel;
+    private MainViewPagerSwipingViewModel mMainViewPagerSwipingViewModel;
     private boolean mBlockSeekBar = true;
     private boolean mVideoControlsVisible = false;
     private boolean mVideoMuted = false;
     private MediaPlayer mMediaPlayer;
-    private Handler updateHandler = new Handler();
-    private Runnable updateVideoTime = new Runnable() {
+    private Handler mUpdateVideoTimeHandler = new Handler();
+    private Handler mHideVideoControlsHandler = new Handler();
+
+    private Runnable mUpdateVideoTimeRunnable = new Runnable() {
         @Override
         public void run() {
             long currentPosition = mVideoView.getCurrentPosition();
@@ -132,7 +137,16 @@ public class TrimFragment extends Fragment {
             mVideoTime.setText(String.format(Locale.ENGLISH, "%s / %s",
                     getVideoTime((int) currentPosition / 1000),
                     getVideoTime(mVideoView.getDuration() / 1000)));
-            updateHandler.postDelayed(this, 100);
+            mUpdateVideoTimeHandler.postDelayed(this, 100);
+        }
+    };
+
+    private Runnable mHideVideoControlsRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (mVideoView.isPlaying() && mVideoControlsVisible) {
+                showVideoControls(false);
+            }
         }
     };
 
@@ -170,8 +184,11 @@ public class TrimFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_trim, container, false);
-
+        mToolbarViewModel = ViewModelProviders.of(getActivity()).get(ToolbarViewModel.class);
+        mToolbarViewModel.showBackButton(false);
         mTrimViewModel = ViewModelProviders.of(getActivity()).get(TrimViewModel.class);
+        mMainViewPagerSwipingViewModel = ViewModelProviders.of(getActivity())
+                .get(MainViewPagerSwipingViewModel.class);
 
         mBanner = view.findViewById(R.id.banner);
         mIcVideo = view.findViewById(R.id.icVideo);
@@ -212,7 +229,7 @@ public class TrimFragment extends Fragment {
         // Initialize SharedPreference
         tinydb = new TinyDB(getActivity());
 
-        new GetDataSync().execute();
+        //new GetDataSync().execute();
 
         mTrim.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -289,7 +306,6 @@ public class TrimFragment extends Fragment {
                     Toast.makeText(getActivity(),
                             "You Don't have free space in your internal memory",
                             Toast.LENGTH_SHORT).show();
-                    //dialog.dismiss();
                     return;
                 }
 
@@ -346,13 +362,20 @@ public class TrimFragment extends Fragment {
                 showPickupVideo(false);
                 displayVideo(true);
                 prepareVideo(mSelectedVideoUri);
+                mMainViewPagerSwipingViewModel.setMainViewPagerSwiping(false);
             }
         }
     }
 
-    /**
-     *
-     */
+    @Override
+    public void onPause() {
+        showPickupVideo(true);
+        displayVideo(false);
+        mHideVideoControlsHandler.removeCallbacks(mHideVideoControlsRunnable);
+        mUpdateVideoTimeHandler.removeCallbacks(mUpdateVideoTimeRunnable);
+        super.onPause();
+    }
+
     public String createDirectory(String name, String seconds) {
         int num = 1;
         if (new File(Environment.getExternalStorageDirectory(),
@@ -526,6 +549,7 @@ public class TrimFragment extends Fragment {
             mIcVideo.setVisibility(View.VISIBLE);
             mOpenGallery.setVisibility(View.VISIBLE);
             mPickUpTrim.setVisibility(View.VISIBLE);
+            mMainViewPagerSwipingViewModel.setMainViewPagerSwiping(true);
         } else {
             mIcVideo.setVisibility(View.INVISIBLE);
             mOpenGallery.setVisibility(View.INVISIBLE);
@@ -597,14 +621,8 @@ public class TrimFragment extends Fragment {
             public void onClick(View v) {
                 if (mIcVideoControl.getAlpha() == 0) {
                     showVideoControls(true);
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (mVideoView.isPlaying() && mVideoControlsVisible) {
-                                showVideoControls(false);
-                            }
-                        }
-                    }, 3000);
+                    mHideVideoControlsHandler.postDelayed(mHideVideoControlsRunnable,
+                            3000);
                     return;
                 }
                 if (mVideoView.isPlaying()) {
@@ -634,14 +652,8 @@ public class TrimFragment extends Fragment {
                     showVideoControls(false);
                 } else {
                     showVideoControls(true);
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (mVideoView.isPlaying() && mVideoControlsVisible) {
-                                showVideoControls(false);
-                            }
-                        }
-                    }, 3000);
+                    mHideVideoControlsHandler.postDelayed(mHideVideoControlsRunnable,
+                            3000);
                 }
             }
         });
@@ -656,8 +668,20 @@ public class TrimFragment extends Fragment {
                 mVideoTime.setText(String.format(Locale.ENGLISH, "%s / %s",
                         getVideoTime(0),
                         getVideoTime(mVideoView.getDuration() / 1000)));
-                updateHandler.postDelayed(updateVideoTime, 100);
+                mUpdateVideoTimeHandler.postDelayed(mUpdateVideoTimeRunnable, 100);
             }
+        });
+
+        mVideoView.setOnCompletionListener(mp -> {
+            mBlockSeekBar = false;
+            mVideoSeekBar.animate().alpha(1);
+            mViewShadow.animate().alpha(1);
+            mIcVideoControl.animate().alpha(1);
+            mVoiceControl.setClickable(true);
+            mVoiceControl.animate().alpha(1);
+            mVideoTime.animate().alpha(1);
+            mVideoControlsVisible = true;
+            mIcVideoControl.setImageResource(R.drawable.ic_play);
         });
 
         mVideoSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -673,12 +697,12 @@ public class TrimFragment extends Fragment {
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
+                mHideVideoControlsHandler.removeCallbacks(mHideVideoControlsRunnable);
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-
+                mHideVideoControlsHandler.postDelayed(mHideVideoControlsRunnable, 3000);
             }
         });
 

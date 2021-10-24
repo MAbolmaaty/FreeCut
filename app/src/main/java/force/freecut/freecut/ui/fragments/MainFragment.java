@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.viewpager2.widget.ViewPager2;
 
@@ -11,6 +12,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -18,6 +20,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import force.freecut.freecut.R;
 import force.freecut.freecut.adapters.MainPagerAdapter;
+import force.freecut.freecut.view_models.MainViewPagerSwipingViewModel;
 import force.freecut.freecut.view_models.ToolbarViewModel;
 
 /**
@@ -34,6 +37,7 @@ public class MainFragment extends Fragment {
     BottomNavigationView mBottomNavigationView;
     private ViewPager2 mViewPager;
     private ToolbarViewModel mToolbarViewModel;
+    private MainViewPagerSwipingViewModel mMainViewPagerSwipingViewModel;
 
     public MainFragment() {
         // Required empty public constructor
@@ -73,9 +77,13 @@ public class MainFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
         Log.d(TAG, "Main Fragment View Created");
         mToolbarViewModel = ViewModelProviders.of(getActivity()).get(ToolbarViewModel.class);
+        mMainViewPagerSwipingViewModel = ViewModelProviders.of(getActivity())
+                .get(MainViewPagerSwipingViewModel.class);
         mBottomNavigationView = view.findViewById(R.id.bottomNavigationView);
         mViewPager = view.findViewById(R.id.viewPager);
-        MainPagerAdapter mainPagerAdapter = new MainPagerAdapter(getChildFragmentManager(), getLifecycle());
+
+        MainPagerAdapter mainPagerAdapter = new MainPagerAdapter(getChildFragmentManager(),
+                getLifecycle());
         mViewPager.setOrientation(ViewPager2.ORIENTATION_HORIZONTAL);
         mViewPager.setAdapter(mainPagerAdapter);
         mViewPager.setCurrentItem(3, false);
@@ -83,6 +91,7 @@ public class MainFragment extends Fragment {
         setBottomNavigationItemSelected();
         setViewPagerChangeListener();
         mViewPager.setPageTransformer(new DepthPageTransformer());
+
         mBottomNavigationView.setSelectedItemId(R.id.navigation_trim);
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -92,6 +101,10 @@ public class MainFragment extends Fragment {
                 setTrimFragmentToolBar();
             }
         }, 0);
+
+        mMainViewPagerSwipingViewModel.getMainViewPagerSwiping().observe(this,
+                swiping -> mViewPager.setUserInputEnabled(swiping));
+
         return view;
     }
 

@@ -3,6 +3,11 @@
   <component name="WizardSettings">
     <option name="children">
       <map>
+        <entry key="imageWizard">
+          <value>
+            <PersistentState />
+          </value>
+        </entry>
         <entry key="vectorWizard">
           <value>
             <PersistentState>
@@ -14,8 +19,8 @@
                         <option name="values">
                           <map>
                             <entry key="assetSourceType" value="FILE" />
-                            <entry key="outputName" value="logo_splash" />
-                            <entry key="sourceFile" value="C:\Users\muham\Desktop\logo_splash.svg" />
+                            <entry key="outputName" value="ic_force_touches" />
+                            <entry key="sourceFile" value="C:\Users\muham\Desktop\ic_force_touches.svg" />
                           </map>
                         </option>
                       </PersistentState>

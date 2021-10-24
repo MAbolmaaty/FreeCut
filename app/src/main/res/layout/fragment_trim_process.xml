@@ -41,21 +41,6 @@
         app:layout_constraintStart_toStartOf="@+id/videoViewBackground"
         app:layout_constraintTop_toTopOf="@+id/videoViewBackground" />
 
-    <ImageView
-        android:id="@+id/ic_share"
-        android:layout_width="@dimen/_30sdp"
-        android:layout_height="@dimen/_30sdp"
-        android:layout_margin="@dimen/_8sdp"
-        android:padding="@dimen/_5sdp"
-        android:alpha="0"
-        tools:alpha="1"
-        android:clickable="false"
-        android:visibility="invisible"
-        android:src="@drawable/ic_cloud"
-        app:layout_constraintEnd_toEndOf="@+id/videoViewBackground"
-        app:layout_constraintTop_toTopOf="@+id/videoViewBackground"
-        tools:visibility="visible" />
-
     <View
         android:id="@+id/videoSeekBarMiddle"
         android:layout_width="0dp"

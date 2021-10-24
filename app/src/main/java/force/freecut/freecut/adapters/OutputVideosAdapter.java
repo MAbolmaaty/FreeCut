@@ -1,7 +1,6 @@
 package force.freecut.freecut.adapters;
 
 import android.content.Context;
-import android.media.MediaMetadataRetriever;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 
-import java.io.File;
 import java.util.Locale;
 
 import force.freecut.freecut.Data.TrimmedVideo;
@@ -62,7 +60,7 @@ public class OutputVideosAdapter
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         Context context = parent.getContext();
-        int layoutIdForTrimmingVideo = R.layout.list_item_output_video;
+        int layoutIdForTrimmingVideo = R.layout.list_item_trimming_video;
         int layoutIdForTrimmedVideo = R.layout.list_item_trimmed_video;
         LayoutInflater inflater = LayoutInflater.from(context);
 
@@ -74,8 +72,8 @@ public class OutputVideosAdapter
 
         switch (viewType){
             case TRIMMING:
-                OutputVideoViewHolder viewHolderTrimmingVideo =
-                        new OutputVideoViewHolder(viewForTrimmingVideo);
+                TrimmingVideoViewHolder viewHolderTrimmingVideo =
+                        new TrimmingVideoViewHolder(viewForTrimmingVideo);
                 return viewHolderTrimmingVideo;
             case TRIMMED:
                 TrimmedVideoViewHolder trimmedVideoViewHolder =
@@ -90,35 +88,33 @@ public class OutputVideosAdapter
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         switch (holder.getItemViewType()){
             case TRIMMING:
-                OutputVideoViewHolder outputVideoViewHolder = (OutputVideoViewHolder)holder;
-                outputVideoViewHolder.mVideoName.setText(mTrimmedVideos[position].getVideoName());
-                outputVideoViewHolder.mVideoProgressStatus.setText(mTrimmedVideos[position]
+                TrimmingVideoViewHolder trimmingVideoViewHolder = (TrimmingVideoViewHolder)holder;
+                trimmingVideoViewHolder.mVideoName.setText(mTrimmedVideos[position].getVideoName());
+                trimmingVideoViewHolder.mVideoProgressStatus.setText(mTrimmedVideos[position]
                         .getTrimmingStatus());
-                outputVideoViewHolder.mProgressPercentage
+                trimmingVideoViewHolder.mProgressPercentage
                         .setText(String.format(Locale.ENGLISH,"%d%%",
                                 mTrimmedVideos[position].getProgress()));
-                outputVideoViewHolder.mVideoProgress
+                trimmingVideoViewHolder.mVideoProgress
                         .setProgress(mTrimmedVideos[position].getProgress());
                 break;
             case TRIMMED:
                 TrimmedVideoViewHolder trimmedVideoViewHolder = (TrimmedVideoViewHolder) holder;
                 trimmedVideoViewHolder.mVideoName.setText(mTrimmedVideos[position].getVideoName());
-//                trimmedVideoViewHolder.mIcPlayVideo
-//                        .setImageResource(mTrimmedVideos[position].getVideoStatus());
                 Glide.with(mContext).load(mTrimmedVideos[position].getVideoFile()).fitCenter()
                         .into(trimmedVideoViewHolder.mVideoThumbnail);
-//                trimmedVideoViewHolder.mVideoTime
-//                        .setText(getVideoDuration(mTrimmedVideos[position].getVideoFile()));
+                trimmedVideoViewHolder.mVideoTime
+                        .setText(mTrimmedVideos[position].getVideoDuration());
+                if (mTrimmedVideos[position].getVideoMode() == TrimmedVideo.Mode.PLAY) {
+                    trimmedVideoViewHolder.mVideoMode.setImageResource(R.drawable.ic_pause);
+                    trimmedVideoViewHolder.mPlayIndicator.setAlpha(1);
+                }
+                if (mTrimmedVideos[position].getVideoMode() == TrimmedVideo.Mode.PAUSE) {
+                    trimmedVideoViewHolder.mVideoMode.setImageResource(R.drawable.ic_play);
+                    trimmedVideoViewHolder.mPlayIndicator.setAlpha(0);
+                }
                 break;
         }
-//        switch (mTrimmedVideos[position].getVideoStatus()){
-//            case R.drawable.ic_play:
-//                holder.mPlayIndicator.setAlpha(0);
-//                break;
-//            case R.drawable.ic_pause:
-//                holder.mPlayIndicator.setAlpha(1);
-//                break;
-//        }
     }
 
     @Override
@@ -126,14 +122,14 @@ public class OutputVideosAdapter
         return mTrimmedVideos.length;
     }
 
-    public class OutputVideoViewHolder extends RecyclerView.ViewHolder{
+    public class TrimmingVideoViewHolder extends RecyclerView.ViewHolder{
 
         private TextView mVideoName;
         private ProgressBar mVideoProgress;
         private TextView mProgressPercentage;
         private TextView mVideoProgressStatus;
 
-        public OutputVideoViewHolder(@NonNull View itemView) {
+        public TrimmingVideoViewHolder(@NonNull View itemView) {
             super(itemView);
             mVideoProgress = itemView.findViewById(R.id.videoProgressBar);
             mVideoName = itemView.findViewById(R.id.videoName);
@@ -171,28 +167,5 @@ public class OutputVideosAdapter
             mShare.setOnClickListener(v ->
                     mVideoShareClickListener.onShareClickListener(getAdapterPosition()));
         }
-    }
-
-    private String getVideoDuration(File videoFile) {
-        if (videoFile == null)
-            return "";
-        String videoPath = videoFile.getAbsolutePath();
-        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-        retriever.setDataSource(videoPath);
-        String time =
-                retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-        int seconds =  Integer.parseInt(time) / 1000;
-        return getVideoTime(seconds);
-    }
-
-    private String getVideoTime(int seconds) {
-        long second = seconds % 60;
-        long minute = (seconds / 60) % 60;
-        long hour = (seconds / (60 * 60)) % 24;
-
-        if (hour > 0)
-            return String.format(Locale.ENGLISH, "%d:%d:%02d", hour, minute, second);
-        else
-            return String.format(Locale.ENGLISH, "%d:%02d", minute, second);
     }
 }
