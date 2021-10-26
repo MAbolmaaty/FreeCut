@@ -17,6 +17,7 @@ import java.util.Locale;
 import force.freecut.freecut.R;
 import force.freecut.freecut.utils.ShareUtils;
 import force.freecut.freecut.utils.SharedPrefUtil;
+import force.freecut.freecut.view_models.MainViewPagerSwipingViewModel;
 
 import static force.freecut.freecut.utils.Constants.LOCALE;
 
@@ -38,7 +39,7 @@ public class AboutFragment extends Fragment {
     private TextView mWebsite;
     private TextView mAppleStore;
     private TextView mGooglePlay;
-
+    private MainViewPagerSwipingViewModel mMainViewPagerSwipingViewModel;
 
     public AboutFragment() {
         // Required empty public constructor
@@ -75,6 +76,8 @@ public class AboutFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_about, container, false);
+        mMainViewPagerSwipingViewModel = ViewModelProviders.of(getActivity())
+                .get(MainViewPagerSwipingViewModel.class);
         mCurrentLanguage = view.findViewById(R.id.text_language);
         mWebsite = view.findViewById(R.id.web_link);
         mAppleStore = view.findViewById(R.id.apple_store);
@@ -141,5 +144,11 @@ public class AboutFragment extends Fragment {
         });
 
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        mMainViewPagerSwipingViewModel.setMainViewPagerSwiping(true);
+        super.onResume();
     }
 }

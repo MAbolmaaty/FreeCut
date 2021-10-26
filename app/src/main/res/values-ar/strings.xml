@@ -75,4 +75,5 @@
     <string name="trimming">تقطيع&#8230;</string>
     <string name="gallery">الاستديو</string>
     <string name="pick_up_trim">اختر الفيديو الذي تريد تجزئته</string>
+    <string name="pick_up_merge">اختر الفيديوهات التي تريد دمجها</string>
 </resources>

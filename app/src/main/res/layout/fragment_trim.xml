@@ -11,7 +11,8 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:id="@+id/constraintLayout">
 
         <ImageView
             android:id="@+id/banner"
@@ -68,7 +69,7 @@
         <View
             android:id="@+id/videoViewBackground"
             android:layout_width="0dp"
-            android:layout_height="@dimen/_170sdp"
+            android:layout_height="0dp"
             android:background="@android:color/black"
             android:visibility="invisible"
             app:layout_constraintStart_toStartOf="parent"
@@ -82,10 +83,10 @@
             android:layout_height="wrap_content"
             android:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.3"
+            app:layout_constraintVertical_bias="0.2"
             tools:layout_height="200dp" />
 
         <View
@@ -98,7 +99,7 @@
             app:layout_constraintBottom_toTopOf="@+id/icVideoControl"
             app:layout_constraintEnd_toEndOf="@+id/videoViewBackground"
             app:layout_constraintStart_toStartOf="@+id/videoViewBackground"
-            app:layout_constraintTop_toTopOf="@+id/videoViewBackground" />
+            app:layout_constraintTop_toTopOf="@+id/videoView" />
 
         <ImageView
             android:id="@+id/ic_remove"
@@ -112,7 +113,7 @@
             android:clickable="false"
             android:src="@drawable/ic_remove"
             app:layout_constraintEnd_toEndOf="@+id/videoViewBackground"
-            app:layout_constraintTop_toTopOf="@+id/videoViewBackground"
+            app:layout_constraintTop_toTopOf="@+id/videoView"
             tools:visibility="visible" />
 
         <ImageView
@@ -126,14 +127,14 @@
             android:clickable="false"
             android:src="@drawable/ic_cloud"
             app:layout_constraintEnd_toStartOf="@+id/ic_remove"
-            app:layout_constraintTop_toTopOf="@+id/videoViewBackground"
+            app:layout_constraintTop_toTopOf="@+id/videoView"
             tools:visibility="visible" />
 
         <View
             android:id="@+id/videoSeekBarMiddle"
             android:layout_width="0dp"
             android:layout_height="1dp"
-            app:layout_constraintBottom_toBottomOf="@+id/videoViewBackground"
+            app:layout_constraintBottom_toBottomOf="@id/videoView"
             app:layout_constraintEnd_toEndOf="@id/videoViewBackground"
             app:layout_constraintStart_toStartOf="@id/videoViewBackground" />
 
@@ -163,10 +164,10 @@
             android:padding="@dimen/_10sdp"
             android:src="@drawable/ic_pause"
             android:visibility="invisible"
-            app:layout_constraintBottom_toBottomOf="@id/videoViewBackground"
-            app:layout_constraintEnd_toEndOf="@id/videoViewBackground"
-            app:layout_constraintStart_toStartOf="@id/videoViewBackground"
-            app:layout_constraintTop_toTopOf="@id/videoViewBackground"
+            app:layout_constraintBottom_toBottomOf="@id/videoView"
+            app:layout_constraintEnd_toEndOf="@id/videoView"
+            app:layout_constraintStart_toStartOf="@id/videoView"
+            app:layout_constraintTop_toTopOf="@id/videoView"
             app:tint="@android:color/white"
             tools:alpha="1" />
 
@@ -179,7 +180,7 @@
             android:textColor="@android:color/white"
             android:textSize="@dimen/_10sdp"
             android:visibility="invisible"
-            app:layout_constraintBottom_toBottomOf="@id/videoViewBackground"
+            app:layout_constraintBottom_toBottomOf="@id/videoView"
             app:layout_constraintStart_toStartOf="@+id/videoViewBackground"
             tools:alpha="1"
             tools:text="0:05 / 4:30" />
@@ -196,7 +197,7 @@
             android:paddingEnd="@dimen/_10sdp"
             android:src="@drawable/ic_speaker"
             android:visibility="invisible"
-            app:layout_constraintBottom_toBottomOf="@+id/videoViewBackground"
+            app:layout_constraintBottom_toBottomOf="@+id/videoView"
             app:layout_constraintEnd_toEndOf="@+id/videoViewBackground"
             app:tint="@android:color/white"
             tools:alpha="1" />
@@ -212,8 +213,8 @@
             android:textSize="@dimen/_10sdp"
             android:visibility="invisible"
             app:layout_constraintEnd_toEndOf="@+id/videoViewBackground"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/videoSeekBar"
+            app:layout_constraintStart_toStartOf="@id/videoViewBackground"
+            app:layout_constraintTop_toBottomOf="@+id/videoView"
             tools:text="Pirates Of Caribbean" />
 
         <TextView
@@ -227,11 +228,11 @@
             android:textColor="@android:color/white"
             android:textSize="@dimen/_12sdp"
             android:visibility="invisible"
+            app:layout_constraintVertical_chainStyle="packed"
+            app:layout_constraintTop_toBottomOf="@+id/videoName"
             app:layout_constraintBottom_toTopOf="@+id/numberOfSeconds"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/videoName"
-            app:layout_constraintVertical_chainStyle="packed" />
+            app:layout_constraintStart_toStartOf="parent" />
 
         <EditText
             android:id="@+id/numberOfSeconds"
@@ -248,9 +249,9 @@
             android:visibility="invisible"
             android:windowSoftInputMode="adjustPan"
             app:layout_constraintBottom_toTopOf="@+id/trim"
+            app:layout_constraintTop_toBottomOf="@+id/enterSeconds"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/enterSeconds" />
+            app:layout_constraintStart_toStartOf="parent" />
 
         <Button
             android:id="@+id/trim"
@@ -265,10 +266,10 @@
             android:textColor="@color/white"
             android:textSize="@dimen/_12sdp"
             android:visibility="invisible"
+            app:layout_constraintTop_toBottomOf="@+id/numberOfSeconds"
             app:layout_constraintBottom_toTopOf="@+id/speedTrim"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/numberOfSeconds" />
+            app:layout_constraintStart_toStartOf="parent" />
 
         <Button
             android:id="@+id/speedTrim"
@@ -283,10 +284,10 @@
             android:textColor="@color/white"
             android:textSize="@dimen/_12sdp"
             android:visibility="invisible"
+            app:layout_constraintTop_toBottomOf="@+id/trim"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/trim" />
+            app:layout_constraintStart_toStartOf="parent"/>
 
         <com.google.android.gms.ads.AdView
             android:id="@+id/adView"

@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,6 +52,7 @@ import force.freecut.freecut.Data.VideoItem;
 import force.freecut.freecut.R;
 import force.freecut.freecut.adapters.VideosAdapter;
 import force.freecut.freecut.utils.interfaces.VideoItemDeleteHandler;
+import force.freecut.freecut.view_models.MainViewPagerSwipingViewModel;
 import force.freecut.freecut.view_models.MergeViewModel;
 import force.freecut.freecut.view_models.ToolbarViewModel;
 
@@ -65,6 +67,8 @@ import static force.freecut.freecut.utils.Constants.VIDEOS_MERGE;
  * create an instance of this fragment.
  */
 public class MergeFragment extends Fragment {
+
+    private static final String TAG = MergeFragment.class.getSimpleName();
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -87,13 +91,13 @@ public class MergeFragment extends Fragment {
     VideoItem mVideoItem;
     View mMerge;
     View mImport;
-    TextView mNoVideos;
     String mylink = "https://www.google.com/";
     private MergeViewModel mMergeViewModel;
     ImageView mBanner;
     String saldo = "";
 
     private ToolbarViewModel mToolbarViewModel;
+    private MainViewPagerSwipingViewModel mMainViewPagerSwipingViewModel;
 
     public MergeFragment() {
         // Required empty public constructor
@@ -130,6 +134,9 @@ public class MergeFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_merge, container, false);
+
+        mMainViewPagerSwipingViewModel = ViewModelProviders.of(getActivity())
+                .get(MainViewPagerSwipingViewModel.class);
         mBanner = view.findViewById(R.id.banner);
         mMergeViewModel = ViewModelProviders.of(getActivity()).get(MergeViewModel.class);
         mToolbarViewModel = ViewModelProviders.of(getActivity()).get(ToolbarViewModel.class);
@@ -143,7 +150,6 @@ public class MergeFragment extends Fragment {
         mRecyclerView = view.findViewById(R.id.recyclerView);
         mMerge = view.findViewById(R.id.view_merge);
         mImport = view.findViewById(R.id.view_import);
-        mNoVideos = view.findViewById(R.id.noVideos);
         tinydb = new TinyDB(getActivity());
         mergeFilePath = new File(Environment.getExternalStorageDirectory(), "FreeCut").getAbsolutePath();
         mListVideos = new ArrayList<>();
@@ -170,7 +176,6 @@ public class MergeFragment extends Fragment {
                 if (deleteAll && mListVideos.size() > 0){
                     mListVideos.clear();
                     mVideosAdapter.notifyDataSetChanged();
-                    mNoVideos.setVisibility(View.VISIBLE);
                 }
             }
         });
@@ -184,8 +189,8 @@ public class MergeFragment extends Fragment {
                     totalbytes += Integer.parseInt(String.valueOf(file.length()));
                 }
                 if (mListVideos.isEmpty() || mListVideos.size() == 1) {
-                    Toast.makeText(getActivity(), getString(R.string.select_videos_for_merge), Toast.LENGTH_SHORT).show();
-                    mNoVideos.startAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.shake50));
+                    Toast.makeText(getActivity(), getString(R.string.select_videos_for_merge),
+                            Toast.LENGTH_SHORT).show();
                 } else if (Utils.getInternalAvailableSpace() < totalbytes) {
                     final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                     builder.setCancelable(true);
@@ -232,26 +237,13 @@ public class MergeFragment extends Fragment {
             }
         });
 
-        mNoVideos.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), Gallery.class);
-                intent.putExtra("title", "Select media");
-                // Mode 1 for both images and videos selection, 2 for images only and 3 for videos!
-                intent.putExtra("mode", 3);
-                intent.putExtra("maxSelection", 100);
-                // Optional
-                startActivityForResult(intent, OPEN_MEDIA_PICKER);
-            }
-        });
-
         return view;
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
-
+    public void onResume() {
+        mMainViewPagerSwipingViewModel.setMainViewPagerSwiping(true);
+        super.onResume();
     }
 
     @Override
@@ -291,17 +283,15 @@ public class MergeFragment extends Fragment {
                                         @Override
                                         public void onClick(int position) {
                                             mListVideos.remove(position);
-                                            if (mListVideos.size() < 1) {
-                                                mNoVideos.setVisibility(View.VISIBLE);
-                                            }
                                             mVideosAdapter.notifyDataSetChanged();
                                         }
                                     });
                                     mRecyclerView.setAdapter(mVideosAdapter);
                                     mProgressDialog.dismiss();
-                                    mNoVideos.setVisibility(View.GONE);
-                                    mImport.setBackgroundTintList(ContextCompat.getColorStateList(getActivity(), R.color.grey));
-                                    mMerge.setBackgroundTintList(ContextCompat.getColorStateList(getActivity(), R.color.orange));
+                                    mImport.setBackgroundTintList(ContextCompat.
+                                            getColorStateList(getActivity(), R.color.grey));
+                                    mMerge.setBackgroundTintList(ContextCompat.
+                                            getColorStateList(getActivity(), R.color.orange));
 
                            /* }
                         }

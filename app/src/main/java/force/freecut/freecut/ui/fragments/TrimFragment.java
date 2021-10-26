@@ -10,14 +10,21 @@ import static force.freecut.freecut.utils.Constants.STORAGE_DIRECTORY;
 import static force.freecut.freecut.utils.Constants.VIDEO_NAME;
 import static force.freecut.freecut.utils.Constants.VIDEO_PATH;
 
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.storage.StorageManager;
+import android.provider.DocumentsContract;
+import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -27,13 +34,17 @@ import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
 import androidx.appcompat.widget.AppCompatSeekBar;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
@@ -53,6 +64,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.lang.reflect.Array;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.Locale;
@@ -128,6 +141,7 @@ public class TrimFragment extends Fragment {
     private MediaPlayer mMediaPlayer;
     private Handler mUpdateVideoTimeHandler = new Handler();
     private Handler mHideVideoControlsHandler = new Handler();
+    private ConstraintLayout mConstraintLayout;
 
     private Runnable mUpdateVideoTimeRunnable = new Runnable() {
         @Override
@@ -184,12 +198,14 @@ public class TrimFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_trim, container, false);
+
         mToolbarViewModel = ViewModelProviders.of(getActivity()).get(ToolbarViewModel.class);
         mToolbarViewModel.showBackButton(false);
         mTrimViewModel = ViewModelProviders.of(getActivity()).get(TrimViewModel.class);
         mMainViewPagerSwipingViewModel = ViewModelProviders.of(getActivity())
                 .get(MainViewPagerSwipingViewModel.class);
 
+        mConstraintLayout = view.findViewById(R.id.constraintLayout);
         mBanner = view.findViewById(R.id.banner);
         mIcVideo = view.findViewById(R.id.icVideo);
         mOpenGallery = view.findViewById(R.id.openGallery);
@@ -230,6 +246,8 @@ public class TrimFragment extends Fragment {
         tinydb = new TinyDB(getActivity());
 
         //new GetDataSync().execute();
+
+        mSelectedVideoUri = null;
 
         mTrim.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -320,7 +338,7 @@ public class TrimFragment extends Fragment {
                 bundle.putString(VIDEO_PATH, mVideoPath);
                 mTrimViewModel.setTrimBundle(bundle);
                 loadFragment(getActivity().getSupportFragmentManager(),
-                        SpeedTrimProcessFragment.newInstance(null, null), false);
+                        SpeedTrimProcessFragment.newInstance(null, null), true);
             }
         });
 
@@ -351,17 +369,31 @@ public class TrimFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        if (mSelectedVideoUri != null){
+            mMainViewPagerSwipingViewModel.setMainViewPagerSwiping(false);
+        } else {
+            mMainViewPagerSwipingViewModel.setMainViewPagerSwiping(true);
+        }
+        super.onResume();
+    }
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_TAKE_GALLERY_VIDEO) {
             if (resultCode == RESULT_OK) {
                 mSelectedVideoUri = data.getData();
-                mVideoPath = Utils.getRealPathFromURI_API19(getActivity(), mSelectedVideoUri);
+                Log.d(TAG, "mSelectedVideoUri : " + mSelectedVideoUri);
+                mVideoPath = getPath(getActivity(), mSelectedVideoUri);
+                Log.d(TAG, "mVideoPath : " + mVideoPath);
                 String[] pathSegments = mVideoPath.split("/");
                 mVideoName = pathSegments[pathSegments.length - 1];
                 showPickupVideo(false);
+
                 displayVideo(true);
                 prepareVideo(mSelectedVideoUri);
+
                 mMainViewPagerSwipingViewModel.setMainViewPagerSwiping(false);
             }
         }
@@ -369,8 +401,12 @@ public class TrimFragment extends Fragment {
 
     @Override
     public void onPause() {
-        showPickupVideo(true);
-        displayVideo(false);
+        if (mVideoView.isPlaying())
+            mVideoView.pause();
+        if(mSelectedVideoUri != null){
+            mIcVideoControl.setImageResource(R.drawable.ic_play);
+            showVideoControls(true);
+        }
         mHideVideoControlsHandler.removeCallbacks(mHideVideoControlsRunnable);
         mUpdateVideoTimeHandler.removeCallbacks(mUpdateVideoTimeRunnable);
         super.onPause();
@@ -592,10 +628,23 @@ public class TrimFragment extends Fragment {
     }
 
     private void prepareVideo(Uri videoUri) {
+        ConstraintSet constraintSet = new ConstraintSet();
+        constraintSet.clone(mConstraintLayout);
         mVideoView.setVideoURI(videoUri);
+        mVideoView.setLayoutParams(
+                new ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                        ConstraintLayout.LayoutParams.WRAP_CONTENT));
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                constraintSet.applyTo(mConstraintLayout);
+            }
+        }, 10);
+
+
         mVideoView.start();
-        mVideoView.setVisibility(View.VISIBLE);
         mVideoView.requestFocus();
+
         mTextViewVideoName.setText(mVideoName);
 
         mIcShare.setOnClickListener(new View.OnClickListener() {
@@ -613,6 +662,7 @@ public class TrimFragment extends Fragment {
             public void onClick(View v) {
                 showPickupVideo(true);
                 displayVideo(false);
+                mSelectedVideoUri = null;
             }
         });
 
@@ -764,5 +814,188 @@ public class TrimFragment extends Fragment {
             mVoiceControl.animate().alpha(0);
             mVideoControlsVisible = false;
         }
+    }
+
+    private String getPath(final Context context, final Uri uri) {
+
+        final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
+
+        // DocumentProvider
+        if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
+
+            // ExternalStorageProvider
+
+            if (isExternalStorageDocument(uri)) {
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                final String type = split[0];
+
+                if ("primary".equalsIgnoreCase(type)) {
+                    return Environment.getExternalStorageDirectory() + "/" + split[1];
+                } else {
+                    // Below logic is how External Storage provider build URI for documents
+                    // Based on http://stackoverflow.com/questions/28605278/android-5-sd-card-label and https://gist.github.com/prasad321/9852037
+                    StorageManager mStorageManager = (StorageManager) context.getSystemService(Context.STORAGE_SERVICE);
+
+                    try {
+                        Class<?> storageVolumeClazz = Class.forName("android.os.storage.StorageVolume");
+                        Method getVolumeList = mStorageManager.getClass().getMethod("getVolumeList");
+                        Method getUuid = storageVolumeClazz.getMethod("getUuid");
+                        Method getState = storageVolumeClazz.getMethod("getState");
+                        Method getPath = storageVolumeClazz.getMethod("getPath");
+                        Method isPrimary = storageVolumeClazz.getMethod("isPrimary");
+                        Method isEmulated = storageVolumeClazz.getMethod("isEmulated");
+
+                        Object result = getVolumeList.invoke(mStorageManager);
+
+                        final int length = Array.getLength(result);
+                        for (int i = 0; i < length; i++) {
+                            Object storageVolumeElement = Array.get(result, i);
+                            //String uuid = (String) getUuid.invoke(storageVolumeElement);
+
+                            final boolean mounted = Environment.MEDIA_MOUNTED.equals(getState.invoke(storageVolumeElement))
+                                    || Environment.MEDIA_MOUNTED_READ_ONLY.equals(getState.invoke(storageVolumeElement));
+
+                            //if the media is not mounted, we need not get the volume details
+                            if (!mounted) continue;
+
+                            //Primary storage is already handled.
+                            if ((Boolean) isPrimary.invoke(storageVolumeElement) && (Boolean) isEmulated.invoke(storageVolumeElement))
+                                continue;
+
+                            String uuid = (String) getUuid.invoke(storageVolumeElement);
+
+                            if (uuid != null && uuid.equals(type)) {
+                                String res = getPath.invoke(storageVolumeElement) + "/" + split[1];
+                                return res;
+                            }
+                        }
+                    } catch (Exception ex) {
+                    }
+                }
+            }
+
+
+            // DownloadsProvider
+            else if (isDownloadsDocument(uri)) {
+
+                final String id = DocumentsContract.getDocumentId(uri);
+                if (!TextUtils.isEmpty(id)) {
+                    if (id.startsWith("raw:")) {
+                        return id.replaceFirst("raw:", "");
+                    }
+                }
+                String[] contentUriPrefixesToTry = new String[]{
+                        "content://downloads/public_downloads",
+                        "content://downloads/my_downloads",
+                        "content://downloads/all_downloads"
+                };
+
+                for (String contentUriPrefix : contentUriPrefixesToTry) {
+                    Uri contentUri = ContentUris.withAppendedId(Uri.parse(contentUriPrefix), Long.valueOf(id));
+                    try {
+                        String path = getDataColumn(context, contentUri, null, null);
+                        if (path != null) {
+                            return path;
+                        }
+                    } catch (Exception e) {
+                    }
+                }
+
+                return null;
+            }
+            // MediaProvider
+            else if (isMediaDocument(uri)) {
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                final String type = split[0];
+
+                Uri contentUri = null;
+                if ("image".equals(type)) {
+                    contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+                } else if ("video".equals(type)) {
+                    contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+                } else if ("audio".equals(type)) {
+                    contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+                }
+
+                final String selection = "_id=?";
+                final String[] selectionArgs = new String[]{
+                        split[1]
+                };
+
+                return getDataColumn(context, contentUri, selection, selectionArgs);
+            }
+        }
+        // MediaStore (and general)
+        else if ("content".equalsIgnoreCase(uri.getScheme())) {
+
+//            // Return the remote address
+            if (isGooglePhotosUri(uri))
+                return uri.getLastPathSegment();
+
+            return getDataColumn(context, uri, null, null);
+        }
+        // File
+        else if ("file".equalsIgnoreCase(uri.getScheme())) {
+            return uri.getPath();
+        }
+
+        return null;
+    }
+
+    public static boolean isGooglePhotosUri(Uri uri) {
+        return "com.google.android.apps.photos.content".equals(uri.getAuthority());
+    }
+
+    /**
+     * Get the value of the data column for this Uri.
+     */
+    private String getDataColumn(Context context, Uri uri, String selection,
+                                 String[] selectionArgs) {
+
+        Cursor cursor = null;
+        final String column = "_data";
+        final String[] projection = {
+                column
+        };
+
+        try {
+            cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs,
+                    null);
+            if (cursor != null && cursor.moveToFirst()) {
+                final int column_index = cursor.getColumnIndexOrThrow(column);
+                return cursor.getString(column_index);
+            }
+        } finally {
+            if (cursor != null)
+                cursor.close();
+        }
+        return null;
+    }
+
+
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is ExternalStorageProvider.
+     */
+    private boolean isExternalStorageDocument(Uri uri) {
+        return "com.android.externalstorage.documents".equals(uri.getAuthority());
+    }
+
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is DownloadsProvider.
+     */
+    private boolean isDownloadsDocument(Uri uri) {
+        return "com.android.providers.downloads.documents".equals(uri.getAuthority());
+    }
+
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is MediaProvider.
+     */
+    private boolean isMediaDocument(Uri uri) {
+        return "com.android.providers.media.documents".equals(uri.getAuthority());
     }
 }
