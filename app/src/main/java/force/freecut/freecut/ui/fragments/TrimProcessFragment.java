@@ -201,7 +201,6 @@ public class TrimProcessFragment extends Fragment {
                         int videoDuration = mVideoView.getDuration() / 1000;
                         mUpdateVideoTimeHandler.postDelayed(mUpdateVideoTimeRunnable, 100);
                         if (mVideoView.getTag().equals(TRIMMED_VIDEO)) {
-
                             mIcVideoControl.setImageResource(R.drawable.ic_pause);
                             mVideoView.start();
                             mBlockSeekBar = true;
@@ -487,9 +486,9 @@ public class TrimProcessFragment extends Fragment {
     }
 
     private void showVideoControls() {
-        mVideoView.setOnClickListener(new View.OnClickListener() {
+        mVideoView.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View view) {
+            public boolean onTouch(View v, MotionEvent event) {
                 if (mVideoControlsVisible) {
                     mVideoSeekBar.animate().alpha(0);
                     mBlockSeekBar = true;
@@ -511,6 +510,7 @@ public class TrimProcessFragment extends Fragment {
                     mHideVideoControlsHandler.postDelayed(mHideVideoControlsRunnable,
                             3000);
                 }
+                return false;
             }
         });
     }

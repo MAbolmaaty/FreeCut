@@ -80,10 +80,11 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_margin="@dimen/_8sdp"
+            android:visibility="invisible"
             app:layout_constraintBottom_toTopOf="@+id/view_import"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/banner"/>
+            app:layout_constraintTop_toBottomOf="@+id/banner" />
 
         <View
             android:id="@+id/view_import"

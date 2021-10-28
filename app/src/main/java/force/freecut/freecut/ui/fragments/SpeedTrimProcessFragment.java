@@ -171,6 +171,7 @@ public class SpeedTrimProcessFragment extends Fragment {
         mLastClickedVideo = -1;
 
         mToolbarViewModel = ViewModelProviders.of(getActivity()).get(ToolbarViewModel.class);
+        mToolbarViewModel.setToolbarTitle(getString(R.string.speed_trim));
         mToolbarViewModel.showBackButton(true);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
@@ -198,7 +199,6 @@ public class SpeedTrimProcessFragment extends Fragment {
                         int videoDuration = mVideoView.getDuration() / 1000;
                         mUpdateVideoTimeHandler.postDelayed(mUpdateVideoTimeRunnable, 100);
                         if (mVideoView.getTag().equals(TRIMMED_VIDEO)) {
-
                             mIcVideoControl.setImageResource(R.drawable.ic_pause);
                             mVideoView.start();
                             mBlockSeekBar = true;
@@ -219,9 +219,6 @@ public class SpeedTrimProcessFragment extends Fragment {
 
                         if (mPaused)
                             return;
-
-                        int numberOfVideos = (int) Math.ceil((double) videoDuration
-                                / bundle.getInt(SEGMENT_TIME));
 
                         showVideoControls();
                         controlVideo();
@@ -408,9 +405,9 @@ public class SpeedTrimProcessFragment extends Fragment {
     }
 
     private void showVideoControls(){
-        mVideoView.setOnClickListener(new View.OnClickListener() {
+        mVideoView.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View view) {
+            public boolean onTouch(View v, MotionEvent event) {
                 if (mVideoControlsVisible) {
                     mVideoSeekBar.animate().alpha(0);
                     mBlockSeekBar = true;
@@ -432,6 +429,7 @@ public class SpeedTrimProcessFragment extends Fragment {
                     mHideVideoControlsHandler.postDelayed(mHideVideoControlsRunnable,
                             3000);
                 }
+                return false;
             }
         });
     }

@@ -171,7 +171,7 @@ public class MainFragment extends Fragment {
 
     private void setMergeFragmentToolBar(){
         mToolbarViewModel.setToolbarTitle(getString(R.string.merge));
-        mToolbarViewModel.showDeleteAll(true);
+        //mToolbarViewModel.showDeleteAll(true);
         mToolbarViewModel.showBackHomeButton(false);
     }
 

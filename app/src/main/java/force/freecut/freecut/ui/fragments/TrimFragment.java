@@ -384,9 +384,7 @@ public class TrimFragment extends Fragment {
         if (requestCode == REQUEST_TAKE_GALLERY_VIDEO) {
             if (resultCode == RESULT_OK) {
                 mSelectedVideoUri = data.getData();
-                Log.d(TAG, "mSelectedVideoUri : " + mSelectedVideoUri);
                 mVideoPath = getPath(getActivity(), mSelectedVideoUri);
-                Log.d(TAG, "mVideoPath : " + mVideoPath);
                 String[] pathSegments = mVideoPath.split("/");
                 mVideoName = pathSegments[pathSegments.length - 1];
                 showPickupVideo(false);
@@ -641,7 +639,6 @@ public class TrimFragment extends Fragment {
             }
         }, 10);
 
-
         mVideoView.start();
         mVideoView.requestFocus();
 
@@ -695,9 +692,9 @@ public class TrimFragment extends Fragment {
             }
         });
 
-        mVideoView.setOnClickListener(new View.OnClickListener() {
+        mVideoView.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View view) {
+            public boolean onTouch(View v, MotionEvent event) {
                 if (mVideoControlsVisible) {
                     showVideoControls(false);
                 } else {
@@ -705,6 +702,7 @@ public class TrimFragment extends Fragment {
                     mHideVideoControlsHandler.postDelayed(mHideVideoControlsRunnable,
                             3000);
                 }
+                return false;
             }
         });
 

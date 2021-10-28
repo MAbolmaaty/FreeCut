@@ -71,7 +71,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/_4sdp"
         android:layout_marginBottom="@dimen/_2sdp"
-        android:elevation="@dimen/_1sdp"
+        android:elevation="@dimen/_2sdp"
         android:textColor="@android:color/white"
         android:textSize="@dimen/_8sdp"
         app:layout_constraintBottom_toBottomOf="@+id/videoThumbnailCardView"

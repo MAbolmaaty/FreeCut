@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -96,6 +97,7 @@ public class MergeFragment extends Fragment {
     ImageView mBanner;
     String saldo = "";
 
+    private Button mOpenGallery;
     private ToolbarViewModel mToolbarViewModel;
     private MainViewPagerSwipingViewModel mMainViewPagerSwipingViewModel;
 
@@ -138,6 +140,8 @@ public class MergeFragment extends Fragment {
         mMainViewPagerSwipingViewModel = ViewModelProviders.of(getActivity())
                 .get(MainViewPagerSwipingViewModel.class);
         mBanner = view.findViewById(R.id.banner);
+        mOpenGallery = view.findViewById(R.id.openGallery);
+
         mMergeViewModel = ViewModelProviders.of(getActivity()).get(MergeViewModel.class);
         mToolbarViewModel = ViewModelProviders.of(getActivity()).get(ToolbarViewModel.class);
 
@@ -151,9 +155,11 @@ public class MergeFragment extends Fragment {
         mMerge = view.findViewById(R.id.view_merge);
         mImport = view.findViewById(R.id.view_import);
         tinydb = new TinyDB(getActivity());
-        mergeFilePath = new File(Environment.getExternalStorageDirectory(), "FreeCut").getAbsolutePath();
+        mergeFilePath = new File(Environment.getExternalStorageDirectory(),
+                "FreeCut").getAbsolutePath();
         mListVideos = new ArrayList<>();
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(),
+                RecyclerView.VERTICAL, false);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
 
@@ -168,17 +174,18 @@ public class MergeFragment extends Fragment {
             }
         });
 
-        new GetDataSync().execute();
+        //new GetDataSync().execute();
 
-        mToolbarViewModel.listenForDeleteAllMergeVideos().observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean deleteAll) {
-                if (deleteAll && mListVideos.size() > 0){
-                    mListVideos.clear();
-                    mVideosAdapter.notifyDataSetChanged();
-                }
-            }
-        });
+//        mToolbarViewModel.listenForDeleteAllMergeVideos()
+//                .observe(this, new Observer<Boolean>() {
+//            @Override
+//            public void onChanged(Boolean deleteAll) {
+//                if (deleteAll && mListVideos.size() > 0){
+//                    mListVideos.clear();
+//                    mVideosAdapter.notifyDataSetChanged();
+//                }
+//            }
+//        });
 
         mMerge.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -224,15 +231,20 @@ public class MergeFragment extends Fragment {
             }
         });
 
-        mImport.setOnClickListener(new View.OnClickListener() {
+        mOpenGallery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), Gallery.class);
-                intent.putExtra("title", "Select media");
-                // Mode 1 for both images and videos selection, 2 for images only and 3 for videos!
-                intent.putExtra("mode", 3);
-                intent.putExtra("maxSelection", 100);
-                // Optional
+//                Intent intent = new Intent(getActivity(), Gallery.class);
+//                intent.putExtra("title", "Select media");
+//                // Mode 1 for both images and videos selection, 2 for images only and 3 for videos!
+//                intent.putExtra("mode", 3);
+//                intent.putExtra("maxSelection", 100);
+//                // Optional
+//                startActivityForResult(intent, OPEN_MEDIA_PICKER);
+                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                intent.setType("video/mp4");
                 startActivityForResult(intent, OPEN_MEDIA_PICKER);
             }
         });
