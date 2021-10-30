@@ -14,6 +14,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -102,11 +103,12 @@ public class TrimProcessFragment extends Fragment {
         @Override
         public void run() {
             long currentPosition = mVideoView.getCurrentPosition();
+            Log.d(TAG, "mVideoView.getCurrentPosition() : " + mVideoView.getCurrentPosition());
             mVideoSeekBar.setProgress((int) currentPosition);
             mVideoTime.setText(String.format(Locale.ENGLISH, "%s / %s",
                     getVideoTime((int) currentPosition / 1000),
                     getVideoTime(mVideoView.getDuration() / 1000)));
-            mUpdateVideoTimeHandler.postDelayed(this, 100);
+            mUpdateVideoTimeHandler.postDelayed(this, 10);
         }
     };
 
@@ -195,11 +197,15 @@ public class TrimProcessFragment extends Fragment {
                 mVideoView.requestFocus();
                 mVideoName.setText(bundle.getString(VIDEO_NAME));
                 mVideoView.setTag(MAIN_VIDEO);
+
                 mVideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                     @Override
                     public void onPrepared(MediaPlayer mp) {
                         int videoDuration = mVideoView.getDuration() / 1000;
-                        mUpdateVideoTimeHandler.postDelayed(mUpdateVideoTimeRunnable, 100);
+                        mUpdateVideoTimeHandler.postDelayed(mUpdateVideoTimeRunnable, 10);
+                        mMediaPlayer = mp;
+                        mVoiceControl.setImageResource(R.drawable.ic_speaker);
+                        mVideoMuted = false;
                         if (mVideoView.getTag().equals(TRIMMED_VIDEO)) {
                             mIcVideoControl.setImageResource(R.drawable.ic_pause);
                             mVideoView.start();
@@ -230,7 +236,6 @@ public class TrimProcessFragment extends Fragment {
                         controlVideoSeekbar();
                         controlVideoVoice();
 
-                        mMediaPlayer = mp;
                         mVideoSeekBar.setProgress(0);
                         mVideoSeekBar.setMax(mVideoView.getDuration());
                         mVideoTime.setText(String.format(Locale.ENGLISH, "%s / %s",
@@ -300,6 +305,7 @@ public class TrimProcessFragment extends Fragment {
                 mVideoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                     @Override
                     public void onCompletion(MediaPlayer mp) {
+                        mUpdateVideoTimeHandler.removeCallbacks(mUpdateVideoTimeRunnable);
                         mBlockSeekBar = false;
                         mVideoSeekBar.animate().alpha(1);
                         mViewShadow.animate().alpha(1);
@@ -467,7 +473,7 @@ public class TrimProcessFragment extends Fragment {
                 } else {
                     mIcVideoControl.setImageResource(R.drawable.ic_pause);
                     mVideoView.start();
-                    mUpdateVideoTimeHandler.postDelayed(mUpdateVideoTimeRunnable, 100);
+                    mUpdateVideoTimeHandler.postDelayed(mUpdateVideoTimeRunnable, 10);
                     mBlockSeekBar = true;
                     mVideoSeekBar.setAlpha(0);
                     mViewShadow.setAlpha(0);
@@ -529,11 +535,15 @@ public class TrimProcessFragment extends Fragment {
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
+                mVideoView.pause();
                 mHideVideoControlsHandler.removeCallbacks(mHideVideoControlsRunnable);
+                mUpdateVideoTimeHandler.removeCallbacks(mUpdateVideoTimeRunnable);
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
+                mUpdateVideoTimeHandler.postDelayed(mUpdateVideoTimeRunnable, 10);
+                mVideoView.start();
                 mHideVideoControlsHandler.postDelayed(mHideVideoControlsRunnable,
                         3000);
             }

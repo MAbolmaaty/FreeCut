@@ -94,6 +94,7 @@ public class SpeedTrimProcessFragment extends Fragment {
         @Override
         public void run() {
             long currentPosition = mVideoView.getCurrentPosition();
+            Log.d(TAG, "mVideoView.getCurrentPosition() : " + mVideoView.getCurrentPosition());
             mVideoSeekBar.setProgress((int) currentPosition);
             mVideoTime.setText(String.format(Locale.ENGLISH, "%s / %s",
                     getVideoTime((int) currentPosition / 1000),
@@ -198,6 +199,9 @@ public class SpeedTrimProcessFragment extends Fragment {
                     public void onPrepared(MediaPlayer mp) {
                         int videoDuration = mVideoView.getDuration() / 1000;
                         mUpdateVideoTimeHandler.postDelayed(mUpdateVideoTimeRunnable, 100);
+                        mMediaPlayer = mp;
+                        mVoiceControl.setImageResource(R.drawable.ic_speaker);
+                        mVideoMuted = false;
                         if (mVideoView.getTag().equals(TRIMMED_VIDEO)) {
                             mIcVideoControl.setImageResource(R.drawable.ic_pause);
                             mVideoView.start();
@@ -225,7 +229,6 @@ public class SpeedTrimProcessFragment extends Fragment {
                         controlVideoSeekbar();
                         controlVideoVoice();
 
-                        mMediaPlayer = mp;
                         mVideoSeekBar.setProgress(0);
                         mVideoSeekBar.setMax(mVideoView.getDuration());
                         mVideoTime.setText(String.format(Locale.ENGLISH, "%s / %s",
@@ -238,6 +241,7 @@ public class SpeedTrimProcessFragment extends Fragment {
                 });
 
                 mVideoView.setOnCompletionListener(mp -> {
+                    mUpdateVideoTimeHandler.removeCallbacks(mUpdateVideoTimeRunnable);
                     mBlockSeekBar = false;
                     mVideoSeekBar.animate().alpha(1);
                     mViewShadow.animate().alpha(1);
