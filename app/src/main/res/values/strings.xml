@@ -78,4 +78,5 @@ cut video in two ways:
     <string name="gallery">Gallery</string>
     <string name="pick_up_trim">Pick up video you want to trim</string>
     <string name="pick_up_merge">Pick up videos you want to merge</string>
+    <string name="select_multiple_videos">You have to select more than one video!</string>
 </resources>
