@@ -103,7 +103,6 @@ public class TrimProcessFragment extends Fragment {
         @Override
         public void run() {
             long currentPosition = mVideoView.getCurrentPosition();
-            Log.d(TAG, "mVideoView.getCurrentPosition() : " + mVideoView.getCurrentPosition());
             mVideoSeekBar.setProgress((int) currentPosition);
             mVideoTime.setText(String.format(Locale.ENGLISH, "%s / %s",
                     getVideoTime((int) currentPosition / 1000),
@@ -546,6 +545,11 @@ public class TrimProcessFragment extends Fragment {
                 mVideoView.start();
                 mHideVideoControlsHandler.postDelayed(mHideVideoControlsRunnable,
                         3000);
+                mIcVideoControl.setImageResource(R.drawable.ic_pause);
+                if (mLastClickedVideo != -1) {
+                    mTrimmedVideos[mLastClickedVideo].setVideoMode(TrimmedVideo.Mode.PLAY);
+                    mVideosAdapter.notifyItemChanged(mLastClickedVideo);
+                }
             }
         });
 
