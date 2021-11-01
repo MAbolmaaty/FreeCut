@@ -15,16 +15,16 @@ import com.bumptech.glide.Glide;
 
 import java.util.Locale;
 
-import force.freecut.freecut.Data.TrimmedVideo;
+import force.freecut.freecut.Data.TrimVideoModel;
 import force.freecut.freecut.R;
 
-public class OutputVideosAdapter
+public class TrimmedVideosAdapter
         extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
-    private static final String TAG = OutputVideosAdapter.class.getSimpleName();
+    private static final String TAG = TrimmedVideosAdapter.class.getSimpleName();
 
     private Context mContext;
-    private TrimmedVideo [] mTrimmedVideos;
+    private TrimVideoModel[] mTrimVideoModels;
     private VideoPlayClickListener mVideoPlayClickListener;
     private VideoShareClickListener mVideoShareClickListener;
     private static final int TRIMMING = 0;
@@ -38,18 +38,18 @@ public class OutputVideosAdapter
         void onShareClickListener(int videoClicked);
     }
 
-    public OutputVideosAdapter(Context context, TrimmedVideo [] trimmedVideos,
-                               VideoPlayClickListener videoPlayClickListener,
-                               VideoShareClickListener videoShareClickListener) {
+    public TrimmedVideosAdapter(Context context, TrimVideoModel[] trimVideoModels,
+                                VideoPlayClickListener videoPlayClickListener,
+                                VideoShareClickListener videoShareClickListener) {
         mContext = context;
-        mTrimmedVideos = trimmedVideos;
+        mTrimVideoModels = trimVideoModels;
         mVideoPlayClickListener = videoPlayClickListener;
         mVideoShareClickListener = videoShareClickListener;
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (mTrimmedVideos[position].getProgress() == 100){
+        if (mTrimVideoModels[position].getProgress() == 100){
             return TRIMMED;
         } else {
             return TRIMMING;
@@ -89,27 +89,27 @@ public class OutputVideosAdapter
         switch (holder.getItemViewType()){
             case TRIMMING:
                 TrimmingVideoViewHolder trimmingVideoViewHolder = (TrimmingVideoViewHolder)holder;
-                trimmingVideoViewHolder.mVideoName.setText(mTrimmedVideos[position].getVideoName());
-                trimmingVideoViewHolder.mVideoProgressStatus.setText(mTrimmedVideos[position]
+                trimmingVideoViewHolder.mVideoName.setText(mTrimVideoModels[position].getVideoName());
+                trimmingVideoViewHolder.mVideoProgressStatus.setText(mTrimVideoModels[position]
                         .getTrimmingStatus());
                 trimmingVideoViewHolder.mProgressPercentage
                         .setText(String.format(Locale.ENGLISH,"%d%%",
-                                mTrimmedVideos[position].getProgress()));
+                                mTrimVideoModels[position].getProgress()));
                 trimmingVideoViewHolder.mVideoProgress
-                        .setProgress(mTrimmedVideos[position].getProgress());
+                        .setProgress(mTrimVideoModels[position].getProgress());
                 break;
             case TRIMMED:
                 TrimmedVideoViewHolder trimmedVideoViewHolder = (TrimmedVideoViewHolder) holder;
-                trimmedVideoViewHolder.mVideoName.setText(mTrimmedVideos[position].getVideoName());
-                Glide.with(mContext).load(mTrimmedVideos[position].getVideoFile()).fitCenter()
+                trimmedVideoViewHolder.mVideoName.setText(mTrimVideoModels[position].getVideoName());
+                Glide.with(mContext).load(mTrimVideoModels[position].getVideoFile()).fitCenter()
                         .into(trimmedVideoViewHolder.mVideoThumbnail);
                 trimmedVideoViewHolder.mVideoTime
-                        .setText(mTrimmedVideos[position].getVideoDuration());
-                if (mTrimmedVideos[position].getVideoMode() == TrimmedVideo.Mode.PLAY) {
+                        .setText(mTrimVideoModels[position].getVideoDuration());
+                if (mTrimVideoModels[position].getVideoMode() == TrimVideoModel.Mode.PLAY) {
                     trimmedVideoViewHolder.mVideoMode.setImageResource(R.drawable.ic_pause);
                     trimmedVideoViewHolder.mPlayIndicator.setAlpha(1);
                 }
-                if (mTrimmedVideos[position].getVideoMode() == TrimmedVideo.Mode.PAUSE) {
+                if (mTrimVideoModels[position].getVideoMode() == TrimVideoModel.Mode.PAUSE) {
                     trimmedVideoViewHolder.mVideoMode.setImageResource(R.drawable.ic_play);
                     trimmedVideoViewHolder.mPlayIndicator.setAlpha(0);
                 }
@@ -119,7 +119,7 @@ public class OutputVideosAdapter
 
     @Override
     public int getItemCount() {
-        return mTrimmedVideos.length;
+        return mTrimVideoModels.length;
     }
 
     public class TrimmingVideoViewHolder extends RecyclerView.ViewHolder{

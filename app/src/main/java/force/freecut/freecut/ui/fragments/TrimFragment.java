@@ -34,9 +34,7 @@ import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -71,7 +69,6 @@ import java.nio.charset.Charset;
 import java.util.Locale;
 
 import force.freecut.freecut.Data.TinyDB;
-import force.freecut.freecut.Data.TrimmedVideo;
 import force.freecut.freecut.Data.Utils;
 import force.freecut.freecut.R;
 import force.freecut.freecut.helper.PreferenceHelper;

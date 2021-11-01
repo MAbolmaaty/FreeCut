@@ -88,29 +88,23 @@ public class MergeFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    private RecyclerView mRecyclerView;
     private VideosAdapter mVideosAdapter;
-    List<VideoItem> mListVideos;
+
     String mergeFilePath;
-    String All = "";
-    private ProgressDialog mProgressDialog;
     static final int OPEN_MEDIA_PICKER = 1;
-    String[] extensions;
-    String[] links;
-    int ind;
-    long totalbytes = 0;
     TinyDB tinydb;
-    VideoItem mVideoItem;
-    View mMerge;
-    View mImport;
     String mylink = "https://www.google.com/";
     private MergeViewModel mMergeViewModel;
     ImageView mBanner;
     String saldo = "";
 
-    private Button mOpenGallery;
     private ToolbarViewModel mToolbarViewModel;
     private MainViewPagerSwipingViewModel mMainViewPagerSwipingViewModel;
+
+    private ImageView mIcVideo2;
+    private ImageView mIcVideo;
+    private Button mOpenGallery;
+    private TextView mPickUpMerge;
 
     public MergeFragment() {
         // Required empty public constructor
@@ -151,7 +145,11 @@ public class MergeFragment extends Fragment {
         mMainViewPagerSwipingViewModel = ViewModelProviders.of(getActivity())
                 .get(MainViewPagerSwipingViewModel.class);
         mBanner = view.findViewById(R.id.banner);
+
+        mIcVideo2 = view.findViewById(R.id.icVideo2);
+        mIcVideo = view.findViewById(R.id.icVideo);
         mOpenGallery = view.findViewById(R.id.openGallery);
+        mPickUpMerge = view.findViewById(R.id.pickUpMerge);
 
         mMergeViewModel = ViewModelProviders.of(getActivity()).get(MergeViewModel.class);
         mToolbarViewModel = ViewModelProviders.of(getActivity()).get(ToolbarViewModel.class);
@@ -162,17 +160,16 @@ public class MergeFragment extends Fragment {
         AdRequest adRequest = new AdRequest.Builder().build();
         adView1.loadAd(adRequest);
 
-        mRecyclerView = view.findViewById(R.id.recyclerView);
-        mMerge = view.findViewById(R.id.view_merge);
-        mImport = view.findViewById(R.id.view_import);
+        //mRecyclerView = view.findViewById(R.id.recyclerView);
+
         tinydb = new TinyDB(getActivity());
         mergeFilePath = new File(Environment.getExternalStorageDirectory(),
                 "FreeCut").getAbsolutePath();
-        mListVideos = new ArrayList<>();
+
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(),
                 RecyclerView.VERTICAL, false);
-        mRecyclerView.setLayoutManager(layoutManager);
-        mRecyclerView.setHasFixedSize(true);
+//        mRecyclerView.setLayoutManager(layoutManager);
+//        mRecyclerView.setHasFixedSize(true);
 
         mBanner.setOnClickListener(new View.OnClickListener() {
 
@@ -198,60 +195,54 @@ public class MergeFragment extends Fragment {
 //            }
 //        });
 
-        mMerge.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                totalbytes = 0;
-                for (int i = 0; i < mListVideos.size(); i++) {
-                    File file = new File(mListVideos.get(i).getImageLink());
-                    totalbytes += Integer.parseInt(String.valueOf(file.length()));
-                }
-                if (mListVideos.isEmpty() || mListVideos.size() == 1) {
-                    Toast.makeText(getActivity(), getString(R.string.select_videos_for_merge),
-                            Toast.LENGTH_SHORT).show();
-                } else if (Utils.getInternalAvailableSpace() < totalbytes) {
-                    final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                    builder.setCancelable(true);
-                    builder.setTitle("Free Cut");
-                    builder.setMessage("You Don't have free space in your internal memory");
-                    builder.setPositiveButton("OK",
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                }
-                            });
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
-                } else {
-                    extensions = new String[mListVideos.size()];
-                    links = new String[mListVideos.size()];
-                    for (int i = 0; i < mListVideos.size(); i++) {
-                        extensions[i] = mListVideos.get(i).getImageLink().substring(mListVideos.get(i).getImageLink().lastIndexOf("."));
-                        links[i] = mListVideos.get(i).getImageLink();
-                    }
-                    Bundle mergeBundle = new Bundle();
-                    mergeBundle.putStringArray("link", links);
-                    mergeBundle.putString("merge", mergeFilePath);
-                    mergeBundle.putString("state", "0");
-                    mMergeViewModel.setMergeBundle(mergeBundle);
-                    loadFragment(getActivity().getSupportFragmentManager(),
-                            MergeProcessFragment.newInstance(null, null),
-                            false);
-                }
-            }
-        });
+//        mMerge.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                totalbytes = 0;
+//                for (int i = 0; i < mListVideos.size(); i++) {
+//                    File file = new File(mListVideos.get(i).getImageLink());
+//                    totalbytes += Integer.parseInt(String.valueOf(file.length()));
+//                }
+//                if (mListVideos.isEmpty() || mListVideos.size() == 1) {
+//                    Toast.makeText(getActivity(), getString(R.string.select_videos_for_merge),
+//                            Toast.LENGTH_SHORT).show();
+//                } else if (Utils.getInternalAvailableSpace() < totalbytes) {
+//                    final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+//                    builder.setCancelable(true);
+//                    builder.setTitle("Free Cut");
+//                    builder.setMessage("You Don't have free space in your internal memory");
+//                    builder.setPositiveButton("OK",
+//                            new DialogInterface.OnClickListener() {
+//                                @Override
+//                                public void onClick(DialogInterface dialog, int which) {
+//                                    dialog.dismiss();
+//                                }
+//                            });
+//                    AlertDialog dialog = builder.create();
+//                    dialog.show();
+//                } else {
+//                    extensions = new String[mListVideos.size()];
+//                    links = new String[mListVideos.size()];
+//                    for (int i = 0; i < mListVideos.size(); i++) {
+//                        extensions[i] = mListVideos.get(i).getImageLink().
+//                                substring(mListVideos.get(i).getImageLink().lastIndexOf("."));
+//                        links[i] = mListVideos.get(i).getImageLink();
+//                    }
+//                    Bundle mergeBundle = new Bundle();
+//                    mergeBundle.putStringArray("link", links);
+//                    mergeBundle.putString("merge", mergeFilePath);
+//                    mergeBundle.putString("state", "0");
+//                    mMergeViewModel.setMergeBundle(mergeBundle);
+//                    loadFragment(getActivity().getSupportFragmentManager(),
+//                            MergeProcessFragment.newInstance(null, null),
+//                            false);
+//                }
+//            }
+//        });
 
         mOpenGallery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Intent intent = new Intent(getActivity(), Gallery.class);
-//                intent.putExtra("title", "Select media");
-//                // Mode 1 for both images and videos selection, 2 for images only and 3 for videos!
-//                intent.putExtra("mode", 3);
-//                intent.putExtra("maxSelection", 100);
-//                // Optional
-//                startActivityForResult(intent, OPEN_MEDIA_PICKER);
                 Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
                 intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
@@ -275,77 +266,19 @@ public class MergeFragment extends Fragment {
         if (requestCode == OPEN_MEDIA_PICKER) {
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
+                showPickupVideos(false);
                 ClipData clipData = data.getClipData();
                 if (clipData != null) {
                     for (int i = 0 ; i < clipData.getItemCount() ; i++){
                         ClipData.Item videoItem = clipData.getItemAt(i);
                         Uri videoURI = videoItem.getUri();
                         String filePath = getPath(getActivity(), videoURI);
-                        mVideoItem = new VideoItem();
-                        mVideoItem.setItem_name(new File(filePath).getName());
-                        mVideoItem.setImageLink(filePath);
-                        mListVideos.add(mVideoItem);
-                        All = "";
-                        mVideosAdapter = new VideosAdapter(getActivity(), mListVideos,
-                                VIDEOS_MERGE, null, new VideoItemDeleteHandler() {
-                            @Override
-                            public void onClick(int position) {
-                                mListVideos.remove(position);
-                                mVideosAdapter.notifyDataSetChanged();
-                            }
-                        });
-                        mRecyclerView.setAdapter(mVideosAdapter);
-                        mRecyclerView.setVisibility(View.VISIBLE);
+
                     }
                 } else {
                     Toast.makeText(getActivity(), getString(R.string.select_multiple_videos),
                             Toast.LENGTH_SHORT).show();
                 }
-//                mProgressDialog = new ProgressDialog(getActivity());
-//                mProgressDialog.setTitle(getString(R.string.preparing));
-//
-//                mProgressDialog.setCancelable(false);
-//                mProgressDialog.setMessage(getString(R.string.waiting));
-//                //mProgressDialog.show();
-//                final ArrayList<String> selectionResult = data.getStringArrayListExtra("result");
-//                ind = 0;
-//                for (final String item : selectionResult) {
-//
-//                    /*final String[] command = {"-i", item};
-//                    FFmpeg.executeAsync(command, new ExecuteCallback() {
-//                        @Override
-//                        public void apply(long executionId, int returnCode) {
-//                            if (returnCode == RETURN_CODE_SUCCESS) {
-//                                ind = ind + 1;*/
-//                                /*if (All.contains("Audio:") && All.contains("Video:") && !All.contains("Invalid data found when processing input")) {
-//                                    */mVideoItem = new VideoItem();
-//                                    mVideoItem.setItem_name(new File(item).getName());
-//                                    mVideoItem.setImageLink(item);
-//                                    mListVideos.add(mVideoItem);
-//                                    All = "";
-//                                /*} else {
-//                                    All = "";
-//                                }*/
-//
-//                                    mVideosAdapter = new VideosAdapter(getActivity(), mListVideos,
-//                                            VIDEOS_MERGE, null, new VideoItemDeleteHandler() {
-//                                        @Override
-//                                        public void onClick(int position) {
-//                                            mListVideos.remove(position);
-//                                            mVideosAdapter.notifyDataSetChanged();
-//                                        }
-//                                    });
-//                                    mRecyclerView.setAdapter(mVideosAdapter);
-//                                    mProgressDialog.dismiss();
-//                                    mImport.setBackgroundTintList(ContextCompat.
-//                                            getColorStateList(getActivity(), R.color.grey));
-//                                    mMerge.setBackgroundTintList(ContextCompat.
-//                                            getColorStateList(getActivity(), R.color.orange));
-//
-//                           /* }
-//                        }
-//                    });*/
-//                }
             }
         }
     }
@@ -407,6 +340,20 @@ public class MergeFragment extends Fragment {
             return json;
         } finally {
             is.close();
+        }
+    }
+
+    private void showPickupVideos(boolean visible){
+        if (visible){
+            mIcVideo2.setVisibility(View.VISIBLE);
+            mIcVideo.setVisibility(View.VISIBLE);
+            mOpenGallery.setVisibility(View.VISIBLE);
+            mPickUpMerge.setVisibility(View.VISIBLE);
+        } else {
+            mIcVideo2.setVisibility(View.INVISIBLE);
+            mIcVideo.setVisibility(View.INVISIBLE);
+            mOpenGallery.setVisibility(View.INVISIBLE);
+            mPickUpMerge.setVisibility(View.INVISIBLE);
         }
     }
 

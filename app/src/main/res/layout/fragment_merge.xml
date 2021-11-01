@@ -1,195 +1,211 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
-    android:scrollbars="none"
     android:background="@color/colorPrimary"
     tools:context=".ui.fragments.MergeFragment">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+    <ImageView
+        android:id="@+id/banner"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/_46sdp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/gid"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:id="@+id/banner"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/_46sdp"
-            android:scaleType="centerCrop"
-            android:visibility="gone"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:src="@drawable/gid" />
+    <ImageView
+        android:id="@+id/icVideo2"
+        android:layout_width="@dimen/_40sdp"
+        android:layout_height="@dimen/_40sdp"
+        android:layout_marginBottom="@dimen/_4sdp"
+        android:src="@drawable/ic_video"
+        app:layout_constraintBottom_toBottomOf="@id/icVideo"
+        app:layout_constraintEnd_toEndOf="@id/icVideo"
+        app:layout_constraintStart_toStartOf="@id/icVideo" />
 
-        <ImageView
-            android:id="@+id/icVideo2"
-            android:layout_width="@dimen/_40sdp"
-            android:layout_height="@dimen/_40sdp"
-            android:src="@drawable/ic_video"
-            android:layout_marginBottom="@dimen/_4sdp"
-            app:layout_constraintStart_toStartOf="@id/icVideo"
-            app:layout_constraintEnd_toEndOf="@id/icVideo"
-            app:layout_constraintBottom_toBottomOf="@id/icVideo"/>
+    <ImageView
+        android:id="@+id/icVideo"
+        android:layout_width="@dimen/_40sdp"
+        android:layout_height="@dimen/_40sdp"
+        android:src="@drawable/ic_video"
+        app:layout_constraintBottom_toTopOf="@+id/openGallery"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
 
-        <ImageView
-            android:id="@+id/icVideo"
-            android:layout_width="@dimen/_40sdp"
-            android:layout_height="@dimen/_40sdp"
-            android:src="@drawable/ic_video"
-            app:layout_constraintBottom_toTopOf="@+id/openGallery"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_chainStyle="packed" />
+    <Button
+        android:id="@+id/openGallery"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_8sdp"
+        android:background="@drawable/background_rectangle_multi_colors"
+        android:fontFamily="@font/cairo_semi_bold"
+        android:paddingStart="@dimen/_30sdp"
+        android:paddingEnd="@dimen/_30sdp"
+        android:stateListAnimator="@null"
+        android:text="@string/gallery"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="@dimen/_12sdp"
+        app:layout_constraintBottom_toTopOf="@+id/pickUpMerge"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/icVideo" />
 
-        <Button
-            android:id="@+id/openGallery"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/_8sdp"
-            android:background="@drawable/background_rectangle_multi_colors"
-            android:fontFamily="@font/cairo_semi_bold"
-            android:paddingStart="@dimen/_30sdp"
-            android:paddingEnd="@dimen/_30sdp"
-            android:stateListAnimator="@null"
-            android:text="@string/gallery"
-            android:textAllCaps="false"
-            android:textColor="@color/white"
-            android:textSize="@dimen/_12sdp"
-            app:layout_constraintBottom_toTopOf="@+id/pickUpMerge"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/icVideo" />
+    <TextView
+        android:id="@+id/pickUpMerge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/pick_up_merge"
+        android:textColor="@android:color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/openGallery" />
 
-        <TextView
-            android:id="@+id/pickUpMerge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/pick_up_merge"
-            android:textColor="@android:color/white"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/openGallery" />
+    <View
+        android:id="@+id/videoViewBackground"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@android:color/black"
+        android:visibility="invisible"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/videoView"
+        app:layout_constraintBottom_toBottomOf="@+id/videoView"/>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerView"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_margin="@dimen/_8sdp"
-            android:visibility="invisible"
-            app:layout_constraintBottom_toTopOf="@+id/view_import"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/banner" />
+    <VideoView
+        android:id="@+id/videoView"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/_200sdp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.2"
+        tools:layout_height="200dp" />
 
-        <View
-            android:id="@+id/view_import"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/_36sdp"
-            android:layout_marginStart="@dimen/_8sdp"
-            android:layout_marginEnd="@dimen/_8sdp"
-            android:layout_marginBottom="@dimen/_8sdp"
-            android:background="@drawable/background_rectangle_corners_18"
-            android:backgroundTint="@color/orange"
-            android:elevation="@dimen/_12sdp"
-            android:visibility="gone"
-            app:layout_constraintHorizontal_weight="1"
-            app:layout_constraintEnd_toStartOf="@+id/view_merge"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/adView22" />
+    <View
+        android:id="@+id/shadow"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:alpha="0"
+        android:background="@drawable/bg_multi_blacks"
+        app:layout_constraintBottom_toTopOf="@+id/icVideoControl"
+        app:layout_constraintEnd_toEndOf="@+id/videoViewBackground"
+        app:layout_constraintStart_toStartOf="@+id/videoViewBackground"
+        app:layout_constraintTop_toTopOf="@+id/videoView" />
 
-        <TextView
-            android:id="@+id/textView_import"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/_4sdp"
-            android:text="@string/import_videos"
-            android:textColor="@color/white"
-            android:textSize="@dimen/_12sdp"
-            android:elevation="@dimen/_12sdp"
-            android:visibility="gone"
-            android:fontFamily="@font/cairo_semi_bold"
-            app:layout_constraintBottom_toBottomOf="@+id/view_import"
-            app:layout_constraintEnd_toStartOf="@+id/icon_import"
-            app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintStart_toStartOf="@id/view_import"
-            app:layout_constraintTop_toTopOf="@id/view_import" />
+    <View
+        android:id="@+id/videoSeekBarMiddle"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        app:layout_constraintStart_toStartOf="@id/videoViewBackground"
+        app:layout_constraintEnd_toEndOf="@id/videoViewBackground"
+        app:layout_constraintBottom_toBottomOf="@id/videoView" />
 
-        <ImageView
-            android:id="@+id/icon_import"
-            android:layout_width="@dimen/_18sdp"
-            android:layout_height="@dimen/_18sdp"
-            android:layout_marginStart="@dimen/_4sdp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/merge_white"
-            android:elevation="@dimen/_12sdp"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@+id/view_import"
-            app:layout_constraintEnd_toEndOf="@+id/view_import"
-            app:layout_constraintStart_toEndOf="@+id/textView_import"
-            app:layout_constraintTop_toTopOf="@+id/view_import" />
+    <androidx.appcompat.widget.AppCompatSeekBar
+        android:id="@+id/videoSeekBar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:progressTint="@android:color/white"
+        android:thumbTint="@android:color/white"
+        android:thumbOffset="@dimen/_3sdp"
+        android:paddingStart="0dp"
+        android:paddingEnd="0dp"
+        android:alpha="0"
+        tools:alpha="1"
+        tools:progress="50"
+        app:layout_constraintTop_toTopOf="@+id/videoSeekBarMiddle"
+        app:layout_constraintBottom_toBottomOf="@+id/videoSeekBarMiddle"
+        app:layout_constraintEnd_toEndOf="@id/videoViewBackground"
+        app:layout_constraintStart_toStartOf="@id/videoViewBackground" />
 
-        <View
-            android:id="@+id/view_merge"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/_36sdp"
-            android:layout_marginStart="@dimen/_8sdp"
-            android:layout_marginEnd="@dimen/_8sdp"
-            android:layout_marginBottom="@dimen/_16sdp"
-            android:background="@drawable/background_rectangle_corners_18"
-            android:backgroundTint="@color/grey"
-            android:elevation="@dimen/_12sdp"
-            android:visibility="gone"
-            app:layout_constraintHorizontal_weight="1"
-            app:layout_constraintTop_toTopOf="@+id/view_import"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/view_import" />
+    <ImageView
+        android:id="@+id/icVideoControl"
+        android:layout_width="@dimen/_40sdp"
+        android:layout_height="@dimen/_40sdp"
+        android:src="@drawable/ic_pause"
+        android:padding="@dimen/_10sdp"
+        android:alpha="0"
+        tools:alpha="1"
+        app:layout_constraintBottom_toBottomOf="@id/videoView"
+        app:layout_constraintEnd_toEndOf="@id/videoView"
+        app:layout_constraintStart_toStartOf="@id/videoView"
+        app:layout_constraintTop_toTopOf="@id/videoView"
+        app:tint="@android:color/white" />
 
-        <TextView
-            android:id="@+id/textView_merge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/_4sdp"
-            android:text="@string/merge"
-            android:textColor="@color/white"
-            android:textSize="@dimen/_12sdp"
-            android:elevation="@dimen/_12sdp"
-            android:fontFamily="@font/cairo_semi_bold"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@+id/view_merge"
-            app:layout_constraintEnd_toStartOf="@+id/icon_merge"
-            app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintStart_toStartOf="@id/view_merge"
-            app:layout_constraintTop_toTopOf="@id/view_merge" />
+    <TextView
+        android:id="@+id/videoTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="0:05 / 4:30"
+        android:alpha="0"
+        tools:alpha="1"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/_10sdp"
+        android:layout_margin="@dimen/_8sdp"
+        app:layout_constraintStart_toStartOf="@+id/videoViewBackground"
+        app:layout_constraintBottom_toBottomOf="@id/videoView"/>
 
-        <ImageView
-            android:id="@+id/icon_merge"
-            android:layout_width="@dimen/_18sdp"
-            android:layout_height="@dimen/_18sdp"
-            android:layout_marginStart="@dimen/_4sdp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/merge_white"
-            android:elevation="@dimen/_12sdp"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@+id/view_merge"
-            app:layout_constraintEnd_toEndOf="@+id/view_merge"
-            app:layout_constraintStart_toEndOf="@+id/textView_merge"
-            app:layout_constraintTop_toTopOf="@+id/view_merge" />
+    <ImageView
+        android:id="@+id/voiceControl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_8sdp"
+        android:src="@drawable/ic_speaker"
+        android:clickable="false"
+        app:tint="@android:color/white"
+        android:alpha="0"
+        tools:alpha="1"
+        android:paddingTop="@dimen/_10sdp"
+        android:paddingStart="@dimen/_10sdp"
+        android:paddingEnd="@dimen/_10sdp"
+        app:layout_constraintEnd_toEndOf="@+id/videoViewBackground"
+        app:layout_constraintBottom_toBottomOf="@+id/videoView"/>
 
-        <com.google.android.gms.ads.AdView
-            android:id="@+id/adView22"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/_8sdp"
-            app:adSize="BANNER"
-            android:visibility="gone"
-            app:adUnitId="ca-app-pub-6503532425142366/6199804785"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</ScrollView>
+    <TextView
+        android:id="@+id/videoName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_4sdp"
+        android:layout_marginStart="@dimen/_8sdp"
+        android:layout_marginEnd="@dimen/_8sdp"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/_10sdp"
+        app:layout_constraintEnd_toEndOf="@+id/videoViewBackground"
+        app:layout_constraintStart_toStartOf="@+id/videoViewBackground"
+        app:layout_constraintTop_toBottomOf="@+id/videoSeekBar"
+        tools:text="Pirates Of Caribbean" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_videos"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="@dimen/_8sdp"
+        android:layout_marginTop="@dimen/_16sdp"
+        android:layout_marginEnd="@dimen/_8sdp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/videoName" />
+
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adView22"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_8sdp"
+        android:visibility="gone"
+        app:adSize="BANNER"
+        app:adUnitId="ca-app-pub-6503532425142366/6199804785"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

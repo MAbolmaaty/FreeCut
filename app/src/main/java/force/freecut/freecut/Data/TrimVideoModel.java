@@ -4,7 +4,7 @@ import android.view.View;
 
 import java.io.File;
 
-public class TrimmedVideo {
+public class TrimVideoModel {
 
     public enum Mode{
         PLAY, PAUSE
@@ -17,8 +17,8 @@ public class TrimmedVideo {
     private int mProgress;
     private Mode mVideoMode;
 
-    public TrimmedVideo(File videoFile, String videoName, String videoDuration,
-                        String trimmingStatus, int progress, Mode videoMode) {
+    public TrimVideoModel(File videoFile, String videoName, String videoDuration,
+                          String trimmingStatus, int progress, Mode videoMode) {
         mVideoFile = videoFile;
         mVideoName = videoName;
         mVideoDuration = videoDuration;

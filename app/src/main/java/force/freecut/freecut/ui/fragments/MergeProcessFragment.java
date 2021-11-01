@@ -112,7 +112,8 @@ public class MergeProcessFragment extends Fragment {
             public void onChanged(Bundle bundle) {
                 array = bundle.getStringArray("link");
                 state = bundle.getString("state");
-                mergeFilePath = new File(Environment.getExternalStorageDirectory(), "FreeCut").getAbsolutePath();
+                mergeFilePath = new File(Environment.getExternalStorageDirectory(),
+                        "FreeCut").getAbsolutePath();
                 tinydb.putString("cut", "FreeCut");
                 mProgress.setText(getString(R.string.your_process_is_executing_now));
                 mProgressBar.setProgress(10);
@@ -125,7 +126,9 @@ public class MergeProcessFragment extends Fragment {
                 if (state.equals("0")) {
                     dest = new File(mergeFilePath, "merge" + children.length + 1 + ".mp4" + "");
                 } else {
-                    dest = new File(mergeFilePath, "merge" + children.length + 1 + array[0].substring(array[0].lastIndexOf(".")));
+                    dest = new File(mergeFilePath,
+                            "merge" + children.length + 1 + array[0].substring(array[0].
+                                    lastIndexOf(".")));
                 }
                 for (int i = 0; i < array.length; i++) {
                     MediaMetadataRetriever retriever = new MediaMetadataRetriever();
