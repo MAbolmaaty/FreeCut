@@ -14,7 +14,6 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -85,7 +84,7 @@ public class TrimProcessFragment extends Fragment {
     private boolean mBlockSeekBar = true;
     private boolean mVideoMuted = false;
     private MediaPlayer mMediaPlayer;
-    private long mFFmpegProcessId;
+    private long mFFmpegTrimProcessId;
     private int mLastClickedVideo;
     private TrimmedVideo[] mTrimmedVideos;
     private boolean mPaused;
@@ -200,6 +199,9 @@ public class TrimProcessFragment extends Fragment {
                 mVideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                     @Override
                     public void onPrepared(MediaPlayer mp) {
+                        if (mPaused)
+                            return;
+
                         int videoDuration = mVideoView.getDuration() / 1000;
                         mUpdateVideoTimeHandler.postDelayed(mUpdateVideoTimeRunnable, 10);
                         mMediaPlayer = mp;
@@ -223,9 +225,6 @@ public class TrimProcessFragment extends Fragment {
                                     getVideoTime(videoDuration)));
                             return;
                         }
-
-                        if (mPaused)
-                            return;
 
                         int numberOfVideos = (int) Math.ceil((double) videoDuration
                                 / bundle.getInt(SEGMENT_TIME));
@@ -270,6 +269,7 @@ public class TrimProcessFragment extends Fragment {
                                         mVideoView.setTag(TRIMMED_VIDEO);
                                         mVideoView.setVideoPath(mTrimmedVideos[videoClicked]
                                                 .getVideoFile().getAbsolutePath());
+                                        mPaused = false;
                                         mVideoName.setText(mTrimmedVideos[videoClicked]
                                                 .getVideoName());
 
@@ -329,6 +329,20 @@ public class TrimProcessFragment extends Fragment {
     @Override
     public void onPause() {
         mPaused = true;
+        mVideoView.pause();
+        mBlockSeekBar = false;
+        mVideoSeekBar.animate().alpha(1);
+        mViewShadow.animate().alpha(1);
+        mIcVideoControl.animate().alpha(1);
+        mVoiceControl.setClickable(true);
+        mVoiceControl.animate().alpha(1);
+        mVideoTime.animate().alpha(1);
+        mVideoControlsVisible = true;
+        mIcVideoControl.setImageResource(R.drawable.ic_play);
+        if (mLastClickedVideo != -1) {
+            mTrimmedVideos[mLastClickedVideo].setVideoMode(TrimmedVideo.Mode.PAUSE);
+            mVideosAdapter.notifyItemChanged(mLastClickedVideo);
+        }
         mUpdateVideoTimeHandler.removeCallbacks(mUpdateVideoTimeRunnable);
         mHideVideoControlsHandler.removeCallbacks(mHideVideoControlsRunnable);
         super.onPause();
@@ -336,7 +350,7 @@ public class TrimProcessFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
-        FFmpeg.cancel(mFFmpegProcessId);
+        FFmpeg.cancel(mFFmpegTrimProcessId);
         super.onDestroyView();
     }
 
@@ -378,7 +392,7 @@ public class TrimProcessFragment extends Fragment {
         mTrimmedVideos[counter - 1].setTrimmingStatus(getString(R.string.trimming));
         mVideosAdapter.notifyItemChanged(counter - 1);
 
-        mFFmpegProcessId = FFmpeg.executeAsync(trim, new ExecuteCallback() {
+        mFFmpegTrimProcessId = FFmpeg.executeAsync(trim, new ExecuteCallback() {
             @Override
             public void apply(long executionId, int returnCode) {
                 if (returnCode == RETURN_CODE_SUCCESS) {

@@ -296,7 +296,6 @@ public class MergeFragment extends Fragment {
                         });
                         mRecyclerView.setAdapter(mVideosAdapter);
                         mRecyclerView.setVisibility(View.VISIBLE);
-
                     }
                 } else {
                     Toast.makeText(getActivity(), getString(R.string.select_multiple_videos),

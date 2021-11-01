@@ -71,7 +71,8 @@ public class SpeedTrimProcessFragment extends Fragment {
     private boolean mBlockSeekBar = true;
     private boolean mVideoMuted = false;
     private MediaPlayer mMediaPlayer;
-    private long mFFmpegProcessId;
+    private long mFFmpegSpeedTrimProcessId;
+    private long mFFmpegSeekToZeroProcessId;
     private int mLastClickedVideo;
     private TrimmedVideo[] mTrimmedVideos;
     private boolean mPaused;
@@ -190,6 +191,9 @@ public class SpeedTrimProcessFragment extends Fragment {
                 mVideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                     @Override
                     public void onPrepared(MediaPlayer mp) {
+                        if (mPaused)
+                            return;
+
                         int videoDuration = mVideoView.getDuration() / 1000;
                         mUpdateVideoTimeHandler.postDelayed(mUpdateVideoTimeRunnable, 10);
                         mMediaPlayer = mp;
@@ -259,6 +263,20 @@ public class SpeedTrimProcessFragment extends Fragment {
     @Override
     public void onPause() {
         mPaused = true;
+        mVideoView.pause();
+        mBlockSeekBar = false;
+        mVideoSeekBar.animate().alpha(1);
+        mViewShadow.animate().alpha(1);
+        mIcVideoControl.animate().alpha(1);
+        mVoiceControl.setClickable(true);
+        mVoiceControl.animate().alpha(1);
+        mVideoTime.animate().alpha(1);
+        mVideoControlsVisible = true;
+        mIcVideoControl.setImageResource(R.drawable.ic_play);
+        if (mLastClickedVideo != -1) {
+            mTrimmedVideos[mLastClickedVideo].setVideoMode(TrimmedVideo.Mode.PAUSE);
+            mVideosAdapter.notifyItemChanged(mLastClickedVideo);
+        }
         mUpdateVideoTimeHandler.removeCallbacks(mUpdateVideoTimeRunnable);
         mHideVideoControlsHandler.removeCallbacks(mHideVideoControlsRunnable);
         super.onPause();
@@ -266,7 +284,8 @@ public class SpeedTrimProcessFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-        FFmpeg.cancel(mFFmpegProcessId);
+        FFmpeg.cancel(mFFmpegSpeedTrimProcessId);
+        FFmpeg.cancel(mFFmpegSeekToZeroProcessId);
         super.onDestroy();
     }
 
@@ -305,7 +324,7 @@ public class SpeedTrimProcessFragment extends Fragment {
                 "-map", "0",
                 initialFile.getAbsolutePath()};
 
-        mFFmpegProcessId = FFmpeg.executeAsync(speedTrim, new ExecuteCallback() {
+        mFFmpegSpeedTrimProcessId = FFmpeg.executeAsync(speedTrim, new ExecuteCallback() {
             @Override
             public void apply(long executionId, int returnCode) {
                 if (returnCode == RETURN_CODE_SUCCESS) {
@@ -342,6 +361,7 @@ public class SpeedTrimProcessFragment extends Fragment {
                             mVideoView.setTag(TRIMMED_VIDEO);
                             mVideoView.setVideoPath(mTrimmedVideos[videoClicked]
                                     .getVideoFile().getAbsolutePath());
+                            mPaused = false;
                             mVideoName.setText(mTrimmedVideos[videoClicked]
                                     .getVideoName());
 
@@ -369,6 +389,7 @@ public class SpeedTrimProcessFragment extends Fragment {
             mOutputVideos.setVisibility(View.VISIBLE);
             mShimmerRecyclerView.setVisibility(View.GONE);
             mOutputVideos.setAdapter(mVideosAdapter);
+            mTrimmingComplete = true;
             return;
         }
 
@@ -384,7 +405,7 @@ public class SpeedTrimProcessFragment extends Fragment {
                 "-c:a", "copy",
                 file.getAbsolutePath()};
 
-        FFmpeg.executeAsync(seekToZero, new ExecuteCallback() {
+        mFFmpegSeekToZeroProcessId = FFmpeg.executeAsync(seekToZero, new ExecuteCallback() {
             @Override
             public void apply(long executionId, int returnCode) {
                 if (returnCode == RETURN_CODE_SUCCESS) {
