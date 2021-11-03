@@ -367,11 +367,10 @@ public class TrimFragment extends Fragment {
 
     @Override
     public void onResume() {
-        if (mSelectedVideoUri != null){
+        if (mSelectedVideoUri != null)
             mMainViewPagerSwipingViewModel.setMainViewPagerSwiping(false);
-        } else {
+        else
             mMainViewPagerSwipingViewModel.setMainViewPagerSwiping(true);
-        }
         super.onResume();
     }
 
@@ -380,16 +379,15 @@ public class TrimFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_TAKE_GALLERY_VIDEO) {
             if (resultCode == RESULT_OK) {
+                mMainViewPagerSwipingViewModel.setMainViewPagerSwiping(false);
                 mSelectedVideoUri = data.getData();
                 mVideoPath = getPath(getActivity(), mSelectedVideoUri);
                 String[] pathSegments = mVideoPath.split("/");
                 mVideoName = pathSegments[pathSegments.length - 1];
                 showPickupVideo(false);
 
-                displayVideo(true);
+                showVideoView(true);
                 prepareVideo(mSelectedVideoUri);
-
-                mMainViewPagerSwipingViewModel.setMainViewPagerSwiping(false);
             }
         }
     }
@@ -398,7 +396,7 @@ public class TrimFragment extends Fragment {
     public void onPause() {
         if (mVideoView.isPlaying())
             mVideoView.pause();
-        if(mSelectedVideoUri != null){
+        if (mSelectedVideoUri != null) {
             mIcVideoControl.setImageResource(R.drawable.ic_play);
             showVideoControls(true);
         }
@@ -575,8 +573,8 @@ public class TrimFragment extends Fragment {
         return file.getAbsolutePath();
     }
 
-    private void showPickupVideo(boolean visible){
-        if (visible){
+    private void showPickupVideo(boolean visible) {
+        if (visible) {
             mIcVideo.setVisibility(View.VISIBLE);
             mOpenGallery.setVisibility(View.VISIBLE);
             mPickUpTrim.setVisibility(View.VISIBLE);
@@ -588,7 +586,7 @@ public class TrimFragment extends Fragment {
         }
     }
 
-    private void displayVideo(boolean visible) {
+    private void showVideoView(boolean visible) {
         if (visible) {
             mVideoView.setVisibility(View.VISIBLE);
             mVideoViewBackground.setVisibility(View.VISIBLE);
@@ -655,7 +653,7 @@ public class TrimFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 showPickupVideo(true);
-                displayVideo(false);
+                showVideoView(false);
                 mSelectedVideoUri = null;
             }
         });

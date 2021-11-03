@@ -18,57 +18,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/icVideo2"
-        android:layout_width="@dimen/_40sdp"
-        android:layout_height="@dimen/_40sdp"
-        android:layout_marginBottom="@dimen/_4sdp"
-        android:src="@drawable/ic_video"
-        app:layout_constraintBottom_toBottomOf="@id/icVideo"
-        app:layout_constraintEnd_toEndOf="@id/icVideo"
-        app:layout_constraintStart_toStartOf="@id/icVideo" />
-
-    <ImageView
-        android:id="@+id/icVideo"
-        android:layout_width="@dimen/_40sdp"
-        android:layout_height="@dimen/_40sdp"
-        android:src="@drawable/ic_video"
-        app:layout_constraintBottom_toTopOf="@+id/openGallery"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed" />
-
-    <Button
-        android:id="@+id/openGallery"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/_8sdp"
-        android:background="@drawable/background_rectangle_multi_colors"
-        android:fontFamily="@font/cairo_semi_bold"
-        android:paddingStart="@dimen/_30sdp"
-        android:paddingEnd="@dimen/_30sdp"
-        android:stateListAnimator="@null"
-        android:text="@string/gallery"
-        android:textAllCaps="false"
-        android:textColor="@color/white"
-        android:textSize="@dimen/_12sdp"
-        app:layout_constraintBottom_toTopOf="@+id/pickUpMerge"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/icVideo" />
-
-    <TextView
-        android:id="@+id/pickUpMerge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/pick_up_merge"
-        android:textColor="@android:color/white"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/openGallery" />
-
     <View
         android:id="@+id/videoViewBackground"
         android:layout_width="0dp"
@@ -186,7 +135,7 @@
         tools:text="Pirates Of Caribbean" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_videos"
+        android:id="@+id/recyclerViewVideos"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="@dimen/_8sdp"
@@ -196,6 +145,57 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/videoName" />
+
+    <ImageView
+        android:id="@+id/icVideo2"
+        android:layout_width="@dimen/_40sdp"
+        android:layout_height="@dimen/_40sdp"
+        android:layout_marginBottom="@dimen/_4sdp"
+        android:src="@drawable/ic_video"
+        app:layout_constraintBottom_toBottomOf="@id/icVideo"
+        app:layout_constraintEnd_toEndOf="@id/icVideo"
+        app:layout_constraintStart_toStartOf="@id/icVideo" />
+
+    <ImageView
+        android:id="@+id/icVideo"
+        android:layout_width="@dimen/_40sdp"
+        android:layout_height="@dimen/_40sdp"
+        android:src="@drawable/ic_video"
+        app:layout_constraintBottom_toTopOf="@+id/openGallery"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <Button
+        android:id="@+id/openGallery"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_8sdp"
+        android:background="@drawable/background_rectangle_multi_colors"
+        android:fontFamily="@font/cairo_semi_bold"
+        android:paddingStart="@dimen/_30sdp"
+        android:paddingEnd="@dimen/_30sdp"
+        android:stateListAnimator="@null"
+        android:text="@string/gallery"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="@dimen/_12sdp"
+        app:layout_constraintBottom_toTopOf="@+id/pickUpMerge"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/icVideo" />
+
+    <TextView
+        android:id="@+id/pickUpMerge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/pick_up_merge"
+        android:textColor="@android:color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/openGallery" />
 
     <com.google.android.gms.ads.AdView
         android:id="@+id/adView22"

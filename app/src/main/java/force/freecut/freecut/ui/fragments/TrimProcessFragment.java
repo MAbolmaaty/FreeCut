@@ -90,7 +90,7 @@ public class TrimProcessFragment extends Fragment {
     private boolean mPaused;
     private boolean mTrimmingComplete;
     private RecyclerView mOutputVideos;
-    private TrimmedVideosAdapter mVideosAdapter;
+    private TrimmedVideosAdapter mTrimmedVideosAdapter;
     private Handler mUpdateVideoTimeHandler = new Handler();
     private Handler mHideVideoControlsHandler = new Handler();
     private ToolbarViewModel mToolbarViewModel;
@@ -180,7 +180,8 @@ public class TrimProcessFragment extends Fragment {
         mToolbarViewModel = ViewModelProviders.of(getActivity()).get(ToolbarViewModel.class);
         mToolbarViewModel.showBackButton(true);
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(),
+                RecyclerView.VERTICAL, false);
         mOutputVideos.setLayoutManager(layoutManager);
         mOutputVideos.setHasFixedSize(true);
 
@@ -262,7 +263,7 @@ public class TrimProcessFragment extends Fragment {
                                     TrimVideoModel.Mode.PAUSE);
                         }
 
-                        mVideosAdapter = new TrimmedVideosAdapter(getActivity(), mTrimVideoModels,
+                        mTrimmedVideosAdapter = new TrimmedVideosAdapter(getActivity(), mTrimVideoModels,
                                 new TrimmedVideosAdapter.VideoPlayClickListener() {
                                     @Override
                                     public void onPlayClickListener(int videoClicked) {
@@ -276,13 +277,13 @@ public class TrimProcessFragment extends Fragment {
                                         if (mLastClickedVideo != -1) {
                                             mTrimVideoModels[mLastClickedVideo]
                                                     .setVideoMode(TrimVideoModel.Mode.PAUSE);
-                                            mVideosAdapter.notifyItemChanged(mLastClickedVideo);
+                                            mTrimmedVideosAdapter.notifyItemChanged(mLastClickedVideo);
                                         }
 
                                         mLastClickedVideo = videoClicked;
                                         mTrimVideoModels[videoClicked]
                                                 .setVideoMode(TrimVideoModel.Mode.PLAY);
-                                        mVideosAdapter.notifyItemChanged(videoClicked);
+                                        mTrimmedVideosAdapter.notifyItemChanged(videoClicked);
                                     }
                                 }, new TrimmedVideosAdapter.VideoShareClickListener() {
                             @Override
@@ -293,7 +294,7 @@ public class TrimProcessFragment extends Fragment {
                             }
                         });
 
-                        mOutputVideos.setAdapter(mVideosAdapter);
+                        mOutputVideos.setAdapter(mTrimmedVideosAdapter);
 
                         trim(bundle.getString(STORAGE_DIRECTORY), bundle.getString(VIDEO_PATH),
                                 bundle.getInt(SEGMENT_TIME), videoDuration,
@@ -316,7 +317,7 @@ public class TrimProcessFragment extends Fragment {
                         mIcVideoControl.setImageResource(R.drawable.ic_play);
                         if (mLastClickedVideo != -1) {
                             mTrimVideoModels[mLastClickedVideo].setVideoMode(TrimVideoModel.Mode.PAUSE);
-                            mVideosAdapter.notifyItemChanged(mLastClickedVideo);
+                            mTrimmedVideosAdapter.notifyItemChanged(mLastClickedVideo);
                         }
                     }
                 });
@@ -341,7 +342,7 @@ public class TrimProcessFragment extends Fragment {
         mIcVideoControl.setImageResource(R.drawable.ic_play);
         if (mLastClickedVideo != -1) {
             mTrimVideoModels[mLastClickedVideo].setVideoMode(TrimVideoModel.Mode.PAUSE);
-            mVideosAdapter.notifyItemChanged(mLastClickedVideo);
+            mTrimmedVideosAdapter.notifyItemChanged(mLastClickedVideo);
         }
         mUpdateVideoTimeHandler.removeCallbacks(mUpdateVideoTimeRunnable);
         mHideVideoControlsHandler.removeCallbacks(mHideVideoControlsRunnable);
@@ -390,7 +391,7 @@ public class TrimProcessFragment extends Fragment {
                 path};
 
         mTrimVideoModels[counter - 1].setTrimmingStatus(getString(R.string.trimming));
-        mVideosAdapter.notifyItemChanged(counter - 1);
+        mTrimmedVideosAdapter.notifyItemChanged(counter - 1);
 
         mFFmpegTrimProcessId = FFmpeg.executeAsync(trim, new ExecuteCallback() {
             @Override
@@ -399,7 +400,7 @@ public class TrimProcessFragment extends Fragment {
                     mTrimVideoModels[counter - 1].setVideoFile(file);
                     mTrimVideoModels[counter - 1].setProgress(100);
                     mTrimVideoModels[counter - 1].setVideoDuration(getVideoDuration(file));
-                    mVideosAdapter.notifyItemChanged(counter - 1);
+                    mTrimmedVideosAdapter.notifyItemChanged(counter - 1);
                     trim(storageDirectory, videoPath,
                             segmentTime, videoDuration, start + segmentTime,
                             counter + 1);
@@ -481,7 +482,7 @@ public class TrimProcessFragment extends Fragment {
                     mUpdateVideoTimeHandler.removeCallbacks(mUpdateVideoTimeRunnable);
                     if (mLastClickedVideo != -1) {
                         mTrimVideoModels[mLastClickedVideo].setVideoMode(TrimVideoModel.Mode.PAUSE);
-                        mVideosAdapter.notifyItemChanged(mLastClickedVideo);
+                        mTrimmedVideosAdapter.notifyItemChanged(mLastClickedVideo);
                     }
                 } else {
                     mIcVideoControl.setImageResource(R.drawable.ic_pause);
@@ -497,7 +498,7 @@ public class TrimProcessFragment extends Fragment {
                     mVideoControlsVisible = false;
                     if (mLastClickedVideo != -1) {
                         mTrimVideoModels[mLastClickedVideo].setVideoMode(TrimVideoModel.Mode.PLAY);
-                        mVideosAdapter.notifyItemChanged(mLastClickedVideo);
+                        mTrimmedVideosAdapter.notifyItemChanged(mLastClickedVideo);
                     }
                 }
             }
@@ -562,7 +563,7 @@ public class TrimProcessFragment extends Fragment {
                 mIcVideoControl.setImageResource(R.drawable.ic_pause);
                 if (mLastClickedVideo != -1) {
                     mTrimVideoModels[mLastClickedVideo].setVideoMode(TrimVideoModel.Mode.PLAY);
-                    mVideosAdapter.notifyItemChanged(mLastClickedVideo);
+                    mTrimmedVideosAdapter.notifyItemChanged(mLastClickedVideo);
                 }
             }
         });

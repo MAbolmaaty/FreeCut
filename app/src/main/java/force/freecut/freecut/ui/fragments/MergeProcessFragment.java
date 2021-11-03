@@ -56,7 +56,6 @@ public class MergeProcessFragment extends Fragment {
     long totalTime = 0;
     String mergeFilePath, state;
     File dest;
-    String[] command4;
     private ProgressBar mProgressBar;
     private TextView mPercentage;
     private TextView mProgress;
@@ -173,7 +172,7 @@ public class MergeProcessFragment extends Fragment {
                         }
                     }
                 }
-                command4 = commandall;
+                String[] command4 = commandall;
                 long executionId = FFmpeg.executeAsync(command4, new ExecuteCallback() {
                     @Override
                     public void apply(long executionId, int returnCode) {

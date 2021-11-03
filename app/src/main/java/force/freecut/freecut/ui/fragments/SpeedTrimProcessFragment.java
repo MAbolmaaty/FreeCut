@@ -79,7 +79,7 @@ public class SpeedTrimProcessFragment extends Fragment {
     private boolean mTrimmingComplete;
     private RecyclerView mOutputVideos;
     private ShimmerRecyclerView mShimmerRecyclerView;
-    private TrimmedVideosAdapter mVideosAdapter;
+    private TrimmedVideosAdapter mTrimmedVideosAdapter;
     private Handler mUpdateVideoTimeHandler = new Handler();
     private Handler mHideVideoControlsHandler = new Handler();
     private ToolbarViewModel mToolbarViewModel;
@@ -88,7 +88,6 @@ public class SpeedTrimProcessFragment extends Fragment {
         @Override
         public void run() {
             long currentPosition = mVideoView.getCurrentPosition();
-            //Log.d(TAG, "mVideoView.getCurrentPosition() : " + mVideoView.getCurrentPosition());
             mVideoSeekBar.setProgress((int) currentPosition);
             mVideoTime.setText(String.format(Locale.ENGLISH, "%s / %s",
                     getVideoTime((int) currentPosition / 1000),
@@ -169,7 +168,8 @@ public class SpeedTrimProcessFragment extends Fragment {
         mToolbarViewModel.setToolbarTitle(getString(R.string.speed_trim));
         mToolbarViewModel.showBackButton(true);
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(),
+                RecyclerView.VERTICAL, false);
         mOutputVideos.setLayoutManager(layoutManager);
         mOutputVideos.setHasFixedSize(true);
 
@@ -218,9 +218,6 @@ public class SpeedTrimProcessFragment extends Fragment {
                             return;
                         }
 
-                        if (mPaused)
-                            return;
-
                         showVideoControls();
                         controlVideo();
                         controlVideoSeekbar();
@@ -250,7 +247,7 @@ public class SpeedTrimProcessFragment extends Fragment {
                     mIcVideoControl.setImageResource(R.drawable.ic_play);
                     if (mLastClickedVideo != -1) {
                         mTrimVideoModels[mLastClickedVideo].setVideoMode(TrimVideoModel.Mode.PAUSE);
-                        mVideosAdapter.notifyItemChanged(mLastClickedVideo);
+                        mTrimmedVideosAdapter.notifyItemChanged(mLastClickedVideo);
                     }
                 });
 
@@ -275,7 +272,7 @@ public class SpeedTrimProcessFragment extends Fragment {
         mIcVideoControl.setImageResource(R.drawable.ic_play);
         if (mLastClickedVideo != -1) {
             mTrimVideoModels[mLastClickedVideo].setVideoMode(TrimVideoModel.Mode.PAUSE);
-            mVideosAdapter.notifyItemChanged(mLastClickedVideo);
+            mTrimmedVideosAdapter.notifyItemChanged(mLastClickedVideo);
         }
         mUpdateVideoTimeHandler.removeCallbacks(mUpdateVideoTimeRunnable);
         mHideVideoControlsHandler.removeCallbacks(mHideVideoControlsRunnable);
@@ -287,17 +284,6 @@ public class SpeedTrimProcessFragment extends Fragment {
         FFmpeg.cancel(mFFmpegSpeedTrimProcessId);
         FFmpeg.cancel(mFFmpegSeekToZeroProcessId);
         super.onDestroy();
-    }
-
-    private String getVideoTime(int seconds) {
-        long second = seconds % 60;
-        long minute = (seconds / 60) % 60;
-        long hour = (seconds / (60 * 60)) % 24;
-
-        if (hour > 0)
-            return String.format(Locale.ENGLISH, "%d:%d:%02d", hour, minute, second);
-        else
-            return String.format(Locale.ENGLISH, "%d:%02d", minute, second);
     }
 
     private void speedTrim(String storageDirectory, String videoPath, int segmentTime) {
@@ -354,7 +340,7 @@ public class SpeedTrimProcessFragment extends Fragment {
                                 TrimVideoModel.Mode.PAUSE);
             }
 
-            mVideosAdapter = new TrimmedVideosAdapter(getActivity(), mTrimVideoModels,
+            mTrimmedVideosAdapter = new TrimmedVideosAdapter(getActivity(), mTrimVideoModels,
                     new TrimmedVideosAdapter.VideoPlayClickListener() {
                         @Override
                         public void onPlayClickListener(int videoClicked) {
@@ -368,13 +354,13 @@ public class SpeedTrimProcessFragment extends Fragment {
                             if (mLastClickedVideo != -1) {
                                 mTrimVideoModels[mLastClickedVideo]
                                         .setVideoMode(TrimVideoModel.Mode.PAUSE);
-                                mVideosAdapter.notifyItemChanged(mLastClickedVideo);
+                                mTrimmedVideosAdapter.notifyItemChanged(mLastClickedVideo);
                             }
 
                             mLastClickedVideo = videoClicked;
                             mTrimVideoModels[videoClicked]
                                     .setVideoMode(TrimVideoModel.Mode.PLAY);
-                            mVideosAdapter.notifyItemChanged(videoClicked);
+                            mTrimmedVideosAdapter.notifyItemChanged(videoClicked);
                         }
                     }, new TrimmedVideosAdapter.VideoShareClickListener() {
                 @Override
@@ -388,7 +374,7 @@ public class SpeedTrimProcessFragment extends Fragment {
             mShimmerRecyclerView.hideShimmer();
             mOutputVideos.setVisibility(View.VISIBLE);
             mShimmerRecyclerView.setVisibility(View.GONE);
-            mOutputVideos.setAdapter(mVideosAdapter);
+            mOutputVideos.setAdapter(mTrimmedVideosAdapter);
             mTrimmingComplete = true;
             return;
         }
@@ -443,7 +429,7 @@ public class SpeedTrimProcessFragment extends Fragment {
                     mUpdateVideoTimeHandler.removeCallbacks(mUpdateVideoTimeRunnable);
                     if (mLastClickedVideo != -1) {
                         mTrimVideoModels[mLastClickedVideo].setVideoMode(TrimVideoModel.Mode.PAUSE);
-                        mVideosAdapter.notifyItemChanged(mLastClickedVideo);
+                        mTrimmedVideosAdapter.notifyItemChanged(mLastClickedVideo);
                     }
                 } else {
                     mIcVideoControl.setImageResource(R.drawable.ic_pause);
@@ -459,7 +445,7 @@ public class SpeedTrimProcessFragment extends Fragment {
                     mVideoControlsVisible = false;
                     if (mLastClickedVideo != -1) {
                         mTrimVideoModels[mLastClickedVideo].setVideoMode(TrimVideoModel.Mode.PLAY);
-                        mVideosAdapter.notifyItemChanged(mLastClickedVideo);
+                        mTrimmedVideosAdapter.notifyItemChanged(mLastClickedVideo);
                     }
                 }
             }
@@ -524,7 +510,7 @@ public class SpeedTrimProcessFragment extends Fragment {
                 mIcVideoControl.setImageResource(R.drawable.ic_pause);
                 if (mLastClickedVideo != -1) {
                     mTrimVideoModels[mLastClickedVideo].setVideoMode(TrimVideoModel.Mode.PLAY);
-                    mVideosAdapter.notifyItemChanged(mLastClickedVideo);
+                    mTrimmedVideosAdapter.notifyItemChanged(mLastClickedVideo);
                 }
             }
         });
@@ -575,5 +561,16 @@ public class SpeedTrimProcessFragment extends Fragment {
                 retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
         int seconds = Integer.parseInt(time) / 1000;
         return getVideoTime(seconds);
+    }
+
+    private String getVideoTime(int seconds) {
+        long second = seconds % 60;
+        long minute = (seconds / 60) % 60;
+        long hour = (seconds / (60 * 60)) % 24;
+
+        if (hour > 0)
+            return String.format(Locale.ENGLISH, "%d:%d:%02d", hour, minute, second);
+        else
+            return String.format(Locale.ENGLISH, "%d:%02d", minute, second);
     }
 }

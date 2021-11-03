@@ -1,35 +1,42 @@
 package force.freecut.freecut.ui.fragments;
 
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
+import static android.app.Activity.RESULT_OK;
+import static com.arthenica.mobileffmpeg.Config.RETURN_CODE_SUCCESS;
+import static force.freecut.freecut.adapters.MergedVideosAdapter.LAST_ITEM;
+import static force.freecut.freecut.adapters.MergedVideosAdapter.MERGING;
+import static force.freecut.freecut.ui.activities.MainActivity.loadFragment;
+
 import android.content.ClipData;
 import android.content.ContentUris;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.media.MediaMetadataRetriever;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.storage.StorageManager;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
-import androidx.core.content.ContextCompat;
+import androidx.appcompat.widget.AppCompatSeekBar;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -37,7 +44,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.arthenica.mobileffmpeg.ExecuteCallback;
 import com.arthenica.mobileffmpeg.FFmpeg;
 import com.bumptech.glide.Glide;
-import com.erikagtierrez.multiple_media_picker.Gallery;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
@@ -56,22 +62,17 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
+import force.freecut.freecut.Data.MergeVideoModel;
 import force.freecut.freecut.Data.TinyDB;
-import force.freecut.freecut.Data.Utils;
-import force.freecut.freecut.Data.VideoItem;
 import force.freecut.freecut.R;
-import force.freecut.freecut.adapters.VideosAdapter;
-import force.freecut.freecut.utils.interfaces.VideoItemDeleteHandler;
+import force.freecut.freecut.adapters.MergedVideosAdapter;
 import force.freecut.freecut.view_models.MainViewPagerSwipingViewModel;
 import force.freecut.freecut.view_models.MergeViewModel;
 import force.freecut.freecut.view_models.ToolbarViewModel;
-
-import static android.app.Activity.RESULT_OK;
-import static com.arthenica.mobileffmpeg.Config.RETURN_CODE_SUCCESS;
-import static force.freecut.freecut.ui.activities.MainActivity.loadFragment;
-import static force.freecut.freecut.utils.Constants.VIDEOS_MERGE;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -88,9 +89,6 @@ public class MergeFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    private VideosAdapter mVideosAdapter;
-
-    String mergeFilePath;
     static final int OPEN_MEDIA_PICKER = 1;
     TinyDB tinydb;
     String mylink = "https://www.google.com/";
@@ -105,6 +103,55 @@ public class MergeFragment extends Fragment {
     private ImageView mIcVideo;
     private Button mOpenGallery;
     private TextView mPickUpMerge;
+    private RecyclerView mRecyclerViewVideos;
+    private VideoView mVideoView;
+    private View mVideoViewBackground;
+    private View mViewShadow;
+    private AppCompatSeekBar mVideoSeekBar;
+    private ImageView mIcVideoControl;
+    private ImageView mVoiceControl;
+    private TextView mVideoName;
+    private boolean mVideoControlsVisible = false;
+    private TextView mVideoTime;
+    private boolean mBlockSeekBar = true;
+    private boolean mVideoMuted = false;
+    private MediaPlayer mMediaPlayer;
+    private MergedVideosAdapter mMergedVideosAdapter;
+    private List<MergeVideoModel> mListVideos;
+    private int mLastClickedVideo = -1;
+    private boolean mPaused;
+    private Handler mUpdateVideoTimeHandler = new Handler();
+    private Handler mHideVideoControlsHandler = new Handler();
+
+    private Runnable mUpdateVideoTimeRunnable = new Runnable() {
+        @Override
+        public void run() {
+            long currentPosition = mVideoView.getCurrentPosition();
+            mVideoSeekBar.setProgress((int) currentPosition);
+            mVideoTime.setText(String.format(Locale.ENGLISH, "%s / %s",
+                    getVideoTime((int) currentPosition / 1000),
+                    getVideoTime(mVideoView.getDuration() / 1000)));
+            mUpdateVideoTimeHandler.postDelayed(this, 10);
+        }
+    };
+
+    private Runnable mHideVideoControlsRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (mVideoView.isPlaying() && mVideoControlsVisible) {
+                if (mVideoView.isPlaying() && mVideoControlsVisible) {
+                    mVideoSeekBar.animate().alpha(0);
+                    mBlockSeekBar = true;
+                    mIcVideoControl.animate().alpha(0);
+                    mViewShadow.animate().alpha(0);
+                    mVideoTime.animate().alpha(0);
+                    mVoiceControl.setClickable(false);
+                    mVoiceControl.animate().alpha(0);
+                    mVideoControlsVisible = false;
+                }
+            }
+        }
+    };
 
     public MergeFragment() {
         // Required empty public constructor
@@ -150,7 +197,17 @@ public class MergeFragment extends Fragment {
         mIcVideo = view.findViewById(R.id.icVideo);
         mOpenGallery = view.findViewById(R.id.openGallery);
         mPickUpMerge = view.findViewById(R.id.pickUpMerge);
+        mRecyclerViewVideos = view.findViewById(R.id.recyclerViewVideos);
+        mVideoView = view.findViewById(R.id.videoView);
+        mVideoViewBackground = view.findViewById(R.id.videoViewBackground);
+        mViewShadow = view.findViewById(R.id.shadow);
+        mVideoSeekBar = view.findViewById(R.id.videoSeekBar);
+        mIcVideoControl = view.findViewById(R.id.icVideoControl);
+        mVoiceControl = view.findViewById(R.id.voiceControl);
+        mVideoName = view.findViewById(R.id.videoName);
+        mVideoTime = view.findViewById(R.id.videoTime);
 
+        mListVideos = new ArrayList<>();
         mMergeViewModel = ViewModelProviders.of(getActivity()).get(MergeViewModel.class);
         mToolbarViewModel = ViewModelProviders.of(getActivity()).get(ToolbarViewModel.class);
 
@@ -160,16 +217,12 @@ public class MergeFragment extends Fragment {
         AdRequest adRequest = new AdRequest.Builder().build();
         adView1.loadAd(adRequest);
 
-        //mRecyclerView = view.findViewById(R.id.recyclerView);
-
         tinydb = new TinyDB(getActivity());
-        mergeFilePath = new File(Environment.getExternalStorageDirectory(),
-                "FreeCut").getAbsolutePath();
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(),
                 RecyclerView.VERTICAL, false);
-//        mRecyclerView.setLayoutManager(layoutManager);
-//        mRecyclerView.setHasFixedSize(true);
+        mRecyclerViewVideos.setLayoutManager(layoutManager);
+        mRecyclerViewVideos.setHasFixedSize(true);
 
         mBanner.setOnClickListener(new View.OnClickListener() {
 
@@ -251,34 +304,154 @@ public class MergeFragment extends Fragment {
             }
         });
 
+        mVideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                if (mPaused)
+                    return;
+
+                mListVideos.get(mLastClickedVideo).setVideoMode(MergeVideoModel.Mode.PLAY);
+                mMergedVideosAdapter.notifyItemChanged(mLastClickedVideo);
+                int videoDuration = mVideoView.getDuration() / 1000;
+                mUpdateVideoTimeHandler.postDelayed(mUpdateVideoTimeRunnable, 10);
+                mMediaPlayer = mp;
+                mVoiceControl.setImageResource(R.drawable.ic_speaker);
+                mVideoMuted = false;
+                mIcVideoControl.setImageResource(R.drawable.ic_pause);
+                mVideoView.start();
+                mBlockSeekBar = true;
+                mVideoSeekBar.setAlpha(0);
+                mViewShadow.setAlpha(0);
+                mIcVideoControl.setAlpha((float) 0);
+                mVideoTime.setAlpha(0);
+                mVoiceControl.setClickable(false);
+                mVoiceControl.setAlpha((float) 0);
+                mVideoControlsVisible = false;
+                mVideoSeekBar.setProgress(0);
+                mVideoSeekBar.setMax(mVideoView.getDuration());
+                mVideoTime.setText(String.format(Locale.ENGLISH, "%s / %s",
+                        getVideoTime(0),
+                        getVideoTime(videoDuration)));
+
+                showVideoControls();
+                controlVideo();
+                controlVideoSeekbar();
+                controlVideoVoice();
+
+                mVideoSeekBar.setProgress(0);
+                mVideoSeekBar.setMax(mVideoView.getDuration());
+                mVideoTime.setText(String.format(Locale.ENGLISH, "%s / %s",
+                        getVideoTime(0),
+                        getVideoTime(videoDuration)));
+            }
+        });
+
+        mVideoView.setOnCompletionListener(mp -> {
+            mUpdateVideoTimeHandler.removeCallbacks(mUpdateVideoTimeRunnable);
+            mBlockSeekBar = false;
+            mVideoSeekBar.animate().alpha(1);
+            mViewShadow.animate().alpha(1);
+            mIcVideoControl.animate().alpha(1);
+            mVoiceControl.setClickable(true);
+            mVoiceControl.animate().alpha(1);
+            mVideoTime.animate().alpha(1);
+            mVideoControlsVisible = true;
+            mIcVideoControl.setImageResource(R.drawable.ic_play);
+            mListVideos.get(mLastClickedVideo).setVideoMode(MergeVideoModel.Mode.PAUSE);
+            mMergedVideosAdapter.notifyItemChanged(mLastClickedVideo);
+        });
+
         return view;
     }
 
     @Override
     public void onResume() {
-        mMainViewPagerSwipingViewModel.setMainViewPagerSwiping(true);
+        if (mLastClickedVideo == -1)
+            mMainViewPagerSwipingViewModel.setMainViewPagerSwiping(true);
+        else
+            mMainViewPagerSwipingViewModel.setMainViewPagerSwiping(false);
         super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        mPaused = true;
+        if (mVideoView.isPlaying()) {
+            mVideoView.pause();
+            mBlockSeekBar = false;
+            mVideoSeekBar.animate().alpha(1);
+            mViewShadow.animate().alpha(1);
+            mIcVideoControl.animate().alpha(1);
+            mVoiceControl.setClickable(true);
+            mVoiceControl.animate().alpha(1);
+            mVideoTime.animate().alpha(1);
+            mVideoControlsVisible = true;
+            mIcVideoControl.setImageResource(R.drawable.ic_play);
+            mListVideos.get(mLastClickedVideo).setVideoMode(MergeVideoModel.Mode.PAUSE);
+            mMergedVideosAdapter.notifyItemChanged(mLastClickedVideo);
+            mUpdateVideoTimeHandler.removeCallbacks(mUpdateVideoTimeRunnable);
+            mHideVideoControlsHandler.removeCallbacks(mHideVideoControlsRunnable);
+        }
+        super.onPause();
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == OPEN_MEDIA_PICKER) {
-            // Make sure the request was successful
             if (resultCode == RESULT_OK) {
+                mMainViewPagerSwipingViewModel.setMainViewPagerSwiping(false);
                 showPickupVideos(false);
+                showVideoView(true);
                 ClipData clipData = data.getClipData();
                 if (clipData != null) {
-                    for (int i = 0 ; i < clipData.getItemCount() ; i++){
+                    for (int i = 0; i < clipData.getItemCount(); i++) {
                         ClipData.Item videoItem = clipData.getItemAt(i);
                         Uri videoURI = videoItem.getUri();
                         String filePath = getPath(getActivity(), videoURI);
-
+                        File file = new File(filePath);
+                        mListVideos.add(new MergeVideoModel(file,
+                                file.getName().split(".mp4")[0],
+                                getVideoDuration(file), MergeVideoModel.Mode.PAUSE,
+                                MERGING));
                     }
                 } else {
                     Toast.makeText(getActivity(), getString(R.string.select_multiple_videos),
                             Toast.LENGTH_SHORT).show();
                 }
+                mListVideos.add(new MergeVideoModel(null, "",
+                        "", null,
+                        LAST_ITEM));
+                mMergedVideosAdapter = new MergedVideosAdapter(getActivity(), mListVideos,
+                        new MergedVideosAdapter.VideoPlayClickListener() {
+                            @Override
+                            public void onPlayClickListener(int videoClicked) {
+                                mPaused = false;
+                                mListVideos.get(mLastClickedVideo).
+                                        setVideoMode(MergeVideoModel.Mode.PAUSE);
+                                mMergedVideosAdapter.notifyItemChanged(mLastClickedVideo);
+                                mLastClickedVideo = videoClicked;
+                                mVideoView.setVideoPath(mListVideos.get(videoClicked).
+                                        getVideoFile().getAbsolutePath());
+                                mVideoName.setText(mListVideos.get(videoClicked).getVideoName());
+                            }
+                        }, new MergedVideosAdapter.VideoShareClickListener() {
+                    @Override
+                    public void onShareClickListener(int videoClicked) {
+
+                    }
+                }, new MergedVideosAdapter.ButtonMergeClickListener() {
+                    @Override
+                    public void onButtonMergeClickListener() {
+                        mergeVideos();
+                    }
+                });
+                mLastClickedVideo = 0;
+                mRecyclerViewVideos.setAdapter(mMergedVideosAdapter);
+                mRecyclerViewVideos.setVisibility(View.VISIBLE);
+                mPaused = false;
+                mVideoView.setVideoPath(mListVideos.get(0).getVideoFile().getAbsolutePath());
+                mVideoName.setText(mListVideos.get(0).getVideoName());
             }
         }
     }
@@ -343,8 +516,8 @@ public class MergeFragment extends Fragment {
         }
     }
 
-    private void showPickupVideos(boolean visible){
-        if (visible){
+    private void showPickupVideos(boolean visible) {
+        if (visible) {
             mIcVideo2.setVisibility(View.VISIBLE);
             mIcVideo.setVisibility(View.VISIBLE);
             mOpenGallery.setVisibility(View.VISIBLE);
@@ -355,6 +528,201 @@ public class MergeFragment extends Fragment {
             mOpenGallery.setVisibility(View.INVISIBLE);
             mPickUpMerge.setVisibility(View.INVISIBLE);
         }
+    }
+
+    private void showVideoView(boolean visible) {
+        if (visible) {
+            mVideoView.setVisibility(View.VISIBLE);
+            mVideoViewBackground.setVisibility(View.VISIBLE);
+            mVideoSeekBar.setVisibility(View.VISIBLE);
+            mViewShadow.setVisibility(View.VISIBLE);
+            mIcVideoControl.setVisibility(View.VISIBLE);
+            mVoiceControl.setVisibility(View.VISIBLE);
+            mVideoTime.setVisibility(View.VISIBLE);
+            mVideoName.setVisibility(View.VISIBLE);
+        } else {
+            mVideoView.setVisibility(View.INVISIBLE);
+            mVideoViewBackground.setVisibility(View.INVISIBLE);
+            mVideoSeekBar.setVisibility(View.INVISIBLE);
+            mViewShadow.setVisibility(View.INVISIBLE);
+            mIcVideoControl.setVisibility(View.INVISIBLE);
+            mVoiceControl.setVisibility(View.INVISIBLE);
+            mVideoTime.setVisibility(View.INVISIBLE);
+            mVideoName.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    private void showVideoControls() {
+        mVideoView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (mVideoControlsVisible) {
+                    mVideoSeekBar.animate().alpha(0);
+                    mBlockSeekBar = true;
+                    mIcVideoControl.animate().alpha(0);
+                    mVideoTime.animate().alpha(0);
+                    mViewShadow.animate().alpha(0);
+                    mVoiceControl.setClickable(false);
+                    mVoiceControl.animate().alpha(0);
+                    mVideoControlsVisible = false;
+                } else {
+                    mBlockSeekBar = false;
+                    mVideoSeekBar.animate().alpha(1);
+                    mIcVideoControl.animate().alpha(1);
+                    mVideoTime.animate().alpha(1);
+                    mViewShadow.animate().alpha(1);
+                    mVoiceControl.setClickable(true);
+                    mVoiceControl.animate().alpha(1);
+                    mVideoControlsVisible = true;
+                    mHideVideoControlsHandler.postDelayed(mHideVideoControlsRunnable,
+                            3000);
+                }
+                return false;
+            }
+        });
+    }
+
+    private void controlVideo() {
+        mIcVideoControl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mIcVideoControl.getAlpha() == 0) {
+                    mBlockSeekBar = false;
+                    mVideoSeekBar.animate().alpha(1);
+                    mIcVideoControl.animate().alpha(1);
+                    mVoiceControl.setClickable(true);
+                    mVoiceControl.animate().alpha(1);
+                    mVideoTime.animate().alpha(1);
+                    mViewShadow.animate().alpha(1);
+                    mVideoControlsVisible = true;
+                    mHideVideoControlsHandler.postDelayed(mHideVideoControlsRunnable,
+                            3000);
+                    return;
+                }
+                if (mVideoView.isPlaying()) {
+                    mIcVideoControl.setImageResource(R.drawable.ic_play);
+                    mVideoView.pause();
+                    mUpdateVideoTimeHandler.removeCallbacks(mUpdateVideoTimeRunnable);
+                    mListVideos.get(mLastClickedVideo).setVideoMode(MergeVideoModel.Mode.PAUSE);
+                    mMergedVideosAdapter.notifyItemChanged(mLastClickedVideo);
+                } else {
+                    mIcVideoControl.setImageResource(R.drawable.ic_pause);
+                    mVideoView.start();
+                    mUpdateVideoTimeHandler.postDelayed(mUpdateVideoTimeRunnable, 10);
+                    mBlockSeekBar = true;
+                    mVideoSeekBar.setAlpha(0);
+                    mIcVideoControl.setAlpha((float) 0);
+                    mViewShadow.setAlpha(0);
+                    mVideoTime.setAlpha(0);
+                    mVoiceControl.setClickable(false);
+                    mVoiceControl.setAlpha((float) 0);
+                    mVideoControlsVisible = false;
+                    mListVideos.get(mLastClickedVideo).setVideoMode(MergeVideoModel.Mode.PLAY);
+                    mMergedVideosAdapter.notifyItemChanged(mLastClickedVideo);
+                }
+            }
+        });
+    }
+
+    private void controlVideoSeekbar() {
+        mVideoSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) {
+                    mVideoView.seekTo(progress);
+                    mVideoTime.setText(String.format(Locale.ENGLISH, "%s / %s",
+                            getVideoTime(progress / 1000),
+                            getVideoTime(mVideoView.getDuration() / 1000)));
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                mVideoView.pause();
+                mHideVideoControlsHandler.removeCallbacks(mHideVideoControlsRunnable);
+                mUpdateVideoTimeHandler.removeCallbacks(mUpdateVideoTimeRunnable);
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                mUpdateVideoTimeHandler.postDelayed(mUpdateVideoTimeRunnable, 10);
+                mVideoView.start();
+                mHideVideoControlsHandler.postDelayed(mHideVideoControlsRunnable,
+                        3000);
+                mIcVideoControl.setImageResource(R.drawable.ic_pause);
+                mListVideos.get(mLastClickedVideo).setVideoMode(MergeVideoModel.Mode.PLAY);
+                mMergedVideosAdapter.notifyItemChanged(mLastClickedVideo);
+            }
+        });
+
+        mVideoSeekBar.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return mBlockSeekBar;
+            }
+        });
+    }
+
+    private void controlVideoVoice() {
+        mVoiceControl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mVideoMuted) {
+                    mMediaPlayer.setVolume(1.0f, 1.0f);
+                    mVoiceControl.setImageResource(R.drawable.ic_speaker);
+                    mVideoMuted = false;
+                } else {
+                    mMediaPlayer.setVolume(0, 0);
+                    mVoiceControl.setImageResource(R.drawable.ic_silent);
+                    mVideoMuted = true;
+                }
+            }
+        });
+    }
+
+    private void mergeVideos(){
+        String storageDirectoryName = "";
+        for (int i = 0 ; i < mListVideos.size()-1 ; i++){
+            if (i == mListVideos.size()-2)
+                storageDirectoryName += mListVideos.get(i).getVideoName();
+            else
+                storageDirectoryName += mListVideos.get(i).getVideoName() + "+";
+        }
+
+        File storageFile = new File(Environment.getExternalStorageDirectory(),"FreeCut/merge/");
+
+        storageFile.mkdirs();
+
+        File mergedFile = new File(storageFile,storageDirectoryName + ".mp4");
+
+        ArrayList<String> listMerge= new ArrayList<>();
+        String filter = "";
+        for (int i = 0 ; i < mListVideos.size()-1 ; i++){
+            filter += String.format(Locale.ENGLISH,"[%d:v] [%d:a] ", i, i);
+            listMerge.add("-i");
+            listMerge.add(mListVideos.get(i).getVideoFile().getAbsolutePath());
+        }
+        filter += String.format(Locale.ENGLISH, "concat=n=%d:v=1:a=1 [v] [a]",
+                mListVideos.size()-1);
+        listMerge.add("-filter_complex");
+        listMerge.add(filter);
+        listMerge.add("-map");
+        listMerge.add("[v]");
+        listMerge.add("-map");
+        listMerge.add("[a]");
+        listMerge.add(mergedFile.getAbsolutePath());
+
+        String [] trans = listMerge.toArray(new String[listMerge.size()]);
+        long executionId = FFmpeg.executeAsync(trans, new ExecuteCallback() {
+            @Override
+            public void apply(long executionId, int returnCode) {
+                if (returnCode == RETURN_CODE_SUCCESS) {
+                    Log.d(TAG, "Merge Success");
+                } else {
+                    Log.d(TAG, "Merge Failed");
+                }
+            }
+        });
     }
 
     private String getPath(final Context context, final Uri uri) {
@@ -538,5 +906,28 @@ public class MergeFragment extends Fragment {
      */
     private boolean isMediaDocument(Uri uri) {
         return "com.android.providers.media.documents".equals(uri.getAuthority());
+    }
+
+    private String getVideoDuration(File videoFile) {
+        if (videoFile == null)
+            return "";
+        String videoPath = videoFile.getAbsolutePath();
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        retriever.setDataSource(videoPath);
+        String time =
+                retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+        int seconds = Integer.parseInt(time) / 1000;
+        return getVideoTime(seconds);
+    }
+
+    private String getVideoTime(int seconds) {
+        long second = seconds % 60;
+        long minute = (seconds / 60) % 60;
+        long hour = (seconds / (60 * 60)) % 24;
+
+        if (hour > 0)
+            return String.format(Locale.ENGLISH, "%d:%d:%02d", hour, minute, second);
+        else
+            return String.format(Locale.ENGLISH, "%d:%02d", minute, second);
     }
 }

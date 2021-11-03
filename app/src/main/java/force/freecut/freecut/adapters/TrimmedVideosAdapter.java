@@ -88,7 +88,7 @@ public class TrimmedVideosAdapter
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         switch (holder.getItemViewType()){
             case TRIMMING:
-                TrimmingVideoViewHolder trimmingVideoViewHolder = (TrimmingVideoViewHolder)holder;
+                TrimmingVideoViewHolder trimmingVideoViewHolder = (TrimmingVideoViewHolder) holder;
                 trimmingVideoViewHolder.mVideoName.setText(mTrimVideoModels[position].getVideoName());
                 trimmingVideoViewHolder.mVideoProgressStatus.setText(mTrimVideoModels[position]
                         .getTrimmingStatus());
