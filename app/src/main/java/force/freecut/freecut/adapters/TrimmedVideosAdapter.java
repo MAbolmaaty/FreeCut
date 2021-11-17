@@ -157,7 +157,7 @@ public class TrimmedVideosAdapter
             mVideoThumbnail = itemView.findViewById(R.id.videoThumbnail);
             mVideoName = itemView.findViewById(R.id.videoName);
             mVideoTime = itemView.findViewById(R.id.videoTime);
-            mShare = itemView.findViewById(R.id.ic_share);
+            mShare = itemView.findViewById(R.id.ic_videoShare);
             mVideoMode = itemView.findViewById(R.id.ic_videoMode);
             mPlayIndicator = itemView.findViewById(R.id.playIndicator);
 

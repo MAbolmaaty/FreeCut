@@ -102,7 +102,7 @@
             app:layout_constraintTop_toTopOf="@+id/videoView" />
 
         <ImageView
-            android:id="@+id/ic_remove"
+            android:id="@+id/ic_videoRemove"
             android:layout_width="@dimen/_30sdp"
             android:layout_height="@dimen/_30sdp"
             android:layout_marginEnd="@dimen/_8sdp"
@@ -117,7 +117,7 @@
             tools:visibility="visible" />
 
         <ImageView
-            android:id="@+id/ic_share"
+            android:id="@+id/ic_videoShare"
             android:layout_width="@dimen/_30sdp"
             android:layout_height="@dimen/_30sdp"
             android:layout_marginTop="@dimen/_8sdp"
@@ -126,7 +126,7 @@
             tools:alpha="1"
             android:clickable="false"
             android:src="@drawable/ic_cloud"
-            app:layout_constraintEnd_toStartOf="@+id/ic_remove"
+            app:layout_constraintEnd_toStartOf="@+id/ic_videoRemove"
             app:layout_constraintTop_toTopOf="@+id/videoView"
             tools:visibility="visible" />
 

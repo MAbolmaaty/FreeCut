@@ -80,7 +80,7 @@
         tools:textColor="@android:color/black" />
 
     <ImageView
-        android:id="@+id/ic_share"
+        android:id="@+id/ic_videoShare"
         android:layout_width="@dimen/_30sdp"
         android:layout_height="@dimen/_30sdp"
         android:layout_marginStart="@dimen/_8sdp"
@@ -103,7 +103,7 @@
         android:src="@drawable/ic_play"
         app:layout_constraintBottom_toBottomOf="@+id/videoName"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/ic_share"
+        app:layout_constraintStart_toEndOf="@+id/ic_videoShare"
         app:layout_constraintTop_toTopOf="@+id/videoName"
         app:tint="@android:color/white" />
 

@@ -210,8 +210,8 @@ public class TrimFragment extends Fragment {
         mVideoView = view.findViewById(R.id.videoView);
         mVideoViewBackground = view.findViewById(R.id.videoViewBackground);
         mViewShadow = view.findViewById(R.id.shadow);
-        mIcShare = view.findViewById(R.id.ic_share);
-        mIcRemove = view.findViewById(R.id.ic_remove);
+        mIcShare = view.findViewById(R.id.ic_videoShare);
+        mIcRemove = view.findViewById(R.id.ic_videoRemove);
         mVideoSeekBar = view.findViewById(R.id.videoSeekBar);
         mIcVideoControl = view.findViewById(R.id.icVideoControl);
         mVideoTime = view.findViewById(R.id.videoTime);
@@ -398,6 +398,7 @@ public class TrimFragment extends Fragment {
             mVideoView.pause();
         if (mSelectedVideoUri != null) {
             mIcVideoControl.setImageResource(R.drawable.ic_play);
+            mVoiceControl.setImageResource(R.drawable.ic_speaker);
             showVideoControls(true);
         }
         mHideVideoControlsHandler.removeCallbacks(mHideVideoControlsRunnable);
@@ -740,12 +741,18 @@ public class TrimFragment extends Fragment {
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
+                mVideoView.pause();
                 mHideVideoControlsHandler.removeCallbacks(mHideVideoControlsRunnable);
+                mUpdateVideoTimeHandler.removeCallbacks(mUpdateVideoTimeRunnable);
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                mHideVideoControlsHandler.postDelayed(mHideVideoControlsRunnable, 3000);
+                mUpdateVideoTimeHandler.postDelayed(mUpdateVideoTimeRunnable, 10);
+                mVideoView.start();
+                mHideVideoControlsHandler.postDelayed(mHideVideoControlsRunnable,
+                        3000);
+                mIcVideoControl.setImageResource(R.drawable.ic_pause);
             }
         });
 

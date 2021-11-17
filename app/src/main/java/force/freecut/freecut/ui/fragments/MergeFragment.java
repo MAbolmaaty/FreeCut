@@ -3,8 +3,8 @@ package force.freecut.freecut.ui.fragments;
 import static android.app.Activity.RESULT_OK;
 import static com.arthenica.mobileffmpeg.Config.RETURN_CODE_SUCCESS;
 import static force.freecut.freecut.adapters.MergedVideosAdapter.LAST_ITEM;
+import static force.freecut.freecut.adapters.MergedVideosAdapter.MERGED;
 import static force.freecut.freecut.adapters.MergedVideosAdapter.MERGING;
-import static force.freecut.freecut.ui.activities.MainActivity.loadFragment;
 
 import android.content.ClipData;
 import android.content.ContentUris;
@@ -35,9 +35,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatSeekBar;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -62,7 +64,7 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -82,7 +84,7 @@ import force.freecut.freecut.view_models.ToolbarViewModel;
 public class MergeFragment extends Fragment {
 
     private static final String TAG = MergeFragment.class.getSimpleName();
-
+    private static final int VIDEOS_LIST_FIRST_POSITION = 0;
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
@@ -122,6 +124,8 @@ public class MergeFragment extends Fragment {
     private boolean mPaused;
     private Handler mUpdateVideoTimeHandler = new Handler();
     private Handler mHideVideoControlsHandler = new Handler();
+    private File mergedFile;
+    private Toast mToast;
 
     private Runnable mUpdateVideoTimeRunnable = new Runnable() {
         @Override
@@ -150,6 +154,33 @@ public class MergeFragment extends Fragment {
                     mVideoControlsVisible = false;
                 }
             }
+        }
+    };
+
+    ItemTouchHelper.SimpleCallback mSimpleCallback = new ItemTouchHelper.SimpleCallback(
+            ItemTouchHelper.UP | ItemTouchHelper.DOWN | ItemTouchHelper.START |
+                    ItemTouchHelper.END, 0) {
+        @Override
+        public boolean onMove(@NonNull RecyclerView recyclerView,
+                              @NonNull RecyclerView.ViewHolder viewHolder,
+                              @NonNull RecyclerView.ViewHolder target) {
+
+            if (viewHolder.getAdapterPosition() == mListVideos.size()-1 ||
+                    target.getAdapterPosition() == mListVideos.size()-1)
+                return true;
+
+            int fromPosition = viewHolder.getAdapterPosition();
+            int toPosition = target.getAdapterPosition();
+
+            Collections.swap(mListVideos, fromPosition, toPosition);
+            recyclerView.getAdapter().notifyItemMoved(fromPosition, toPosition);
+
+            return false;
+        }
+
+        @Override
+        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+
         }
     };
 
@@ -223,6 +254,9 @@ public class MergeFragment extends Fragment {
                 RecyclerView.VERTICAL, false);
         mRecyclerViewVideos.setLayoutManager(layoutManager);
         mRecyclerViewVideos.setHasFixedSize(true);
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(mSimpleCallback);
+        itemTouchHelper.attachToRecyclerView(mRecyclerViewVideos);
 
         mBanner.setOnClickListener(new View.OnClickListener() {
 
@@ -403,6 +437,9 @@ public class MergeFragment extends Fragment {
                 mMainViewPagerSwipingViewModel.setMainViewPagerSwiping(false);
                 showPickupVideos(false);
                 showVideoView(true);
+                if (!mListVideos.isEmpty()){
+                    mListVideos.remove(mListVideos.size()-1);
+                }
                 ClipData clipData = data.getClipData();
                 if (clipData != null) {
                     for (int i = 0; i < clipData.getItemCount(); i++) {
@@ -410,19 +447,36 @@ public class MergeFragment extends Fragment {
                         Uri videoURI = videoItem.getUri();
                         String filePath = getPath(getActivity(), videoURI);
                         File file = new File(filePath);
-                        mListVideos.add(new MergeVideoModel(file,
-                                file.getName().split(".mp4")[0],
+                        mListVideos.add(new MergeVideoModel(file, file.getName(),
                                 getVideoDuration(file), MergeVideoModel.Mode.PAUSE,
                                 MERGING));
                     }
                 } else {
-                    Toast.makeText(getActivity(), getString(R.string.select_multiple_videos),
-                            Toast.LENGTH_SHORT).show();
+                    Uri videoURI = data.getData();
+                    String filePath = getPath(getActivity(), videoURI);
+                    File file = new File(filePath);
+                    mListVideos.add(new MergeVideoModel(file, file.getName(),
+                            getVideoDuration(file), MergeVideoModel.Mode.PAUSE,
+                            MERGING));
                 }
+
                 mListVideos.add(new MergeVideoModel(null, "",
                         "", null,
                         LAST_ITEM));
+
                 mMergedVideosAdapter = new MergedVideosAdapter(getActivity(), mListVideos,
+                        new MergedVideosAdapter.VideoReorderClickListener() {
+                            @Override
+                            public void onReorderClickListener() {
+                                if (mToast != null)
+                                    mToast.cancel();
+
+                                mToast = Toast.makeText(getActivity(),
+                                        R.string.hold_to_reorder, Toast.LENGTH_SHORT);
+
+                                mToast.show();
+                            }
+                        },
                         new MergedVideosAdapter.VideoPlayClickListener() {
                             @Override
                             public void onPlayClickListener(int videoClicked) {
@@ -440,10 +494,25 @@ public class MergeFragment extends Fragment {
                     public void onShareClickListener(int videoClicked) {
 
                     }
-                }, new MergedVideosAdapter.ButtonMergeClickListener() {
+                }, new MergedVideosAdapter.VideoRemoveClickListener() {
+                    @Override
+                    public void onVideoRemoveClickListener(int videoClicked) {
+
+                    }
+                },
+                new MergedVideosAdapter.ButtonMergeClickListener() {
                     @Override
                     public void onButtonMergeClickListener() {
                         mergeVideos();
+                    }
+                }, new MergedVideosAdapter.ButtonGalleryClickListener() {
+                    @Override
+                    public void onButtonGalleryClickListener() {
+                        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                        intent.addCategory(Intent.CATEGORY_OPENABLE);
+                        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                        intent.setType("video/mp4");
+                        startActivityForResult(intent, OPEN_MEDIA_PICKER);
                     }
                 });
                 mLastClickedVideo = 0;
@@ -457,8 +526,6 @@ public class MergeFragment extends Fragment {
     }
 
     public class GetDataSync extends AsyncTask<Void, Void, Void> {
-
-
         @Override
         protected Void doInBackground(Void... params) {
             try {
@@ -478,12 +545,12 @@ public class MergeFragment extends Fragment {
             String imgURL = "http://forcetouches.com/freecutAdmin/images/" + saldo;
             Glide.with(getActivity()).load(imgURL).into(mBanner);
 
-
         }
     }
 
     private void getData() throws IOException, JSONException {
-        JSONObject json = readJsonFromUrl("http://www.forcetouches.com/freecutAdmin/getandroidbanners.php");
+        JSONObject json =
+                readJsonFromUrl("http://www.forcetouches.com/freecutAdmin/getandroidbanners.php");
         try {
             String response = json.getString("banner");
             mylink = json.getString("url");
@@ -507,7 +574,8 @@ public class MergeFragment extends Fragment {
     public JSONObject readJsonFromUrl(String url) throws IOException, JSONException {
         InputStream is = new URL(url).openStream();
         try {
-            BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+            BufferedReader rd =
+                    new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
             String jsonText = readAll(rd);
             JSONObject json = new JSONObject(jsonText);
             return json;
@@ -680,30 +748,31 @@ public class MergeFragment extends Fragment {
         });
     }
 
-    private void mergeVideos(){
-        String storageDirectoryName = "";
-        for (int i = 0 ; i < mListVideos.size()-1 ; i++){
-            if (i == mListVideos.size()-2)
-                storageDirectoryName += mListVideos.get(i).getVideoName();
-            else
-                storageDirectoryName += mListVideos.get(i).getVideoName() + "+";
-        }
-
-        File storageFile = new File(Environment.getExternalStorageDirectory(),"FreeCut/merge/");
-
+    private void mergeVideos() {
+        File storageFile = new File(Environment.getExternalStorageDirectory(),
+                "FreeCut/merge/");
         storageFile.mkdirs();
 
-        File mergedFile = new File(storageFile,storageDirectoryName + ".mp4");
+        String mergedFileName;
 
-        ArrayList<String> listMerge= new ArrayList<>();
+        int j = 1;
+
+        do {
+            mergedFileName = String.format(Locale.ENGLISH, "merge-%02d", j);
+            mergedFile = new File(storageFile, mergedFileName + ".mp4");
+            j++;
+        } while (mergedFile.isFile());
+
+
+        ArrayList<String> listMerge = new ArrayList<>();
         String filter = "";
-        for (int i = 0 ; i < mListVideos.size()-1 ; i++){
-            filter += String.format(Locale.ENGLISH,"[%d:v] [%d:a] ", i, i);
+        for (int i = 0; i < mListVideos.size() - 1; i++) {
+            filter += String.format(Locale.ENGLISH, "[%d:v] [%d:a] ", i, i);
             listMerge.add("-i");
             listMerge.add(mListVideos.get(i).getVideoFile().getAbsolutePath());
         }
         filter += String.format(Locale.ENGLISH, "concat=n=%d:v=1:a=1 [v] [a]",
-                mListVideos.size()-1);
+                mListVideos.size() - 1);
         listMerge.add("-filter_complex");
         listMerge.add(filter);
         listMerge.add("-map");
@@ -712,12 +781,16 @@ public class MergeFragment extends Fragment {
         listMerge.add("[a]");
         listMerge.add(mergedFile.getAbsolutePath());
 
-        String [] trans = listMerge.toArray(new String[listMerge.size()]);
+        String[] trans = listMerge.toArray(new String[listMerge.size()]);
         long executionId = FFmpeg.executeAsync(trans, new ExecuteCallback() {
             @Override
             public void apply(long executionId, int returnCode) {
                 if (returnCode == RETURN_CODE_SUCCESS) {
                     Log.d(TAG, "Merge Success");
+                    mMergedVideosAdapter.addToList(VIDEOS_LIST_FIRST_POSITION,
+                            new MergeVideoModel(mergedFile, mergedFile.getName(),
+                                    getVideoDuration(mergedFile), MergeVideoModel.Mode.PAUSE,
+                                    MERGED));
                 } else {
                     Log.d(TAG, "Merge Failed");
                 }

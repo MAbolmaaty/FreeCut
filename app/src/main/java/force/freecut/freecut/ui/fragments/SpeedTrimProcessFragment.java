@@ -191,12 +191,13 @@ public class SpeedTrimProcessFragment extends Fragment {
                 mVideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                     @Override
                     public void onPrepared(MediaPlayer mp) {
+                        mMediaPlayer = mp;
+
                         if (mPaused)
                             return;
 
                         int videoDuration = mVideoView.getDuration() / 1000;
                         mUpdateVideoTimeHandler.postDelayed(mUpdateVideoTimeRunnable, 10);
-                        mMediaPlayer = mp;
                         mVoiceControl.setImageResource(R.drawable.ic_speaker);
                         mVideoMuted = false;
                         if (mVideoView.getTag().equals(TRIMMED_VIDEO)) {
@@ -270,6 +271,7 @@ public class SpeedTrimProcessFragment extends Fragment {
         mVideoTime.animate().alpha(1);
         mVideoControlsVisible = true;
         mIcVideoControl.setImageResource(R.drawable.ic_play);
+        mVoiceControl.setImageResource(R.drawable.ic_speaker);
         if (mLastClickedVideo != -1) {
             mTrimVideoModels[mLastClickedVideo].setVideoMode(TrimVideoModel.Mode.PAUSE);
             mTrimmedVideosAdapter.notifyItemChanged(mLastClickedVideo);

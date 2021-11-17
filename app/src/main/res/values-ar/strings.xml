@@ -77,4 +77,5 @@
     <string name="pick_up_trim">اختر الفيديو الذي تريد تجزئته</string>
     <string name="pick_up_merge">اختر الفيديوهات التي تريد دمجها</string>
     <string name="select_multiple_videos">يجب اختيار اكثر من فيديو</string>
+    <string name="hold_to_reorder">استمر فى الضغط لترتيب الفيديوهات</string>
 </resources>

@@ -80,14 +80,14 @@
         tools:textColor="@android:color/black" />
 
     <ImageView
-        android:id="@+id/ic_share"
+        android:id="@+id/ic_videoRemove"
         android:layout_width="@dimen/_30sdp"
         android:layout_height="@dimen/_30sdp"
         android:layout_marginStart="@dimen/_8sdp"
-        android:padding="@dimen/_6sdp"
-        android:src="@drawable/ic_cloud"
+        android:padding="@dimen/_8sdp"
+        android:src="@drawable/ic_remove"
         app:layout_constraintBottom_toBottomOf="@+id/videoName"
-        app:layout_constraintEnd_toStartOf="@+id/ic_videoMode"
+        app:layout_constraintEnd_toStartOf="@+id/ic_videoShare"
         app:layout_constraintHorizontal_bias="1"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toEndOf="@+id/videoName"
@@ -95,15 +95,39 @@
         app:tint="@android:color/white" />
 
     <ImageView
+        android:id="@+id/ic_videoShare"
+        android:layout_width="@dimen/_30sdp"
+        android:layout_height="@dimen/_30sdp"
+        android:padding="@dimen/_6sdp"
+        android:src="@drawable/ic_cloud"
+        app:layout_constraintBottom_toBottomOf="@+id/videoName"
+        app:layout_constraintEnd_toStartOf="@+id/ic_videoMode"
+        app:layout_constraintStart_toEndOf="@+id/ic_videoRemove"
+        app:layout_constraintTop_toTopOf="@+id/videoName"
+        app:tint="@android:color/white" />
+
+    <ImageView
         android:id="@+id/ic_videoMode"
         android:layout_width="@dimen/_30sdp"
         android:layout_height="@dimen/_30sdp"
-        android:layout_marginEnd="@dimen/_8sdp"
         android:padding="@dimen/_8sdp"
         android:src="@drawable/ic_play"
         app:layout_constraintBottom_toBottomOf="@+id/videoName"
+        app:layout_constraintEnd_toStartOf="@+id/ic_videoReorder"
+        app:layout_constraintStart_toEndOf="@+id/ic_videoShare"
+        app:layout_constraintTop_toTopOf="@+id/videoName"
+        app:tint="@android:color/white" />
+
+    <ImageView
+        android:id="@+id/ic_videoReorder"
+        android:layout_width="@dimen/_30sdp"
+        android:layout_height="@dimen/_30sdp"
+        android:layout_marginEnd="@dimen/_8sdp"
+        android:padding="@dimen/_2sdp"
+        android:src="@drawable/ic_reorder"
+        app:layout_constraintBottom_toBottomOf="@+id/videoName"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/ic_share"
+        app:layout_constraintStart_toEndOf="@+id/ic_videoMode"
         app:layout_constraintTop_toTopOf="@+id/videoName"
         app:tint="@android:color/white" />
 
