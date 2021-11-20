@@ -165,8 +165,8 @@ public class MergeFragment extends Fragment {
                               @NonNull RecyclerView.ViewHolder viewHolder,
                               @NonNull RecyclerView.ViewHolder target) {
 
-            if (viewHolder.getAdapterPosition() == mListVideos.size()-1 ||
-                    target.getAdapterPosition() == mListVideos.size()-1)
+            if (viewHolder.getAdapterPosition() == mListVideos.size() - 1 ||
+                    target.getAdapterPosition() == mListVideos.size() - 1)
                 return true;
 
             int fromPosition = viewHolder.getAdapterPosition();
@@ -174,6 +174,26 @@ public class MergeFragment extends Fragment {
 
             Collections.swap(mListVideos, fromPosition, toPosition);
             recyclerView.getAdapter().notifyItemMoved(fromPosition, toPosition);
+
+//            if (mListVideos.get(mLastClickedVideo).getVideoMode() ==
+//                    MergeVideoModel.Mode.PAUSE){
+//                mLastClickedVideo = 0;
+//                mPaused = true;
+//                mVideoView.setVideoPath(mListVideos.get(0).getVideoFile().getAbsolutePath());
+//                mVideoName.setText(mListVideos.get(0).getVideoName());
+//            } else {
+//                for(MergeVideoModel video : mListVideos){
+//                    if (video.getVideoMode() == MergeVideoModel.Mode.PLAY){
+//                        mLastClickedVideo = mListVideos.indexOf(video);
+//                    }
+//                }
+//            }
+
+            for (MergeVideoModel video : mListVideos) {
+                if (video.getVideoMode() == MergeVideoModel.Mode.PLAY) {
+                    mLastClickedVideo = mListVideos.indexOf(video);
+                }
+            }
 
             return false;
         }
@@ -391,8 +411,8 @@ public class MergeFragment extends Fragment {
             mVideoTime.animate().alpha(1);
             mVideoControlsVisible = true;
             mIcVideoControl.setImageResource(R.drawable.ic_play);
-            mListVideos.get(mLastClickedVideo).setVideoMode(MergeVideoModel.Mode.PAUSE);
-            mMergedVideosAdapter.notifyItemChanged(mLastClickedVideo);
+            //mListVideos.get(mLastClickedVideo).setVideoMode(MergeVideoModel.Mode.PAUSE);
+            //mMergedVideosAdapter.notifyItemChanged(mLastClickedVideo);
         });
 
         return view;
@@ -437,8 +457,8 @@ public class MergeFragment extends Fragment {
                 mMainViewPagerSwipingViewModel.setMainViewPagerSwiping(false);
                 showPickupVideos(false);
                 showVideoView(true);
-                if (!mListVideos.isEmpty()){
-                    mListVideos.remove(mListVideos.size()-1);
+                if (!mListVideos.isEmpty()) {
+                    mListVideos.remove(mListVideos.size() - 1);
                 }
                 ClipData clipData = data.getClipData();
                 if (clipData != null) {
@@ -500,12 +520,12 @@ public class MergeFragment extends Fragment {
 
                     }
                 },
-                new MergedVideosAdapter.ButtonMergeClickListener() {
-                    @Override
-                    public void onButtonMergeClickListener() {
-                        mergeVideos();
-                    }
-                }, new MergedVideosAdapter.ButtonGalleryClickListener() {
+                        new MergedVideosAdapter.ButtonMergeClickListener() {
+                            @Override
+                            public void onButtonMergeClickListener() {
+                                mergeVideos();
+                            }
+                        }, new MergedVideosAdapter.ButtonGalleryClickListener() {
                     @Override
                     public void onButtonGalleryClickListener() {
                         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
@@ -671,8 +691,8 @@ public class MergeFragment extends Fragment {
                     mIcVideoControl.setImageResource(R.drawable.ic_play);
                     mVideoView.pause();
                     mUpdateVideoTimeHandler.removeCallbacks(mUpdateVideoTimeRunnable);
-                    mListVideos.get(mLastClickedVideo).setVideoMode(MergeVideoModel.Mode.PAUSE);
-                    mMergedVideosAdapter.notifyItemChanged(mLastClickedVideo);
+//                    mListVideos.get(mLastClickedVideo).setVideoMode(MergeVideoModel.Mode.PAUSE);
+//                    mMergedVideosAdapter.notifyItemChanged(mLastClickedVideo);
                 } else {
                     mIcVideoControl.setImageResource(R.drawable.ic_pause);
                     mVideoView.start();
@@ -1002,5 +1022,13 @@ public class MergeFragment extends Fragment {
             return String.format(Locale.ENGLISH, "%d:%d:%02d", hour, minute, second);
         else
             return String.format(Locale.ENGLISH, "%d:%02d", minute, second);
+    }
+
+    private boolean isBetween(int value, int min, int max) {
+        if (value > min && value < max) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
