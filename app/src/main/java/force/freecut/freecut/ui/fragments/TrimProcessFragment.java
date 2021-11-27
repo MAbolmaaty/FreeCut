@@ -14,6 +14,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -250,7 +251,6 @@ public class TrimProcessFragment extends Fragment {
                             int videoFrames = Integer.parseInt(object.getString("nb_frames"));
                             fps = videoFrames / videoDuration;
                             mProgressPerVideo = fps * bundle.getInt(SEGMENT_TIME);
-
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }

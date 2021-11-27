@@ -4,6 +4,7 @@ import static android.app.Activity.RESULT_OK;
 import static com.arthenica.mobileffmpeg.Config.RETURN_CODE_SUCCESS;
 import static force.freecut.freecut.adapters.MergedVideosAdapter.LAST_ITEM;
 import static force.freecut.freecut.adapters.MergedVideosAdapter.MERGED;
+import static force.freecut.freecut.adapters.MergedVideosAdapter.MERGE_PROCESS;
 import static force.freecut.freecut.adapters.MergedVideosAdapter.MERGING;
 
 import android.content.ClipData;
@@ -43,13 +44,19 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.arthenica.mobileffmpeg.Config;
 import com.arthenica.mobileffmpeg.ExecuteCallback;
 import com.arthenica.mobileffmpeg.FFmpeg;
+import com.arthenica.mobileffmpeg.FFprobe;
+import com.arthenica.mobileffmpeg.MediaInformation;
+import com.arthenica.mobileffmpeg.Statistics;
+import com.arthenica.mobileffmpeg.StatisticsCallback;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -126,6 +133,7 @@ public class MergeFragment extends Fragment {
     private Handler mHideVideoControlsHandler = new Handler();
     private File mergedFile;
     private Toast mToast;
+    int mergedVideoFrames = 0;
 
     private Runnable mUpdateVideoTimeRunnable = new Runnable() {
         @Override
@@ -169,25 +177,14 @@ public class MergeFragment extends Fragment {
                     target.getAdapterPosition() == mListVideos.size() - 1)
                 return true;
 
+            if (mMergedVideosAdapter.getVideosList().get(0).getType() == MERGE_PROCESS)
+                return true;
+
             int fromPosition = viewHolder.getAdapterPosition();
             int toPosition = target.getAdapterPosition();
 
             Collections.swap(mListVideos, fromPosition, toPosition);
             recyclerView.getAdapter().notifyItemMoved(fromPosition, toPosition);
-
-//            if (mListVideos.get(mLastClickedVideo).getVideoMode() ==
-//                    MergeVideoModel.Mode.PAUSE){
-//                mLastClickedVideo = 0;
-//                mPaused = true;
-//                mVideoView.setVideoPath(mListVideos.get(0).getVideoFile().getAbsolutePath());
-//                mVideoName.setText(mListVideos.get(0).getVideoName());
-//            } else {
-//                for(MergeVideoModel video : mListVideos){
-//                    if (video.getVideoMode() == MergeVideoModel.Mode.PLAY){
-//                        mLastClickedVideo = mListVideos.indexOf(video);
-//                    }
-//                }
-//            }
 
             for (MergeVideoModel video : mListVideos) {
                 if (video.getVideoMode() == MergeVideoModel.Mode.PLAY) {
@@ -534,6 +531,14 @@ public class MergeFragment extends Fragment {
                         intent.setType("video/mp4");
                         startActivityForResult(intent, OPEN_MEDIA_PICKER);
                     }
+                }, new MergedVideosAdapter.ButtonDeleteAllClickListener() {
+                    @Override
+                    public void onButtonDeleteAllClickListener() {
+                        mMergedVideosAdapter.clearVideosList();
+                        mMainViewPagerSwipingViewModel.setMainViewPagerSwiping(true);
+                        showPickupVideos(true);
+                        showVideoView(false);
+                    }
                 });
                 mLastClickedVideo = 0;
                 mRecyclerViewVideos.setAdapter(mMergedVideosAdapter);
@@ -628,6 +633,7 @@ public class MergeFragment extends Fragment {
             mVoiceControl.setVisibility(View.VISIBLE);
             mVideoTime.setVisibility(View.VISIBLE);
             mVideoName.setVisibility(View.VISIBLE);
+            mRecyclerViewVideos.setVisibility(View.VISIBLE);
         } else {
             mVideoView.setVisibility(View.INVISIBLE);
             mVideoViewBackground.setVisibility(View.INVISIBLE);
@@ -637,6 +643,7 @@ public class MergeFragment extends Fragment {
             mVoiceControl.setVisibility(View.INVISIBLE);
             mVideoTime.setVisibility(View.INVISIBLE);
             mVideoName.setVisibility(View.INVISIBLE);
+            mRecyclerViewVideos.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -790,7 +797,21 @@ public class MergeFragment extends Fragment {
             filter += String.format(Locale.ENGLISH, "[%d:v] [%d:a] ", i, i);
             listMerge.add("-i");
             listMerge.add(mListVideos.get(i).getVideoFile().getAbsolutePath());
+            MediaInformation info = FFprobe.getMediaInformation(
+                    mListVideos.get(i).getVideoFile().getAbsolutePath());
+            try {
+                JSONArray array = info.getAllProperties().getJSONArray("streams");
+                JSONObject object = array.getJSONObject(0);
+                int videoFrames = Integer.parseInt(object.getString("nb_frames"));
+                mergedVideoFrames += videoFrames;
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
         }
+
+        Log.d(TAG, "mergedVideoFrames : " + mergedVideoFrames);
+
         filter += String.format(Locale.ENGLISH, "concat=n=%d:v=1:a=1 [v] [a]",
                 mListVideos.size() - 1);
         listMerge.add("-filter_complex");
@@ -802,17 +823,48 @@ public class MergeFragment extends Fragment {
         listMerge.add(mergedFile.getAbsolutePath());
 
         String[] trans = listMerge.toArray(new String[listMerge.size()]);
+
+        mMergedVideosAdapter.addToList(VIDEOS_LIST_FIRST_POSITION,
+                new MergeVideoModel(mergedFile, mergedFile.getName(),
+                        "", MergeVideoModel.Mode.PAUSE,
+                        MERGE_PROCESS));
+
         long executionId = FFmpeg.executeAsync(trans, new ExecuteCallback() {
             @Override
             public void apply(long executionId, int returnCode) {
                 if (returnCode == RETURN_CODE_SUCCESS) {
                     Log.d(TAG, "Merge Success");
+                    mMergedVideosAdapter.removeFromList(VIDEOS_LIST_FIRST_POSITION,
+                            false);
                     mMergedVideosAdapter.addToList(VIDEOS_LIST_FIRST_POSITION,
                             new MergeVideoModel(mergedFile, mergedFile.getName(),
                                     getVideoDuration(mergedFile), MergeVideoModel.Mode.PAUSE,
                                     MERGED));
                 } else {
                     Log.d(TAG, "Merge Failed");
+                }
+            }
+        });
+
+        Config.enableStatisticsCallback(new StatisticsCallback() {
+            @Override
+            public void apply(Statistics statistics) {
+                double progress =
+                        ((double) statistics.getVideoFrameNumber() / mergedVideoFrames) * 100;
+
+                if (progress <= 100 && mListVideos.get(VIDEOS_LIST_FIRST_POSITION).
+                        getType() == MERGE_PROCESS) {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (mRecyclerViewVideos.
+                                    findViewHolderForAdapterPosition(VIDEOS_LIST_FIRST_POSITION) != null)
+                                ((MergedVideosAdapter.MergeProcessViewHolder)
+                                        mRecyclerViewVideos.
+                                                findViewHolderForAdapterPosition(VIDEOS_LIST_FIRST_POSITION)).
+                                        updateProgress((int) progress);
+                        }
+                    });
                 }
             }
         });

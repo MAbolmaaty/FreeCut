@@ -14,6 +14,7 @@
         <entry key="..\:/MU/FreeCut/app/src/main/res/drawable/bg_multi_colors.xml" value="0.2712820512820513" />
         <entry key="..\:/MU/FreeCut/app/src/main/res/drawable/bg_multi_primary.xml" value="0.26481481481481484" />
         <entry key="..\:/MU/FreeCut/app/src/main/res/drawable/bg_translucent.xml" value="0.26481481481481484" />
+        <entry key="..\:/MU/FreeCut/app/src/main/res/drawable/bg_translucent_accent.xml" value="0.2712820512820513" />
         <entry key="..\:/MU/FreeCut/app/src/main/res/drawable/custom_progressbar.xml" value="0.26481481481481484" />
         <entry key="..\:/MU/FreeCut/app/src/main/res/drawable/ic_force_touches.xml" value="0.26944444444444443" />
         <entry key="..\:/MU/FreeCut/app/src/main/res/drawable/ic_launcher.xml" value="0.2611111111111111" />
@@ -36,10 +37,12 @@
         <entry key="..\:/MU/FreeCut/app/src/main/res/layout/fragment_trim.xml" value="0.259375" />
         <entry key="..\:/MU/FreeCut/app/src/main/res/layout/fragment_trim_process.xml" value="0.24722222222222223" />
         <entry key="..\:/MU/FreeCut/app/src/main/res/layout/list_item_merge_last.xml" value="0.259375" />
+        <entry key="..\:/MU/FreeCut/app/src/main/res/layout/list_item_merge_process.xml" value="0.259375" />
         <entry key="..\:/MU/FreeCut/app/src/main/res/layout/list_item_merged_video.xml" value="0.259375" />
         <entry key="..\:/MU/FreeCut/app/src/main/res/layout/list_item_merging_video.xml" value="0.259375" />
         <entry key="..\:/MU/FreeCut/app/src/main/res/layout/list_item_output_video.xml" value="0.259375" />
         <entry key="..\:/MU/FreeCut/app/src/main/res/layout/list_item_trimmed_video.xml" value="0.259375" />
+        <entry key="..\:/MU/FreeCut/app/src/main/res/layout/list_item_trimming_video.xml" value="0.259375" />
         <entry key="..\:/MU/FreeCut/app/src/main/res/layout/list_item_video.xml" value="0.24722222222222223" />
         <entry key="..\:/MU/FreeCut/app/src/main/res/layout/toolbar.xml" value="0.259375" />
         <entry key="..\:/MU/FreeCut/app/src/main/res/layout/video_view.xml" value="0.259375" />

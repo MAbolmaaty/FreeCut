@@ -892,7 +892,8 @@ public class TrimFragment extends Fragment {
                 };
 
                 for (String contentUriPrefix : contentUriPrefixesToTry) {
-                    Uri contentUri = ContentUris.withAppendedId(Uri.parse(contentUriPrefix), Long.valueOf(id));
+                    Uri contentUri = ContentUris.withAppendedId(Uri.parse(contentUriPrefix),
+                            Long.valueOf(id));
                     try {
                         String path = getDataColumn(context, contentUri, null, null);
                         if (path != null) {
