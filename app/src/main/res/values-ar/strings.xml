@@ -79,4 +79,5 @@
     <string name="select_multiple_videos">يجب اختيار اكثر من فيديو</string>
     <string name="hold_to_reorder">استمر فى الضغط لترتيب الفيديوهات</string>
     <string name="merging">دمج&#8230;</string>
+    <string name="merge_process_in_progress">يجب الانتهاء اولا من عملية الدمج الحالية</string>
 </resources>

@@ -163,6 +163,14 @@ public class MergedVideosAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                         .into(mergedVideoViewHolder.mVideoThumbnail);
                 mergedVideoViewHolder.mVideoTime
                         .setText(mVideosList.get(position).getVideoDuration());
+                if (mVideosList.get(position).getVideoMode() == MergeVideoModel.Mode.PLAY) {
+                    mergedVideoViewHolder.mVideoMode.setImageResource(R.drawable.ic_pause);
+                    //mergedVideoViewHolder.mPlayIndicator.setAlpha(1);
+                }
+                if (mVideosList.get(position).getVideoMode() == MergeVideoModel.Mode.PAUSE) {
+                    mergedVideoViewHolder.mVideoMode.setImageResource(R.drawable.ic_play);
+                    //mergingVideoViewHolder.mPlayIndicator.setAlpha(0);
+                }
                 break;
             case LAST_ITEM:
         }
@@ -210,7 +218,6 @@ public class MergedVideosAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                     mVideoRemoveClickListener.onVideoRemoveClickListener(getAdapterPosition());
                 }
             });
-
         }
     }
 
@@ -237,12 +244,36 @@ public class MergedVideosAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         private TextView mVideoName;
         private ImageView mVideoThumbnail;
         private TextView mVideoTime;
+        private ImageView mVideoMode;
+        private ImageView mVideoReorder;
+        private ImageView mVideoShare;
+        private ImageView mVideoRemove;
 
         public MergedVideoViewHolder(@NonNull View itemView) {
             super(itemView);
             mVideoName = itemView.findViewById(R.id.videoName);
             mVideoThumbnail = itemView.findViewById(R.id.videoThumbnail);
             mVideoTime = itemView.findViewById(R.id.videoTime);
+            mVideoMode = itemView.findViewById(R.id.ic_videoMode);
+            mVideoReorder = itemView.findViewById(R.id.ic_videoReorder);
+            mVideoShare = itemView.findViewById(R.id.ic_videoShare);
+            mVideoRemove = itemView.findViewById(R.id.ic_videoRemove);
+
+            mVideoMode.setOnClickListener(v ->
+                    mVideoPlayClickListener.onPlayClickListener(getAdapterPosition()));
+
+            mVideoReorder.setOnClickListener(v ->
+                    mVideoReorderClickListener.onReorderClickListener());
+
+            mVideoShare.setOnClickListener(v ->
+                    mVideoShareClickListener.onShareClickListener(getAdapterPosition()));
+
+            mVideoRemove.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mVideoRemoveClickListener.onVideoRemoveClickListener(getAdapterPosition());
+                }
+            });
         }
     }
 
@@ -271,8 +302,7 @@ public class MergedVideosAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     public void addToList(int index, MergeVideoModel mergeVideoModel) {
         mVideosList.add(index, mergeVideoModel);
-        notifyItemChanged(index);
-        notifyItemChanged(index + 1);
+        notifyDataSetChanged();
     }
 
     public void removeFromList(int index, boolean notifyItemChanged) {
@@ -287,5 +317,10 @@ public class MergedVideosAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     public void clearVideosList(){
         mVideosList.clear();
+    }
+
+    public void swapVideosList(List<MergeVideoModel> videosList){
+        mVideosList = videosList;
+        notifyDataSetChanged();
     }
 }

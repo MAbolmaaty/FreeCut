@@ -38,6 +38,7 @@ import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatSeekBar;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -134,6 +135,7 @@ public class MergeFragment extends Fragment {
     private File mergedFile;
     private Toast mToast;
     int mergedVideoFrames = 0;
+    private long mFFmpegMergeProcessId;
 
     private Runnable mUpdateVideoTimeRunnable = new Runnable() {
         @Override
@@ -509,33 +511,73 @@ public class MergeFragment extends Fragment {
                         }, new MergedVideosAdapter.VideoShareClickListener() {
                     @Override
                     public void onShareClickListener(int videoClicked) {
-
+                        shareVideo(mListVideos.get(videoClicked).getVideoFile()
+                                .getAbsolutePath());
                     }
                 }, new MergedVideosAdapter.VideoRemoveClickListener() {
                     @Override
                     public void onVideoRemoveClickListener(int videoClicked) {
-
+                        mListVideos.remove(videoClicked);
+                        if (mListVideos.size() == 1){
+                            mMergedVideosAdapter.clearVideosList();
+                            mMainViewPagerSwipingViewModel.setMainViewPagerSwiping(true);
+                            mLastClickedVideo = -1;
+                            FFmpeg.cancel(mFFmpegMergeProcessId);
+                            showPickupVideos(true);
+                            showVideoView(false);
+                            return;
+                        }
+                        mMergedVideosAdapter.swapVideosList(mListVideos);
+                        for (MergeVideoModel video : mListVideos) {
+                            if (video.getVideoMode() == MergeVideoModel.Mode.PLAY) {
+                                mLastClickedVideo = mListVideos.indexOf(video);
+                            }
+                        }
                     }
                 },
                         new MergedVideosAdapter.ButtonMergeClickListener() {
                             @Override
                             public void onButtonMergeClickListener() {
-                                mergeVideos();
+                                if (mListVideos.get(VIDEOS_LIST_FIRST_POSITION).getType() ==
+                                MERGE_PROCESS){
+                                    if (mToast != null)
+                                        mToast.cancel();
+
+                                    mToast = Toast.makeText(getActivity(),
+                                            R.string.merge_process_in_progress, Toast.LENGTH_SHORT);
+
+                                    mToast.show();
+                                } else {
+                                    mergeVideos();
+                                }
                             }
                         }, new MergedVideosAdapter.ButtonGalleryClickListener() {
                     @Override
                     public void onButtonGalleryClickListener() {
-                        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-                        intent.addCategory(Intent.CATEGORY_OPENABLE);
-                        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-                        intent.setType("video/mp4");
-                        startActivityForResult(intent, OPEN_MEDIA_PICKER);
+                        if (mListVideos.get(VIDEOS_LIST_FIRST_POSITION).getType() ==
+                                MERGE_PROCESS){
+                            if (mToast != null)
+                                mToast.cancel();
+
+                            mToast = Toast.makeText(getActivity(),
+                                    R.string.merge_process_in_progress, Toast.LENGTH_SHORT);
+
+                            mToast.show();
+                        } else {
+                            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                            intent.addCategory(Intent.CATEGORY_OPENABLE);
+                            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                            intent.setType("video/mp4");
+                            startActivityForResult(intent, OPEN_MEDIA_PICKER);
+                        }
                     }
                 }, new MergedVideosAdapter.ButtonDeleteAllClickListener() {
                     @Override
                     public void onButtonDeleteAllClickListener() {
                         mMergedVideosAdapter.clearVideosList();
                         mMainViewPagerSwipingViewModel.setMainViewPagerSwiping(true);
+                        mLastClickedVideo = -1;
+                        FFmpeg.cancel(mFFmpegMergeProcessId);
                         showPickupVideos(true);
                         showVideoView(false);
                     }
@@ -791,12 +833,12 @@ public class MergeFragment extends Fragment {
         } while (mergedFile.isFile());
 
 
-        ArrayList<String> listMerge = new ArrayList<>();
+        ArrayList<String> listMergeCommands = new ArrayList<>();
         String filter = "";
         for (int i = 0; i < mListVideos.size() - 1; i++) {
             filter += String.format(Locale.ENGLISH, "[%d:v] [%d:a] ", i, i);
-            listMerge.add("-i");
-            listMerge.add(mListVideos.get(i).getVideoFile().getAbsolutePath());
+            listMergeCommands.add("-i");
+            listMergeCommands.add(mListVideos.get(i).getVideoFile().getAbsolutePath());
             MediaInformation info = FFprobe.getMediaInformation(
                     mListVideos.get(i).getVideoFile().getAbsolutePath());
             try {
@@ -814,22 +856,28 @@ public class MergeFragment extends Fragment {
 
         filter += String.format(Locale.ENGLISH, "concat=n=%d:v=1:a=1 [v] [a]",
                 mListVideos.size() - 1);
-        listMerge.add("-filter_complex");
-        listMerge.add(filter);
-        listMerge.add("-map");
-        listMerge.add("[v]");
-        listMerge.add("-map");
-        listMerge.add("[a]");
-        listMerge.add(mergedFile.getAbsolutePath());
+        listMergeCommands.add("-filter_complex");
+        listMergeCommands.add(filter);
+        listMergeCommands.add("-map");
+        listMergeCommands.add("[v]");
+        listMergeCommands.add("-map");
+        listMergeCommands.add("[a]");
+        listMergeCommands.add(mergedFile.getAbsolutePath());
 
-        String[] trans = listMerge.toArray(new String[listMerge.size()]);
+        String[] mergeCommand = listMergeCommands.toArray(new String[listMergeCommands.size()]);
 
         mMergedVideosAdapter.addToList(VIDEOS_LIST_FIRST_POSITION,
                 new MergeVideoModel(mergedFile, mergedFile.getName(),
                         "", MergeVideoModel.Mode.PAUSE,
                         MERGE_PROCESS));
 
-        long executionId = FFmpeg.executeAsync(trans, new ExecuteCallback() {
+        for (MergeVideoModel video : mListVideos) {
+            if (video.getVideoMode() == MergeVideoModel.Mode.PLAY) {
+                mLastClickedVideo = mListVideos.indexOf(video);
+            }
+        }
+
+        mFFmpegMergeProcessId = FFmpeg.executeAsync(mergeCommand, new ExecuteCallback() {
             @Override
             public void apply(long executionId, int returnCode) {
                 if (returnCode == RETURN_CODE_SUCCESS) {
@@ -1082,5 +1130,16 @@ public class MergeFragment extends Fragment {
         } else {
             return false;
         }
+    }
+
+    private void shareVideo(String videoPath) {
+        Uri uri = FileProvider.getUriForFile(getActivity(),
+                getActivity().getApplicationContext()
+                        .getPackageName() + ".provider", new File(videoPath));
+
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType("video/*");
+        shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+        getActivity().startActivity(Intent.createChooser(shareIntent, ""));
     }
 }

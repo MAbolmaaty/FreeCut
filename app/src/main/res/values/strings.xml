@@ -81,4 +81,5 @@ cut video in two ways:
     <string name="select_multiple_videos">You have to select more than one video!</string>
     <string name="hold_to_reorder">Hold to reorder videos</string>
     <string name="merging">merging&#8230;</string>
+    <string name="merge_process_in_progress">A merge process already in progress</string>
 </resources>
