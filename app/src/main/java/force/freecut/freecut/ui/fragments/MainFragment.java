@@ -86,8 +86,8 @@ public class MainFragment extends Fragment {
                 getLifecycle());
         mViewPager.setOrientation(ViewPager2.ORIENTATION_HORIZONTAL);
         mViewPager.setAdapter(mainPagerAdapter);
-        mViewPager.setCurrentItem(3, false);
-        mViewPager.setOffscreenPageLimit(4);
+        mViewPager.setCurrentItem(2, false);
+        mViewPager.setOffscreenPageLimit(3);
         setBottomNavigationItemSelected();
         setViewPagerChangeListener();
         mViewPager.setPageTransformer(new DepthPageTransformer());
@@ -97,7 +97,7 @@ public class MainFragment extends Fragment {
             @Override
             public void run() {
                 mBottomNavigationView.getMenu().findItem(R.id.navigation_trim).setChecked(true);
-                mViewPager.setCurrentItem(3, false);
+                mViewPager.setCurrentItem(2, false);
                 setTrimFragmentToolBar();
             }
         }, 0);
@@ -115,21 +115,21 @@ public class MainFragment extends Fragment {
                     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                         switch (menuItem.getItemId()) {
                             case R.id.navigation_trim:
-                                mViewPager.setCurrentItem(3);
+                                mViewPager.setCurrentItem(2);
                                 setTrimFragmentToolBar();
                                 return true;
                             case R.id.navigation_merge:
-                                mViewPager.setCurrentItem(2);
+                                mViewPager.setCurrentItem(1);
                                 setMergeFragmentToolBar();
                                 return true;
                             case R.id.navigation_about:
-                                mViewPager.setCurrentItem(1);
+                                mViewPager.setCurrentItem(0);
                                 setAboutFragmentToolBar();
                                 return true;
-                            case R.id.navigation_my_list:
-                                mViewPager.setCurrentItem(0);
-                                setMyListFragmentToolBar();
-                                return true;
+//                            case R.id.navigation_my_list:
+//                                mViewPager.setCurrentItem(0);
+//                                setMyListFragmentToolBar();
+//                                return true;
                         }
                         return false;
                     }
@@ -142,19 +142,19 @@ public class MainFragment extends Fragment {
             public void onPageSelected(int position) {
                 super.onPageSelected(position);
                 switch (position){
+//                    case 0:
+//                        mBottomNavigationView.setSelectedItemId(R.id.navigation_my_list);
+//                        setMyListFragmentToolBar();
+//                        break;
                     case 0:
-                        mBottomNavigationView.setSelectedItemId(R.id.navigation_my_list);
-                        setMyListFragmentToolBar();
-                        break;
-                    case 1:
                         mBottomNavigationView.setSelectedItemId(R.id.navigation_about);
                         setAboutFragmentToolBar();
                         break;
-                    case 2:
+                    case 1:
                         mBottomNavigationView.setSelectedItemId(R.id.navigation_merge);
                         setMergeFragmentToolBar();
                         break;
-                    case 3:
+                    case 2:
                         mBottomNavigationView.setSelectedItemId(R.id.navigation_trim);
                         setTrimFragmentToolBar();
                         break;

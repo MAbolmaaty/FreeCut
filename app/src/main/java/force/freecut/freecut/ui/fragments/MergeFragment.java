@@ -517,20 +517,40 @@ public class MergeFragment extends Fragment {
                 }, new MergedVideosAdapter.VideoRemoveClickListener() {
                     @Override
                     public void onVideoRemoveClickListener(int videoClicked) {
-                        mListVideos.remove(videoClicked);
-                        if (mListVideos.size() == 1){
-                            mMergedVideosAdapter.clearVideosList();
-                            mMainViewPagerSwipingViewModel.setMainViewPagerSwiping(true);
-                            mLastClickedVideo = -1;
-                            FFmpeg.cancel(mFFmpegMergeProcessId);
-                            showPickupVideos(true);
-                            showVideoView(false);
-                            return;
-                        }
-                        mMergedVideosAdapter.swapVideosList(mListVideos);
-                        for (MergeVideoModel video : mListVideos) {
-                            if (video.getVideoMode() == MergeVideoModel.Mode.PLAY) {
-                                mLastClickedVideo = mListVideos.indexOf(video);
+                        if (mListVideos.get(videoClicked).getVideoMode() ==
+                                MergeVideoModel.Mode.PLAY){
+                            mListVideos.remove(videoClicked);
+                            if (mListVideos.size() == 1){
+                                mMergedVideosAdapter.clearVideosList();
+                                mMainViewPagerSwipingViewModel.setMainViewPagerSwiping(true);
+                                mLastClickedVideo = -1;
+                                FFmpeg.cancel(mFFmpegMergeProcessId);
+                                showPickupVideos(true);
+                                showVideoView(false);
+                                return;
+                            }
+                            mMergedVideosAdapter.swapVideosList(mListVideos);
+                            mLastClickedVideo = VIDEOS_LIST_FIRST_POSITION;
+                            mVideoView.setVideoPath(mListVideos.get(VIDEOS_LIST_FIRST_POSITION).
+                                    getVideoFile().getAbsolutePath());
+                            mVideoName.setText(mListVideos.get(VIDEOS_LIST_FIRST_POSITION).
+                                    getVideoName());
+                        } else {
+                            mListVideos.remove(videoClicked);
+                            if (mListVideos.size() == 1){
+                                mMergedVideosAdapter.clearVideosList();
+                                mMainViewPagerSwipingViewModel.setMainViewPagerSwiping(true);
+                                mLastClickedVideo = -1;
+                                FFmpeg.cancel(mFFmpegMergeProcessId);
+                                showPickupVideos(true);
+                                showVideoView(false);
+                                return;
+                            }
+                            mMergedVideosAdapter.swapVideosList(mListVideos);
+                            for (MergeVideoModel video : mListVideos) {
+                                if (video.getVideoMode() == MergeVideoModel.Mode.PLAY) {
+                                    mLastClickedVideo = mListVideos.indexOf(video);
+                                }
                             }
                         }
                     }
@@ -548,6 +568,7 @@ public class MergeFragment extends Fragment {
 
                                     mToast.show();
                                 } else {
+                                    //changeVideoResolution();
                                     mergeVideos();
                                 }
                             }
@@ -817,6 +838,40 @@ public class MergeFragment extends Fragment {
         });
     }
 
+    private void changeVideoResolution(){
+        File storageFile = new File(Environment.getExternalStorageDirectory(),
+                "FreeCut/merge/");
+        storageFile.mkdirs();
+
+        String mergedFileName;
+
+        int j = 1;
+
+        do {
+            mergedFileName = String.format(Locale.ENGLISH, "merge-%02d", j);
+            mergedFile = new File(storageFile, mergedFileName + ".mp4");
+            j++;
+        } while (mergedFile.isFile());
+
+        final String[] changeResolution = {
+                "-i", mListVideos.get(0).getVideoFile().getAbsolutePath(),
+                "-filter:v",
+                "scale=640:360",
+                "-c:a", "copy",
+                mergedFile.getAbsolutePath()};
+
+        FFmpeg.executeAsync(changeResolution, new ExecuteCallback() {
+            @Override
+            public void apply(long executionId, int returnCode) {
+                if (returnCode == RETURN_CODE_SUCCESS) {
+                    Log.d(TAG, "Change Resolution Success");
+                } else {
+                    Log.d(TAG, "Change Resolution Failed");
+                }
+            }
+        });
+    }
+
     private void mergeVideos() {
         File storageFile = new File(Environment.getExternalStorageDirectory(),
                 "FreeCut/merge/");
@@ -851,8 +906,6 @@ public class MergeFragment extends Fragment {
             }
 
         }
-
-        Log.d(TAG, "mergedVideoFrames : " + mergedVideoFrames);
 
         filter += String.format(Locale.ENGLISH, "concat=n=%d:v=1:a=1 [v] [a]",
                 mListVideos.size() - 1);

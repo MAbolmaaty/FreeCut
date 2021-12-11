@@ -22,13 +22,13 @@ public class MainPagerAdapter extends FragmentStateAdapter {
     @Override
     public Fragment createFragment(int position) {
         switch (position) {
+//            case 0:
+//                return MyListFragment.newInstance(null, null);
             case 0:
-                return MyListFragment.newInstance(null, null);
-            case 1:
                 return AboutFragment.newInstance(null, null);
-            case 2:
+            case 1:
                 return MergeFragment.newInstance(null, null);
-            case 3:
+            case 2:
                 return TrimFragment.newInstance(null, null);
         }
         return null;
@@ -36,6 +36,6 @@ public class MainPagerAdapter extends FragmentStateAdapter {
 
     @Override
     public int getItemCount() {
-        return 4;
+        return 3;
     }
 }
